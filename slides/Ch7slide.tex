@@ -1,0 +1,949 @@
+\documentclass{beamer}
+
+\mode<presentation> {
+	\usetheme{Pittsburgh}
+}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\graphicspath{{./graphics/}}
+\usepackage{booktabs}
+\usepackage{picture}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{animate}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{adjustbox}
+\setbeamercovered{transparent}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\hypersetup{
+	colorlinks,
+	linkcolor={red!50!black},
+	citecolor={blue!50!black},
+	urlcolor={blue!80!black}
+}
+\def\calA{{\cal A}}
+\def\calF{{\cal F}}
+\def\calP{{\cal P}}
+\def\calE{{\cal E}}
+\def\var{{\rm var}}
+
+\def\bfA{{\bf A}}
+\def\bfB{{\bf B}}
+\def\bfC{{\bf C}}
+\def\bfD{{\bf D}}
+\def\bfE{{\bf E}}
+\def\bfF{{\bf F}}
+\def\bfG{{\bf G}}
+\def\bfU{{\bf U}}
+\def\bfV{{\bf V}}
+\def\bfW{{\bf W}}
+\def\bfX{{\bf X}}
+\def\bfY{{\bf Y}}
+\def\bfZ{{\bf Z}}
+
+\def\bfa{{\bf a}}
+\def\bfb{{\bf b}}
+\def\bfc{{\bf c}}
+\def\bfd{{\bf d}}
+\def\bfe{{\bf e}}
+\def\bff{{\bf f}}
+\def\bfg{{\bf g}}
+\def\bfu{{\bf u}}
+\def\bfv{{\bf v}}
+\def\bfw{{\bf w}}
+\def\bfx{{\bf x}}
+\def\bfy{{\bf y}}
+\def\bfz{{\bf z}}
+\def \bfbeta {\boldsymbol{\beta}}
+\def \bfalpha {\boldsymbol{\alpha}}
+
+\setbeamertemplate{footline}{\insertframenumber}
+
+\usetheme{Montpellier}  
+\useoutertheme{infolines}
+\usefonttheme{serif}
+
+
+\title[Chapter 7]{Moving Beyond Linearity} 
+
+\author{Yuan YAO} 
+\institute[HKUST]
+{
+	Chapter 7 \\ 
+	\medskip
+	\textit{ } 
+}
+%\date{\today}
+
+\begin{document}
+	 	
+	 	\begin{frame}
+	 		\titlepage % Print the title page as the first slide
+	 	\end{frame}
+	
+ \begin{frame}
+ 	\frametitle{ }
+ 	\tableofcontents
+ \end{frame}
+ %###################################################################
+ %###################################################################
+           
+      
+      \begin{frame}
+      	\frametitle{About this chapter}
+      	\begin{itemize}
+      		\item  Linear model is the most fundamental statistical model.
+      		\item  Its limitation is the mean response must be a linear function of inputs/covariates.
+      		\item  This relation in practice often does not hold.
+      		\item  Nonlinear models are needed  
+        	\end{itemize}
+        \end{frame}
+        
+       
+       \begin{frame}
+       	\frametitle{The nonlinear models. }
+       	\begin{itemize}
+       		\item Polynomial regression.
+       		\item Step functions 
+       		\item Regression splines
+       		\item Smoothing splines
+       		\item Local regression
+       		\item Generalized additive models.
+       		\item Trees, SVM, neural nets, ...	
+       	\end{itemize}
+       \end{frame} 
+       
+        
+       
+\section{Polynomial regression}
+        
+         \begin{frame}
+         	\frametitle{Some general remark}
+         	\begin{itemize}
+         	
+         		\item  Rather than directly using inputs, we use polynomials, or step functions, of the inputs 
+         		as the ``derived inputs", in linear regression.
+         		\item  The approach can be viewed  as derived inputs approach.
+         		\item More generally, the basis function approach. 
+         	  \item Starting from now, we only consider one input, for simplicty of illustration.
+         	\end{itemize}
+         \end{frame} 
+        
+          \begin{frame}
+          	\frametitle{}
+          	\begin{itemize}
+          			\item  Data: $(y_i, x_i), i=1,...,n$.
+          		\item  The genearl model
+          		$$ y_i = f(x_i) + \epsilon_i$$
+          		\item  We can safely assume $f(\cdot)$ to be continuous.
+          		\item  Cannot search for arbitrary function $f(\cdot)$.
+          		\item Limit the search space.
+          		\item Continuous functions? (still infinite dimension but can be approxiamted.
+          		\item by Polynomial functions, or step functions, or certain basis functions,...
+          			\end{itemize}
+          		\end{frame} 
+          		
+          		\begin{frame}
+          			\frametitle{}
+          			\begin{itemize}
+          		 
+          		\item  Linear model (retricting $f(\cdot)$ to be linear) :
+          		$$ y_i = \beta_0 + \beta_1 x_i + \epsilon_i$$
+          		\item  Polynomial regression model (restricting $f(\cdot)$ to be polynomial of degree $p$):
+          			$$ y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + ...+ \beta_p x_i^p + \epsilon_i$$
+          		\item This is a multiple linear regression model with $p$ inputs:
+          		$(x_i, x_i^2, ..., x_i^p)$.
+          		\item All linear regression results apply.
+          		\item Problem: how to determine the appropriate degree $p$.
+          	   \item Drawback: difficult to fit locally highly varying functions.
+          	\end{itemize}
+          \end{frame} 
+       
+         \begin{frame}
+         	\frametitle{The generalized  linear model}
+         	\begin{itemize}
+         		
+         		\item  Generalized linear model:
+         		$$ E(Y|X) = g(X^T\beta)$$
+         		where $g$ is a given {\it link function}
+         		\item  Examples:
+         		\begin{enumerate}
+         			\item linear regression: $g(x)= x$
+         			\item logistic regression: $g(x)= 1/(1+ e^{-x})$, the sigmoid function. $Y=1$ or $0$.
+         			\item Probit model: $g(x)= \Phi(x)$, the cdf of $N(0, 1)$. $Y=1$ or $0$.
+         			\item Poisson model: $g(x) = e^x$. $Y$ is count data.
+         			\item ...
+         		\end{enumerate}
+         	 
+         		\item They can be extended to generalized non-linear model in the same fashion.
+         		
+         	\end{itemize}
+         \end{frame} 
+         
+           \begin{frame}
+           	\frametitle{ logistic model with polynomial regression}
+           	\begin{itemize}
+           		
+           		\item  For binary response $y_i$, coded the binary events as $1$ and $0$. 
+           		$$ p(y_i =1|x_i) =  \frac{  \exp(\beta_0 + \beta_1 x_i + ...+ \beta_p x_i^p) }{ 1 + \exp(\beta_0 + \beta_1 x_i + ...+ \beta_p x_i^p)} $$
+           		 
+           		\item   This is essentially just logistic model with $p$ inputs.
+           	 
+           		\item All results on logistic model apply here.	
+           	\end{itemize}
+           \end{frame} 
+        
+         
+           
+           \begin{frame}
+           	\frametitle{ }
+           	\begin{figure}
+           		\centering
+           		 
+           			\centering
+           			\includegraphics[width=.8\linewidth]{ISLRFigures/7_1.pdf}
+           			%\caption{A subfigure}
+           		\caption{\scriptsize 7.1. The Wage data. Left: The solid blue curve is a degree-4 polynomial
+           			of wage (in thousands of dollars) as a function of age, fit by least squares. The
+           			dotted curves indicate an estimated 95\% confidence interval. Right: We model the
+           			binary event wage$>250$ using logistic regression, again with a degree-4 polynomial.
+           			The fitted posterior probability of wage exceeding \$250,000 is shown in blue, along
+           			with an estimated 95\% confidence interval.
+           		}
+           	\end{figure}
+           \end{frame}
+           
+\section{Step functions}
+
+  \begin{frame}
+    \frametitle{ Step functions (piecewise constant functions)}
+    \begin{itemize}
+       \item Step functions are piece-wise constants.
+       \item Continuous functions can be well approximated by step functions.
+       A function can be approximated by step functions.
+        \item  Create the cutpoints 
+        $$-\infty = c_0 < c_1< ...< c_p < c_{p+1}=\infty$$  
+       \item The entire real line is cut into $p+1$ intervals.
+       \item Set $c_k(x) = I(c_k \leq x < c_{k+1})$, for $k=0, ..., p$.  
+       \item Use linear combination of $c_k(x)$ to approximate functions.	
+              		
+    \end{itemize}
+  \end{frame} 
+  
+  \begin{frame}
+  	\frametitle{ Regression model based on step functions}
+  	\begin{itemize}
+  		\item 
+  		$$ y_i = \beta_0 + \beta_1 c_1(x_i) + ... + \beta_p c_p(x_i) + \epsilon_i.$$
+  		
+  		\item Again a multiple linear regression model. 
+  		\item Same extension works for generalized linear model.
+  		\item Difficulty in creating the number and locations of cutpoints 
+  		\item Drawback: non-smooth, not even continuous.
+  		
+  	\end{itemize}
+  \end{frame} 
+  
+            
+             \begin{frame}
+             	\frametitle{ }
+             	\begin{figure}
+             		\centering
+             		
+             		\centering
+             		\includegraphics[width=.7\linewidth]{ISLRFigures/7_2.pdf}
+             		%\caption{A subfigure}
+             		\caption{7.2. The Wage data. Left: The solid curve displays the fitted value from
+             			a least squares regression of wage (in thousands of dollars) using step functions
+             			of age. The dotted curves indicate an estimated 95\% confidence interval. Right:
+             			We model the binary event wage$>250$ using logistic regression, again using step
+             			functions of age. The fitted posterior probability of wage exceeding \$250,000 is
+             			shown, along with an estimated 95\% confidence interval.
+             		}
+             	\end{figure}
+             \end{frame}
+             
+              
+              \begin{frame}
+              	\frametitle{ Basis functions}
+              	\begin{itemize}
+              		\item In general, let $b_1(x),..., b_p(x)$ be a set of  {\it  basis functions.}
+              		\item We limit the search space of $f(\cdot)$ to the space that is linearly spanned by
+              		these basis functions:
+              		$$ \{ g(x): g(x)= a_0 +  \sum_{j=1}^p a_i b_i(x) \}$$
+              		\item The model is 
+              		$$ y_i = \beta_0 + \beta_1 b_1(x_i) + ... + \beta_p b_p(x_i) + \epsilon_i.$$
+              		
+              		\item Again a multiple linear regression model. 
+              		\item The polynomial functions or step functions are special cases of basis functions approach.
+              		\item Other choices: wavelet functions or Fourier series or regression splines.
+              	\end{itemize}
+              \end{frame} 
+\section{Regression splines}
+
+  \begin{frame}
+  	\frametitle{ Piecewise polynomial functions}
+  	\begin{itemize}
+  		\item A hybrid of step function approach and polynomal function approach.
+  		\item Cut the entire real line (or the range of values of covariates) into sub-intervals same as
+  		step function approach.
+  		\item These cutpoints are called knots. 
+  		\item Use a polynomial function   on each sub-interval.
+  		\item Still a multiple linear regression model.
+  		
+  		\item Step function approach is a special case of piecewise polynomial of degree $0$.
+  		
+  		\item Advantage: capture local variation; the degree of polynomial is generally low.
+  		\item disadvantage: dis-continuity at knots.
+  	 
+  	\end{itemize}
+  \end{frame} 
+  
+               \begin{frame}
+               	\frametitle{ }
+               	\begin{figure}
+               		\centering
+               		
+               		\centering
+               		\includegraphics[width=.8\linewidth]{ISLRFigures/7_3.pdf}
+               		%\caption{A subfigure}
+               		
+               	\end{figure}
+               \end{frame}
+               
+                \begin{frame}
+                	
+               Figure 7.3. (Figure of previous page) Various piecewise polynomials are fit to a subset of the Wage
+               	data, with a knot at age$=50$. Top Left: The cubic polynomials are unconstrained.
+               	Top Right: The cubic polynomials are constrained to be continuous at age$=50$.
+               	Bottom Left: The cubic polynomials are constrained to be continuous, and to
+               	have continuous first and second derivatives. Bottom Right: A linear spline is
+               	shown, which is constrained to be continuous
+              
+               \end{frame} 
+               
+               \begin{frame}
+               	\frametitle{Constraining the piecewise polynomial}
+               	\begin{itemize}
+               		\item When fit the least squares, one can add constriants to 
+               		the least squares minimization  
+               		\item The constraints can be such that the piecewise polynomial is forced 
+               		to be continuous at knots.
+               		\item The constraints can be stronger such that the piecewise polynomial is forced 
+               		to be differentiale at knots with continuous first derivatives. 
+               		
+               		\item The constraints can be stronger such that the piecewise polynomial is forced 
+               		to be differentiale at knots with continuous second derivatives.
+               		
+               		 \item ...
+               		
+               	\end{itemize}
+               \end{frame} 
+               
+                 \begin{frame}
+                 	\frametitle{The effect of constraints  }
+                 	\begin{itemize}
+                 		\item Each constraint can be expressed as on linear equation. 
+                 		\item It reduces one degree of freedom.
+                 		\item And reduces the complexity of the model. 
+                 		
+                 	  
+                 	\end{itemize}
+                 \end{frame} 
+                 
+                  
+                  \begin{frame}
+                  	\frametitle{Spline functions  }
+                  	\begin{itemize}
+                  		\item Spline functions of degree $d$ are piecewise polynomial functions
+                  		of degree $d$ but have continuous derivatives up to order $d-1$ at knots.
+                  		
+                  		\item Cubic spline: piecewise cubic polynomials but are continuous and have continous 1st and
+                  		second derivatives at knots.
+                  		
+                  		\item The degree of freedom of a cubic spline with $K$ knots is:
+                  		$$ 4\times (K+1) - 3K = K+4.$$
+                  		Totally $K+1$ cubic functions, each has 4 free parameters, but
+                  		each of the $K$ knot has 3 constraints on continuity, continuity of 1st and 2nd derivatives. 
+                  		
+                  	\end{itemize}
+                  \end{frame} 
+                  
+                   \begin{frame}
+                   \frametitle{Spline basis representation   }
+                   \begin{itemize}
+                   \item  Suppose the $K$ knots $\xi_1< ... < \xi_K$ are determined.
+                   \item We may find $1, b_1(x), ..., b_{K+3}$ to form the space of cubic splines with knots
+                   at $\xi_1, ..., \xi_K$. 
+                   \item Then the spline regression model is 
+                   $$y_i = \beta_0 + \eta_1 b_1(x_i) + ... + \beta_K b_{K+3}(x_i) + \epsilon_i$$
+                   \item How to find these basis functions $b_k(x)$?
+                   \item Each must be a polynomial of order 3 and must be continuous, continous at
+                   1st and 2nd derivates at all knots.
+                  
+                   \end{itemize}
+                   \end{frame} 
+                  
+              
+                   \begin{frame}
+                   	\frametitle{Spline basis representation   }
+                   	\begin{itemize}
+                   		\item $x $ , $x^2$ and $x^3$ satisfy the requirement.
+                   		\item Let 
+                   		$$ h(x, \xi)= (x-\xi)_+^3= \begin{cases} 
+                   		(x-\xi)^3 & \text{if  } x > \xi   \\
+                   		0   & \text{otherwise} 
+                   		\end{cases}$$
+                   		
+                   		\item $h(x, \xi_k)$ also satisfy the requirement.
+                   		\item The basis functions of cubic splines can be
+                   		$$1, x, x^2, x^3, h(x, \xi_1), ..., h(x, \xi_K)$$
+                   		\item Totally   $K+4$ dimension with $K+3$ features.
+                   		
+                   	\end{itemize}
+                   \end{frame} 
+                   
+                   
+                   \begin{frame}
+                   	\frametitle{Natural spline  }
+                   	\begin{itemize}
+                   		\item The behavior of the cubic spline at boundary can be quite unstable.
+                   		\item Natural spline is cubic spline but require the function to be linear
+                   		on $(-\infty, \xi_1]$ and $[\xi_K, \infty)$. 
+                   		\item With further restriction near boundary, natural spline regression
+                   		generally behaves better than cubic spline regression.
+                   		
+                   		
+                   	\end{itemize}
+                   \end{frame} 
+                  
+               
+                 \begin{frame}
+                 	\frametitle{ }
+                 	\begin{figure}
+                 		\centering
+                 		
+                 		\centering
+                 		\includegraphics[width=.7\linewidth]{ISLRFigures/7_4.pdf}
+                 		%\caption{A subfigure}
+                 		\caption{7.4. A cubic spline and a natural cubic spline, with three knots, fit to
+                 			a subset of the Wage data. Natural spline has narrower confidence intervals near boundary
+                 		}
+                 	\end{figure}
+                 \end{frame}
+                 
+                  
+                  \begin{frame}
+                  	\frametitle{Choice of number and locations of knots  }
+                  	\begin{itemize}
+                  		\item The behavior of the cubic spline at boundary can be quite unstable.
+                  		\item Natural spline is cubic spline but require the function to be linear
+                  		on $(-\infty, \xi_1]$ and $[\xi_K, \infty)$. 
+                  		\item With further restriction near boundary, natural spline regression
+                  		generally behaves better than cubic spline regression.
+                  		\item Degree of freedom of natural spline with $K$ knots is $K+4-4=K$, but
+                  		excluding the constant (absorbed in intercept), we usually call it $K-1$ degree of freedom.
+                  		\item Example: natural cubic splines has $4=K-1$ degree of fredom corresponds to 
+                  		$K=5$ knots and $K-2=3$ interior knots.
+                  		
+                  	\end{itemize}
+                  \end{frame} 
+                  
+                   
+                   \begin{frame}
+                   	\frametitle{ }
+                   	\begin{figure}
+                   		\centering
+                   		
+                   		\centering
+                   		\includegraphics[width=.8\linewidth]{ISLRFigures/7_5.pdf}
+                   		%\caption{A subfigure}
+                   		\caption{7.5. A natural cubic spline function with four degrees of freedom is
+                   			fit to the Wage data. Left: A spline is fit to wage (in thousands of dollars) as
+                   			a function of age. Right: Logistic regression is used to model the binary event
+                   			wage$>250$ as a function of age. The fitted posterior probability of wage exceeding
+                   			\$250,000 is shown.
+                   		}
+                   	\end{figure}
+                   \end{frame}
+                  
+                    
+                    \begin{frame}
+                    	\frametitle{Choice of number and locations of knots  }
+                    	\begin{itemize}
+                    		\item Usually choose equally spaced knots within the range of values of inputs.
+                    		\item If we know a function is highly varying somewhere, place more knots there, so that
+                    		the spline function is also highly varying in the area.
+                    		\item Try several choices of the number of knots, and use validation/cross-validation approach to determine the best.
+                    		\item Many statistics software provide automatic choice of number and location of knots.
+                    		
+                    	\end{itemize}
+                    \end{frame} 
+                 
+                   
+                   
+                     \begin{frame}
+                     	\frametitle{Example: Wage data}
+                     	\begin{figure}
+                     		\centering
+                     		
+                     		\centering
+                     		\includegraphics[width=.8\linewidth]{ISLRFigures/7_6.pdf}
+                     		%\caption{A subfigure}
+                     		\caption{Ten-fold cross-validated mean squared errors for selecting the
+                     			degrees of freedom when fitting splines to the Wage data. The response is wage
+                     			and the predictor age. Left: A natural cubic spline. Right: A cubic spline.
+                     			It seems that three degrees of freedom for the natural
+                     			spline and four degrees of freedom for the cubic spline are quite adequate
+                     		}
+                     	\end{figure}
+                     \end{frame}
+                     
+                     
+                     
+                     \begin{frame}
+                     	\frametitle{Comparison with Polynomial Regression}
+                     	\begin{itemize}
+                     		\item Regression splines often give superior results to polynomial regression.
+                     		\item Splines introduce
+                     		flexibility by increasing the number of knots but keeping the degree
+                     		fixed.
+                     		\item Polynomial increase model flexibity by increased order of power function, which 
+                     		can be dangerously inapproximate for moderately large or small $X$ in absolute value.
+                     		\item Polynomial function has poor boundary behavior.
+                     		\item Natural spline is much better. 
+                     		
+                     	\end{itemize}
+                     \end{frame} 
+                     
+                       \begin{frame}
+                       	\frametitle{}
+                       	\begin{figure}
+                       		\centering
+                       		
+                       		\centering
+                       		\includegraphics[width=.6\linewidth]{ISLRFigures/7_7.pdf}
+                       		%\caption{A subfigure}
+                       		\caption{\scriptsize 7.7. On the Wage data set, a natural cubic spline with 15 degrees
+                       			of freedom is compared to a degree-15 polynomial. Polynomials can show wild
+                       			behavior, especially near the tails.
+                       		}
+                       	\end{figure}
+                       \end{frame}
+\section{Smoothing spline}
+
+\begin{frame}
+	\frametitle{Smoothing spline}
+	\begin{itemize}
+		\item With to minimize
+		$$ \sum_{i=1}^n (y_i - f(x_i))^2$$ 
+		subject to certain smoothness constraints on $f(\cdot)$.
+		\item  The most common constraint is $\ddot{f}$, the second derivative do not vary much. 
+	
+		\item  A natural choice is: minimizng 
+		$$ \sum_{i=1}^n (y_i - f(x_i))^2\quad \hbox{subject to} \int \ddot f(x)^2 dx < s$$ 
+	 
+	
+	\end{itemize}
+\end{frame} 
+
+
+\begin{frame}
+	\frametitle{Smoothing spline}
+	\begin{itemize}
+			\item This is equivalent to 
+			$$ \sum_{i=1}^n (y_i - f(x_i))^2 +\lambda\int \ddot f(x)^2 dx \eqno(7.11)$$ 
+			where $\lambda$ is the tuning parameter.
+			\item The first term is loss; the second term is roughness penalty.
+			\item The function $f$ minimizing the above is called {\it smoothing spline.}
+			
+		\item The function that minimize that loss+roughness penalty is 
+		a natural cubic spline with knots $x_1, ..., x_n$. 
+	 
+	\end{itemize}
+\end{frame} 
+
+
+\begin{frame}
+	\frametitle{The tuning parameter}
+	\begin{itemize}
+		\item  $\lambda$ controls the amount of roughness penalty
+		\item $\lambda= 0$: no penalty,   degree of freedom $= n$; overfit.
+		 $$\hat f(x_i) = y_i$$ 
+		\item $\lambda=\infty$: infinity penalty; $f$ must be linear, degree of freedom $=2$.
+		$$\hat f(x) = \hat \beta_0 + \hat \beta_1 x_i, \quad \hbox{the least squares estimate}$$
+		\item What the degree of freedom when $\lambda >0 $ and is finite?
+		\item We call it {\it  effective degree of freedom}, denoted as $df_\lambda$.  
+	 
+		
+	\end{itemize}
+\end{frame} 
+
+
+\begin{frame}
+	\frametitle{Effective degree of freedom}
+	\begin{itemize}
+		\item  The $df_\lambda$   is a measure of the flexibility of the
+		smoothing spline—the higher it is, the more flexible (and the lower-bias but
+		higher-variance) the smoothing spline
+		\item  Minimizing (7.11), let the fitted values be
+		$$\hat {\bf y} = {\bf S}_\lambda {\bf y} \eqno(7.12)$$
+		where $\hat {\bf y}  = (y_1, ... , y_n)^T$ is an $n$-vector, representing the fitted values
+		at $x_1, ..., x_n$; and the sensitivity matrix ${\bf S}_\lambda$ is an $n\times n$ matrix, depending only on covariates.
+		\item (It can be shown that the fitted values are  linear functions of {\bf y}).
+		\item Then, the effective degree of freedom is 
+		$$df_\lambda = trace ({\bf S})$$
+	 
+		
+		
+	\end{itemize}
+\end{frame} 
+
+
+\begin{frame}
+	\frametitle{Choice of $\lambda$}
+	\begin{itemize}
+		\item  By cross validation.
+		\item For leave-one-out cross-validation (LOOCV), it can be  shown
+		$$\hbox{RSS}_{cv}(\lambda)= \sum_{i=1}^n (y_i - \hat f_\lambda^{(-i)}(x_i))^2
+	= \sum_{i=1}^n \Bigl[ \frac{y_i - \hat f_{\lambda}(x_i) }{1- s_{\lambda, ii}}\Bigr]^2 $$
+		where $s_{\lambda, ii}$ is the $i$-th diagonal element of ${\bf S}_\lambda$.
+		\item One fit does it all! 
+		\item Recall that this is the same as linear regression. 
+		In fact, 
+		$${\bf S}_{\infty} =  {\bf H}$$
+		where ${\bf H}= {\bf X}({\bf X}^T {\bf X})^{-1} {\bf X}^T$ is the hat matrix in linear regression. 
+		
+	\end{itemize}
+\end{frame} 
+
+\begin{frame}
+\frametitle{Fast computation of cross-validation I}
+
+\begin{itemize}\small
+  \item The leave-one-out cross-validation statistic is given by $$ CV = \frac{1}{N}\sum^N_{i=1} e^2_{[i]},$$
+  where $e_{[i]}= y_i -\hat{y}_{[i]}$, the observations are given by $y_1,\dots, y_N$, and $\hat{y}_{[i]}$ is the predicted value obtained when the model is estimated with the $i$th case deleted.
+  \item Suppose we have a linear regression model $\mathbf{Y} = \bfX \bfbeta + \mathbf{e}$. The $\hat{\bfbeta} = (\bfX^T \bfX)^{-1}\bfX^T \bfY$ and $\mathbf{H} = \bfX(\bfX^T \bfX)^{-1}\bfX^T$ is the hat matrix. It has this name because it is used to compute $\hat{\bfY}=\bfX \hat{\bfbeta} = \mathbf{H} \bfY$. If the diagonal values of $\mathbf{H}$ are denoted by $h_1,\dots,h_N$, then the leave-one-oout cross-validation statistic can be computed using
+  $$CV=\frac{1}{N}\sum^N_{i=1} [e_i /(1-h_i)]^2,$$
+  where $e_i = y_i - \hat{y}_i$ is predicted value obtained when the model is estimated with all data included.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Fast computation of cross-validation II}
+
+\textbf{Proof}
+\begin{itemize}\small
+  \item Let $\bfX_{[i]}$ and $\bfY_{[i]}$ be similar to $\bfX$ and $\bfY$ but with the 
+$i$th row deleted in each case. Let $\bfx^T_i$ be the $i$th row of $\bfX$ and let $$\hat{\bfbeta}_{[i]} = (\bfX^T_{[i]}\bfX_{[i]})^{-1} \bfX^T_{[i]} \bfY_{[i]}$$
+be the estimate of $\bfbeta$ without the $i$th case. Then $e_{[i]} = y_i - \bfx^T_i \hat{\bfbeta}_{[i]}$.
+\item Now $\bfX^T_{[i]} \bfX_{[i]} = (\bfX^T \bfX -\bfx_i \bfx^T_i)$ and $\bfx^T_i (\bfX^T \bfX)^{-1} \bfx_i = h_i$. So by the Sherman-Morrison-Woodbury formula,
+$$(\bfX^T_{[i]} \bfX_{[i]})^{-1}  = (\bfX^T \bfX)^{-1} + \frac{(\bfX^T \bfX)^{-1} \bfx_i \bfx^T_i (\bfX^T \bfX)^{-1}}{1-h_i}.$$
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Fast computation of cross-validation III}
+
+\textbf{Proof}
+\begin{itemize}\small
+  \item Also note that $\bfX^T_{[i]}\bfY_{[i]} = \bfX^T\bfY - \bfx y_i$. Therefore
+  \begin{align*}
+  \hat{\bfbeta}_{[i]} &= \left[(\bfX^T \bfX)^{-1} + \frac{(\bfX^T \bfX)^{-1} \bfx_i \bfx^T_i (\bfX^T \bfX)^{-1}}{1-h_i}\right](\bfX^T \bfY - \bfx_i y_i)\\
+  &=\hat\bfbeta - \left[\frac{(\bfX^T\bfX)^{-1}\bfx_i}{1-h_i}\right][y_i (1-h_i)-\bfx^T_i \hat\bfbeta + h_i y_i]\\
+  &=\hat\bfbeta - (\bfX^T\bfX)^{-1} \bfx_i e_i /(1-h_i)
+  \end{align*}
+  \item Thus
+  \begin{align*}
+  e_{[i]} &= y_i - \bfx^T_i \hat{\bfbeta}_{[i]}\\
+   &=y_i - \bfx^T_i\left[\hat{\bfbeta} - (\bfX^T\bfX)^{-1} \bfx_i e_i /(1-h_i)\right]\\
+   &=e_i + h_i e_i/(1-h_i) = e_i/(1-h_i)
+  \end{align*}
+\end{itemize}
+
+\end{frame}
+
+
+                         \begin{frame}
+                         	\frametitle{ }
+                         	\begin{figure}
+                         		\centering
+                         		
+                         		\centering
+                         		\includegraphics[width=.7\linewidth]{ISLRFigures/7_8.pdf}
+                         		%\caption{A subfigure}
+                         		\caption{\scriptsize 7.8. Smoothing spline fits to the Wage data. The red curve results
+                         			from specifying 16 effective degrees of freedom. For the blue curve, $\lambda$ was found
+                         			automatically by leave-one-out cross-validation, which resulted in 6.8 effective
+                         			degrees of freedom.
+                         		}
+                         	\end{figure}
+                         \end{frame}
+\section{Local regression}
+
+
+\begin{frame}
+	\frametitle{Local view }
+	\begin{itemize}
+		\item  Rather than considering fitting a function $f$ to the data, we just focus on 
+		a target point, say $x_0$, and try to estimate $f(x_0) = \beta_0 $. 
+		\item  Consider a weight function, often called kernel function, 
+	 $k(t)$ which is nonnegative symmetric and becomes small when $|t|$ is large.
+	 	\end{itemize}
+	 \end{frame} 
+	
+	\begin{frame}
+		\frametitle{Typical choice of kernels }
+		\begin{itemize}
+	  
+	 	\item Uniform kernel:  $k(t) = 1/2 I(|t| \leq 1)$.
+	 	\item Triangle kernel: $k(t) = (1- |t|)I(1t| \leq 1)$.
+	 	\item Gaussian kernel:
+	 	$k(t) = e^{-t^2/2}/\sqrt{2\pi}$
+	 	\item Epanecknikov kernel:
+	 	$k(t) = 3/4 (1- t^2)_+$
+	 \item Logistic kernel: $k(t) = 1/(e^t + e^{-t} +2)$.
+	 \item Sigmoid kernel: $k(t) = 2/(\pi(e^t + e^{-t}))$. 
+		 
+	\end{itemize}
+\end{frame} 
+  
+ 
+ \begin{frame}
+ 	\frametitle{Local view }
+ 	\begin{itemize}
+ 		
+ 	\item use the kernel function to create {\it  weights } on each observation so that 
+ 	those with $x_i$ closer to $x_0$ gets more weights:
+ 	$$K_{i0} = \frac{1}{h} k(\frac{x_i -x_0}{h}) $$ 
+ \item These weights create the ``Localness" surrounding $x_0$. $h$ is the bandwidth that is usually small.
+ \item we can consider minimization
+ $$ \sum_{i=1}^n K_{i0} (y_i - \beta_0 - \beta_1(x_i-x_0))^2$$
+ Then, $\hat \beta_0$ is the estimator of $f(x_0)$. 
+ \item This estimator is local linear estimator, since locally around $x_0$, we used linear function
+ to approximate $f(x)$. 
+ \item One can certainly consider local polynomial estimation, by considering local polynomial approximation.
+ 	 
+ 	\end{itemize}
+ \end{frame} 
+  
+
+\begin{frame}
+	\frametitle{Remark. }
+	\begin{itemize}
+		
+		\item  Local linear estimate is also a linear function of ${\bf y}$, and there has expression of the form of (7.12). 
+		\item The degree of freedom controled by the bandwidth. 
+		\item Small  bandwidth results in small bias but high variance (and high effective degree of freedom).
+		\item Can be difficult to implement with high dimension data, by the curse of dimensionality.
+	\end{itemize}
+\end{frame}
+                         
+                           \begin{frame}
+                           	%\frametitle{Local regression}
+                           	\begin{figure}
+                           		\centering
+                           		
+                           		\centering
+                           		\includegraphics[width=.8\linewidth]{ISLRFigures/7_9.pdf}
+                           		%\caption{A subfigure}
+                           		\caption{\scriptsize 7.9. Local regression illustrated on some simulated data, where the
+                           			blue curve represents $f(x)$ from which the data were generated, and the light
+                           			orange curve corresponds to the local regression estimate $\hat f(x)$. The orange colored
+                           			points are local to the target point $x_0$, represented by the orange vertical line.
+                           			The yellow bell-shape superimposed on the plot indicates weights assigned to each
+                           			point, decreasing to zero with distance from the target point. The fit$\hat f(x_0)$ at 
+                           			$x_0$ is
+                           			obtained by fitting a weighted linear regression (orange line segment), and using
+                           			the fitted value at $x_0$ (orange solid dot) as the estimate $\hat f(x)$.
+                           		}
+                           	\end{figure}
+                           \end{frame}
+\section{Generalized additive model}
+
+\begin{frame}
+	\frametitle{  }
+	\begin{itemize}
+		
+		\item  With $p$ inputs, the general model should be
+		$$ y_i = f(x_{i1}, ..., x_{ip}) + \epsilon_i.$$  
+		\item  Difficult to model multivariate nonlinear function.
+		\item  Restrict  search space to 
+		$$\{ f(x_1, ..., x_p): f_1(x_1) + f_2(x_2) + ... f_p(x_p) \}$$
+		\item The multivariate function is simple sum of nonlinear function of each varible. 
+		\item This leads to the generalized additive model (GAM).
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{The GAM  }
+	\begin{itemize}
+		
+		\item  The model:
+		$$ y_i = f_1(x_{i1}) + f_2(x_{i2}) ...+ f_p(x_{ip}) + \epsilon_i$$ 
+		\item  The statistical estimation of $f_1$, ..., $f_p$ can be solved by
+		taking advantage of 
+		\item  1. the methodologies for nonlinear model for single input case.
+		\item  2. a backfit algorithm.
+	\end{itemize}
+\end{frame}
+
+%\begin{frame}
+%	\frametitle{The GAM  }
+%	\begin{itemize}
+%		
+%		\item  The model:
+%		$$ y_i = f_1(x_{i1}) + f_2(x_{i2}) ...+ f_p(x_{ip}) + \epsilon_i$$ 
+%		\item  The statistical estimation of $f_1$, ..., $f_p$ can be solved by
+%		taking advantage of 
+%		\item  1. the methodologies for nonlinear model for single input case.
+%		\item 2.  a backfit algorithm.
+%	\end{itemize}
+%\end{frame}
+% 
+ 
+  
+
+\begin{frame}
+	\frametitle{The backfitting algorithm  }
+	\begin{itemize}
+		
+		\item  Initialize the estimator of $f_1$, ..., $f_p$, denoted as
+		$\hat f_1, ..., \hat f_p $.
+		\item  Given estimates $\hat f_1, .., \hat f_{k-1}$, $\hat f_{k+1}$, ..., $ \hat f_p$,  
+		compute 
+		 $$\tilde y_i = y_i - \hat f_1(x_{i1}) - \hat f_{k-1}(x_{i, k-1})- \hat f_{k+1} (x_{i, k+1}) - ...- f_p(x_{ip})$$
+		\item  Run nonlinear regression with response $\tilde y_i$ and single input $x_{ik}$, to obtain the estimate 
+		of $f_k$. Update $\hat f_k$ by this estimate.
+		\item Continue with the update of $f_{k+1}$. (If $k=p$ continue the update of $f_1$.)
+		\item Repeat till convergence.
+	\end{itemize}
+\end{frame}
+
+
+                             \begin{frame}
+                             	\frametitle{Example: Wage data}
+                             	\begin{figure}
+                             		\centering
+                             		
+                             		\centering
+                             		\includegraphics[width=.8\linewidth]{ISLRFigures/7_11.pdf}
+                             		%\caption{A subfigure}
+                             		\caption{7.11. For the Wage data, plots of the relationship between each feature
+                             			and the response, wage, in the fitted model (7.16). Each plot displays the fitted
+                             			function and pointwise standard errors. The first two functions are natural splines
+                             			in year and age, with four and five degrees of freedom, respectively. The third
+                             			function is a step function, fit to the qualitative variable education.
+                             		}
+                             	\end{figure}
+                             \end{frame}
+                               \begin{frame}
+                               	\frametitle{Example: Credit data}
+                               	\begin{figure}
+                               		\centering
+                               		
+                               		\centering
+                               		\includegraphics[width=.8\linewidth]{ISLRFigures/7_12.pdf}
+                               		%\caption{A subfigure}
+                               		\caption{7.12. Details are as in Figure 7.11, but now $f_1$  and $f_2$ are smoothing
+                               			splines with four and five degrees of freedom, respectively.
+                               		}
+                               	\end{figure}
+                               \end{frame}
+                               
+ 
+ \begin{frame}
+ 	\frametitle{Pros and Cons of GAM}
+ 	\begin{itemize}
+ 		
+ 		\item  It is nonlinear (potentially more accurate than linear if linear relation is not true)
+ 		\item  Additivity:
+		\begin{itemize}
+		\item examine the effect of each $x_j$ on the response $y$ while holding all of the other variables
+ 		fixed; 
+		\item inference is possible; 
+		\item the smoothness of the function $f_j$ for the variable $X_j$ can be summarized via degrees of freedom. 
+		\end{itemize} 
+ 		\item  Interactions are missed: add low-dimensional interaction functions of the form $f_{jk}(X_j,X_k)$. 
+ 	\end{itemize}
+ \end{frame}        
+ 
+ 
+ 
+ \begin{frame}
+ 	\frametitle{ GAM also work for generalized linear model}
+ 	\begin{itemize}
+ 		
+ 		\item In general we have 
+ 	$$E(Y|X) = g(f_1(X_1) + ...+ f_p(X_p))$$
+ 		where $g$ is known link function. 
+ 		\item   For example, for logistic GAM:
+ 		$$P(Y=1|X) = \frac{\exp(f_1(X_1) +...+f_p(X_p))}{1 + \exp(f_1(X_1) +...+f_p(X_p))}$$
+ 	\end{itemize}
+ \end{frame}    
+ 
+ 
+ 
+ 
+              
+                                 \begin{frame}
+                                 	\frametitle{Logistic GAM}
+                                 	\begin{figure}
+                                 		\centering
+                                 		
+                                 		\centering
+                                 		\includegraphics[width=.8\linewidth]{ISLRFigures/7_13.pdf}
+                                 		%\caption{A subfigure}
+                                 		\caption{7.13. For the Wage data, the logistic regression GAM given in (7.19)
+                                 			is fit to the binary response I(wage$>250$)
+                                 		Each plot displays the fitted function
+                                 			and pointwise standard errors. The first function is linear in year, the second
+                                 			function a smoothing spline with five degrees of freedom in age, and the third a
+                                 			step function for education. There are very wide standard errors for the first
+                                 			level $<$HS of education.
+                                 		}
+                                 	\end{figure}
+                                 \end{frame}
+                                  
+                 
+                 
+                         
+                                
+                      
+      		\begin{frame}
+      			\frametitle{Exercises  }
+      			
+      			
+      			{\sl  Run the R-Lab codes in Section 7.8 of ISLR
+      				
+      				Exercises 1, 2, 3, 5, 6, 7, 10 of Section 7.9 of ISLR (print 7) %1-7 of Section 7.9 of ISLR 
+      			}
+      			
+      			
+      			
+      			
+      			
+      		\end{frame}
+      		
+      			\begin{frame}
+      				\frametitle{  }
+      				
+      				
+      				
+      				End of Chapter 7. 
+      				
+      				
+      			\end{frame}
+      
+    \end{document}
+    
+    
+ 
