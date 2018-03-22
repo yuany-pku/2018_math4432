@@ -1,0 +1,1350 @@
+\documentclass{beamer}
+
+\mode<presentation> {
+	\usetheme{Warsaw}
+	\setbeamercovered{transparent}
+}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\graphicspath{{../graphics/}}
+\usepackage{booktabs}
+\usepackage{picture}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{animate}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{adjustbox}
+\setbeamercovered{transparent}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\hypersetup{
+	colorlinks,
+	linkcolor={red!50!black},
+	citecolor={blue!50!black},
+	urlcolor={blue!80!black}
+}
+\def\calA{{\cal A}}
+\def\calF{{\cal F}}
+\def\calP{{\cal P}}
+\def\calE{{\cal E}}
+\def\var{{\rm var}}
+
+\def\bfA{{\bf A}}
+\def\bfB{{\bf B}}
+\def\bfC{{\bf C}}
+\def\bfD{{\bf D}}
+\def\bfE{{\bf E}}
+\def\bfF{{\bf F}}
+\def\bfG{{\bf G}}
+\def\bfU{{\bf U}}
+\def\bfV{{\bf V}}
+\def\bfW{{\bf W}}
+\def\bfX{{\bf X}}
+\def\bfY{{\bf Y}}
+\def\bfZ{{\bf Z}}
+
+\def\bfa{{\bf a}}
+\def\bfb{{\bf b}}
+\def\bfc{{\bf c}}
+\def\bfd{{\bf d}}
+\def\bfe{{\bf e}}
+\def\bff{{\bf f}}
+\def\bfg{{\bf g}}
+\def\bfu{{\bf u}}
+\def\bfv{{\bf v}}
+\def\bfw{{\bf w}}
+\def\bfx{{\bf x}}
+\def\bfy{{\bf y}}
+\def\bfz{{\bf z}}
+
+\setbeamertemplate{footline}{\insertframenumber}
+
+\usetheme{Warsaw}  
+\useoutertheme{infolines}
+
+
+\title[Chapter 3]{Linear Regression} 
+
+\author{ } 
+\institute[ ]
+{
+	Chapter 3 \\ 
+	\medskip
+	\textit{ } 
+}
+%\date{\today}
+
+\begin{document}
+	 	
+	 	\begin{frame}
+	 		\titlepage % Print the title page as the first slide
+	 	\end{frame}
+	
+ \begin{frame}
+ 	\frametitle{ }
+ 	\tableofcontents
+ \end{frame}
+ %###################################################################
+ %###################################################################
+ 
+
+ 
+
+ 
+
+ 
+     
+     
+      
+      
+      \begin{frame}
+      	\frametitle{About linear regression model}
+      	\begin{itemize}
+      		\item  Fundamental statistical models. (supervised learning)
+      		\item  Covering one-sample, two-sample, multiple sample problems.
+      		\item  Most illustrative on various important issues: fitting, prediciton, model checking, ...
+      		\item  In-depth understanding of linear model helps learning further topics.
+      		\item  This chapter is slightly more advanced than Chapter 3 of 	
+      	\end{itemize}
+      \end{frame}
+      
+      \section{3.1.  \ Simple linear regression}
+      
+      
+      
+      \begin{frame}
+      	\frametitle{The formulation}
+      	\begin{itemize}	 
+      		\item  Consider linear regression model:
+      		$$y_i = \beta_0 + \beta_1 x_{i} +  \epsilon_i, \qquad i=1,..., n  $$
+      		where $y_i, x_i $ are the $i$-th observation of the response
+      		and covariates. Here $x_i$ is of $1$-dimension.
+      		\item Responses are sometimes called dependent variables or outputs;
+      		\item  covariates called independent variables or inputs or regressors.
+      		\item  obtain the parameter estimation and
+      		making prediction of any responses on given covariates. 
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      
+      \begin{frame}
+      	\frametitle{Example: Advertising data}
+      	The data contains 200 observations.
+      	
+      	Sample size: $n=200$. 
+      	
+      	Sales: $y_i$, $i=1..., n$. 	
+      	
+      	TV (bugdets):  $x_{i1} ,  i=1,..., n$. 
+      	
+      	Radio (budgets):  $x_{i2} ,  i=1,..., n$. 
+      	
+      	Newspaper (budgets): $x_{i3} ,  i=1,..., n$. 
+      	
+      
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{Example: Advertising data}
+      	
+      	\begin{figure}[h]
+      		\centering
+      		\includegraphics[width=.9\textwidth]{ISLRFigures/2_1.pdf}	 
+      	\end{figure}	
+      \end{frame}
+      
+        \begin{frame}
+        	\frametitle{Simple linear regression}
+        	
+        	For the time being, we only consider one covariate: TV. 
+        	
+        	The linear regression model is 
+        		$$y_i = \beta_0 + \beta_1 x_{i1} +  \epsilon_i, \qquad i=1,..., n  $$
+        	
+        \end{frame}
+        
+          \begin{frame}
+          	\frametitle{Estimating the coefficient by the least squares}
+          	
+           
+          	Minimizing the sum of squares of error:
+          	 
+          	$$\sum_{i=1}^n (y_i = \beta_0 + \beta_1 x_{i1})^2.  $$
+          	The estimator is 
+          	$$ \hat \beta_1 = { \sum_{i=1}^n (x_i - \bar x)(y_i - \bar y) 
+          		\over \sum_{i=1}^n (x_i - \bar x)^2}$$
+          	$$ \hat \beta_0 = \bar y - \hat \beta_1 \bar x$$
+          	Here $x_i = x_{i1}$.
+          	
+          	
+          \end{frame}
+          
+        
+        \begin{frame}
+        	\frametitle{Illustrating least squares}
+        	
+        	\begin{figure}[h]
+        		\centering
+        		\includegraphics[width=.9\textwidth]{ISLRFigures/3_1.pdf}	 
+        	\end{figure}	
+        \end{frame}
+        
+        \begin{frame} 
+        	\frametitle{Inference}
+        	
+        	$${ \hat \beta_1 - \beta_1 \over s \sqrt{ 1/ \sum_{i=1}^n (x_i -\bar x)^2} }  \sim t_{n-2}$$
+        	$${\hat \beta_0 - \beta_0 \over s \sqrt{ 1/n + \bar x^2 / \sum_{i=1}^n (x_i -\bar x)^2} }  \sim t_{n-2}$$
+        	where 
+        	$$ s^2 = \hbox{RSS}/(n-2)$$
+        	is an unbiased estimator of the variance of the error, 
+        	and, setting $\hat y_i = \hat \beta_0 + \hat \beta_1 x_i$ as the so-called fitted value, 
+        	$$ {\rm RSS} = \sum_{i=1}^n (y_i - \hat y_i)^2 $$
+        	are so-called residual sum of squares.
+        	
+        	Details would be provided in multiple linear regression. 
+        	
+        \end{frame}
+        
+        
+        \begin{frame} \frametitle{Result of the estimation}
+        	TABLE 3.1. (from ISLR) The advertising data: coefficients of the LSE for the regression on 
+        	number of units sold on TV advertising budget. An increase of \$1000 in the TV advertising budget 
+        	would cause an increase of sales of about 50 units.
+        	\begin{center}
+        		\begin{adjustbox}{width=1\textwidth}
+        			\small
+        			\begin{tabular}{lllll} 
+        				& Coefficient & Std.error & t-statistic &p-value  \\
+        				\hline \\	
+        				Intercept &7.0325 &0.4578& 15.36& $<0.0001$  \\
+        				TV & 0.0475 &0.0027& 17.67& $<0.0001$\\		
+        			\end{tabular}
+        		\end{adjustbox} 
+        	\end{center}
+        \end{frame}	
+      
+      
+     \section{3.2 \ Multiple linear regression}  
+      
+      \begin{frame}
+      	\frametitle{Linear models formulation}
+      	\begin{itemize}	 
+      		\item  Consider linear regression model:
+      		$$y_i = \beta_0 + \beta_1 x_{i1}+\cdots + \beta_p x_{ip} + \epsilon_i, \qquad i=1,..., n \eqno(2.1)$$
+      		where $y_i, x_i=(x_{i1}, ..., x_{ip})$ are the $i$-th observation of the response
+      		and covariates. 
+      		\item Responses are sometimes called dependent variables or outputs;
+      		\item  covariates called independent variables or inputs or regressors.
+      		
+      		\item  obtain the parameter estimation and
+      		making prediction of any responses on given covariates. 
+      		
+      	\end{itemize}
+      \end{frame}
+      
+       \begin{frame}
+       	\frametitle{Example: Advertising data}
+       	
+       	Now, we consider three covariates: TV, radio and newspapers.
+       	
+       	The number of covarites $p=3$. 
+       	
+       	The linear regression model is 
+       	$$y_i = \beta_0 + \beta_1 x_{i1} +  \beta_2 x_{i2} + \beta_3 x_{i3} + \epsilon_i, \qquad i=1,..., n  $$
+       	
+       \end{frame}
+       
+       \begin{frame}
+       	\frametitle{Estimating the coefficient by the least squares}
+       	
+       	
+       	Minimizing the sum of squares of error:
+       	
+       	$$\sum_{i=1}^n (y_i - \beta_0 - \beta_1 x_{i1} - \beta_2 x_{i2} - \beta_3 x_{i3} )^2.  $$
+       	which is
+       	$$ \sum_{i=1}^n (y_i - \beta^T x_i   )^2$$
+       	
+       	The expression of the LSE  of $\beta$, as a vector, has a simple matrix expression, even though
+       	the estimator of the individual $\hat \beta_i$ is not eqaully simple.      	
+       \end{frame}
+       
+        
+        \begin{frame}
+        	\frametitle{Illustrating the least squares}
+        	
+        	\begin{figure}[h]
+        		\centering
+        		\includegraphics[width=.8\textwidth]{ISLRFigures/3_5.pdf}	 
+        	\end{figure}	
+        \end{frame}
+        
+         
+         \begin{frame} \frametitle{Result of the estimation}
+         	TABLE 3.9. (from ISLR) The advertising data: coefficients of the LSE for the regression on 
+         	number of units sold on TV, radio and newspaper advertising budgets.  
+         	\begin{center}
+         		\begin{adjustbox}{width=1\textwidth}
+         			\small
+         			\begin{tabular}{lllll} 
+         				& Coefficient & Std.error & t-statistic &p-value  \\
+         				\hline \\	
+         				Intercept & 2.939 &0.3119& 9.42& $<0.0001$  \\
+         				TV        & 0.046 &0.0014 & 32.81& $<0.0001$\\	
+         				radio      & 0.189 &0.0086& 21.89& $<0.0001$\\	
+         			newspaper      & -0.001  &0.0059& -0.18& $0.8599$\\		
+         			\end{tabular}
+         		\end{adjustbox} 
+         	\end{center}
+         \end{frame}	
+      
+    \section{3.3.  \  The least squares estimation}
+      
+      \begin{frame}
+      	\frametitle{Notations}
+      	With slight abuse of notation, in this chapter, we use
+      	\begin{eqnarray*}
+      		{\bf X} &=&   \begin{pmatrix}
+      			1      &x_{11} & x_{12} &   ... &x_{1p} \cr
+      			1      &x_{21} & x_{22} &   ... &x_{2p}\cr
+      			\vdots &\vdots &  \vdots& ...    & \vdots   \cr
+      			1      &x_{n1} & x_{n2} &     ...&x_{np}
+      		\end{pmatrix} 
+      		\\
+      		&=&
+      		\begin{pmatrix}  {\bf 1} \vdots {\bf x}_1 \vdots {\bf x}_2 \vdots \cdots \vdots {\bf x}_p
+      		\end{pmatrix}.
+      	\end{eqnarray*}
+      	Here a column of ones, ${\bf 1}$,  is added, which corresponds to the intercept $\beta_0$.
+      	Then ${\bf X}$ is a $n$ by $p+1$ matrix.
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{ }
+      	Recall that
+      	\begin{eqnarray*}
+      		{\bf y}       =\begin{pmatrix} y_1 \cr\vdots \cr y_n \end{pmatrix} \quad
+      		{\bf \beta}   =\begin{pmatrix} \beta_0 \cr\vdots \cr \beta_p \end{pmatrix},  \quad
+      		{\bf \epsilon} =\begin{pmatrix} \epsilon_1   \cr\vdots \cr  \epsilon_n \end{pmatrix}, \quad
+      		{\bf x}_j      =\begin{pmatrix} x_{1j} \cr \vdots \cr x_{nj}  \end{pmatrix}
+      	\end{eqnarray*}
+      \end{frame}
+      
+      
+      
+      \begin{frame}
+      	\frametitle{The least squares criterion}
+      	The least squares criterion is try to minimize the sum of squares:
+      	$$ \sum_{i=1}^n (y_i -  \beta_0 - \beta_1 x_{i1}-\cdots - \beta_p x_{ip} )^2.$$
+      	Using matrix algebra, the above sum of squares is
+      	$$ \|{\bf y} - {\bf X} {\bf \beta}\|^2 = ({\bf y} - {\bf X} {\bf \beta})^T({\bf y} - {\bf X} {\bf \beta}).$$
+      \end{frame}
+      
+      
+      
+      
+      \begin{frame}
+      	\frametitle{ The LSE, fitted values and residuals}
+      	By some linear algebra calcuation,
+      	the least squares estimator of $\bf \beta$ is then
+      	$$\hat {\bf \beta } = ({\bf X}^T {\bf X} )^{-1} {\bf X}^T {\bf y}.$$
+      	Then
+      	$$\hat {\bf y} = {\bf X} \hat {\bf \beta}$$
+      	is called the fitted values; 
+      	viewed as the predicted values of the reponses
+      	based on the linear model.
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{Terminology and notation }
+      	
+      	$${\bf y} - \hat {\bf y}$$
+      	are called residuals, which is denoted as $\hat {\bf \epsilon}$.
+      	The sum of squares of these residuals
+      	$$ \sum_{i=1}^n \hat \epsilon_i^2 = \sum_{i=1}^n (y_i - \hat y_i)^2
+      	= \| {\bf y} - \hat {\bf y}\|^2.$$
+      \end{frame}	
+      
+      
+       
+       \begin{frame}
+       	\frametitle{}
+       	\begin{itemize}	
+       		
+       		\item   The zero-correlation of two variables from
+       		multivariate normal random variable implies their independence.
+       		
+       		\item
+       		Suppose ${\bf z} = (z_1, ..., z_n)^T$, and $z_i$ are iid standard normal
+       		random variables.  
+       		
+       		\item Let ${\bf z}_1 = {\bf A} {\bf z}$ and ${\bf z}_2 = {\bf B} {\bf z}$
+       		with ${\bf A}$ and ${\bf B}$ are two nonrandom matrices.
+       		
+       		\item  Then
+       		$$ \hbox{cov} ({\bf z}_1, {\bf z}_2) = {\bf A} {\bf B}^T = 0$$
+       		implies the independence between ${\bf z}_1$ and ${\bf z}_2$.
+       		\item We also call
+       		$\bfz_1$ and $\bfz_2$ orthogonal.
+       		
+       	\end{itemize}
+       \end{frame}
+       
+      \begin{frame}
+      	\frametitle{Orthogonality }
+      	
+      	\begin{itemize}
+      		\item 
+      		The residual $\hat {\bf \epsilon}$ is orthogonal to
+      		all columns of $\bfX$, i.e, all ${\bf 1}, {\bf x}_1, ..., {\bf x}_p$.
+      		This can be seen by
+      		\begin{eqnarray*}
+      			&& {\bf X}^T\hat {\bf \epsilon}= {\bf X}^T {\bf y} - {\bf X}^T{\bf X} {\hat {\bf \beta}} \\
+      			&= & {\bf X}^T {\bf y} - {\bf X}^T{\bf X}({\bf X}^T{\bf X})^{-1}{\bf X}^T {\bf y} = 0.
+      		\end{eqnarray*}
+      		\item The residual vector $\hat {\bf \epsilon}$ is orthogonal to the hyperplane
+      		formed by vectors ${\bf 1}, {\bf x}_1, ..., {\bf x}_p$ in $n$ dimensional real space.
+      		
+      	\end{itemize}
+      \end{frame}	
+      
+      \begin{frame}
+      	\frametitle{  A proof of the LSE}
+      	
+      	\begin{eqnarray*}
+      		&  & \| {\bf y} - {\bf X} {\bf b} \|^2 \\
+      		&=  &
+      		\| {\bf y} - {\bf X} {\hat {\bf \beta}} - {\bf X} ( {\bf b}- {\hat {\bf \beta}}) \|^2
+      		\\
+      		&= & \| {\bf y} - {\bf X} {\hat {\bf \beta}}\|^2
+      		+\|  {\bf X} ( {\bf b}- {\hat {\bf \beta}}) \|^2 \qquad \hbox{by orthogonality}
+      		\\
+      		&\geq & \| {\bf y} - {\bf X} {\hat {\bf \beta}}\|^2
+      	\end{eqnarray*}
+      \end{frame}
+      
+      
+      
+      \begin{frame}
+      	\frametitle{ }
+      	\begin{itemize}
+      		\item 
+      		The fitted value $  \hat {\bf y } = {\bf X} {\hat {\bf \beta}}$, which, also
+      		as a vector in $n$ dimensional real space, is a linear combination of the
+      		vectors ${\bf 1}, {\bf x}_1, ..., {\bf x}_p$, with the $p+1$ linear combination coefficients being
+      		the components of $\hat {\bf \beta}$. 
+      		
+      		\item
+      		The fitted values are orthogonal to the residuals, i.e.,
+      		$\hat {\bf y }$ is orthogonal to ${\bf y } - \hat {\bf y}$ or
+      		$$\hat {\bf y }^T ( {\bf y } - \hat {\bf y} ) =0.$$
+      		This implies
+      		$$\|{\bf y} \|^2 = \|\hat {\bf y}\|^2 + \| {\bf y} -\hat { \bf y} \|^2.$$
+      	\end{itemize}
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{The projection matrix}
+      	
+      	\begin{itemize}
+      		\item 
+      		Let ${\bf H} = {\bf X} ( { \bf X}^T {\bf X} )^{-1} \bfX^T$.
+      		\item This $n$ by $n$ matrix is called projection matrix or hat  matrix.
+      		\item It has the property that, for any vector, ${\bf b}$ in $n$ dimensional real space
+      		${\bf H} {\bf b}$ projects ${\bf b}$ onto the linear space formed by the columns of ${\bf X}$.
+      		\item
+      		${\bf H} {\bf b} $  is in this linear space formed by the columns of ${\bf X}$.
+      		\item
+      		And ${\bf b} - {\bf H} { \bf b}$ is orthogonal to this space.
+      	\end{itemize}
+      \end{frame}
+      
+      
+  %    \begin{frame}
+  %    	\frametitle{The least squares projection}
+  %    	\begin{figure}[h]
+  %    		\centering
+  %    		\includegraphics[width=.7\textwidth]{ESLFigures/figures3_1.pdf}	 	 
+  %    	\end{figure}	
+  %    \end{frame}
+     
+     
+     \begin{frame}
+     	\frametitle{The least squares projection}
+     	\begin{figure}[h]
+     		\centering
+     		\includegraphics[width=.7\textwidth]{ESLFigures/figures3_2.pdf}	 	 
+     	\end{figure}	
+     \end{frame}
+     
+      \begin{frame}
+      	\frametitle{symmetric and idempotent}
+      	\begin{itemize}
+      		\item 
+      		projection matrix ${\bf H}$ is symmetric and idempotent; i.e., ${\bf H}^2 = {\bf H}$.
+      		\item   eigenvalues are either 1 or 0.
+      		\item	All eigenvectors associated with eigenvalue 1 form a space, say ${\cal L}_1$; 
+      		\item Those with
+      		eigenvalue 0 form the orthogonal space,  ${\cal L}_0$, of ${\cal L}_1$. 
+      		\item Then $\bf H$ is the projection
+      		onto space ${\cal L}_1$ and ${\bf I} - {\bf H}$ is the projection onto ${\cal L}_0$, where
+      		${\bf I}$ is the $n$ by $n$ identity matrix.
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{Matrix decomposition  }
+      	
+      	\begin{itemize}
+      		\item 
+      		Suppose, for convenience $n \geq p$, any matrix $n$ by $p$ matrix $A$ can always be decomposed into
+      		$${\bf A}= {\bf U} {\bf D}{\bf V}^T $$
+      		where ${\bf U}$ is $n\times p$  orthogonal matrix, ${\bf D}$ is a $p\times p$ diagonal matrix and
+      		${\bf V}$ is $p\times p$ orthogonal matrix. In particular
+      		$$ {\bf X} = {\bf U} {\bf R}, $$
+      		where ${\bf R}= {\bf D}{ \bf V}$.
+      		
+      		\item	If $\bfA$ and $\bfB^T$ are two matrices of same dimension,   then
+      		$$trace (\bfA \bfB)=  trace(\bfB \bfA).$$
+      	\end{itemize}
+      \end{frame}
+      
+      \section{3.4. \ The statistical properties of the least squares estimates.}
+      
+      \begin{frame}
+      	\frametitle{Model assumptions}
+      	
+      	\begin{itemize}
+      		\item 
+      		The linear regression model general assumes
+      		the error $\epsilon_i$ has zero conditional mean and constant conditional
+      		variance $\sigma^2$, and the covariates $x_i$ are non-random;
+      		\item Independence across the observations
+      		\item  A more restrictive (but common) assumption:  the errors
+      		follow normal distribution, i.e, $N(0, \sigma^2)$.
+      	\end{itemize}
+      	
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{Statistical properties of LSE }
+      	
+      	\begin{eqnarray*}
+      		&\hat {\bf \beta} \sim N({\bf \beta}, \sigma^2 ({\bf X}^T {\bf X})^{-1}); \\
+      		&\hbox{RSS} = \sum_{i=1}^n \hat \epsilon_i^2 = \sum_{i=1}^n (y_i - \hat y_i)^2
+      		\sim \sigma^2 \chi^2_{n-p-1} \\
+      		&\hat {\bf \beta} \hbox{ and RSS are independent} \\
+      		&s^2 = \hbox{RSS}/(n-p-1) \hbox{ unbiased estimate of $\sigma^2$} \\
+      		&{\hat \beta_j - \beta_j \over s \sqrt{c_{jj}} } \sim t_{n-p-1} \\
+      		& { (\hat {\bf \beta} - {\bf \beta})^T({\bf X}^T { \bf X})   (\hat {\bf \beta} - {\bf \beta})/p
+      			\over   s^2  } \sim F_{p+1, n-p-1}
+      	\end{eqnarray*}
+      	where $c_{00}, c_{11}, ..., c_{pp}$ are the diagonal elements of
+      	$({\bf X}^T{\bf X})^{-1}$.
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{Understanding}
+      	\begin{eqnarray*}
+      		& \hbox{cov}(\hat {\bf \beta}, \hat {\bf \epsilon}) \\
+      		=&
+      		\hbox{cov} ({\bf X}({\bf X}^T{\bf X})^{-1} {\bf X}^T {\bf \epsilon}, \,\,  ({\bf I} - {\bf H}) {\bf \epsilon})
+      		\\
+      		=& {\bf X}({\bf X}^T{\bf X})^{-1} {\bf X}^T \hbox{var}({\bf \epsilon})({\bf I} - {\bf H})
+      		\\
+      		= & 0
+      	\end{eqnarray*}
+      	because ${\bf H}$ is idempotent.
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{ Confidence intervals}
+      	
+      	For example,
+      	$$\hat \beta_j \pm t_{n-p-1}(\alpha/2) s \sqrt{c_{jj}}$$
+      	is a confidence interval for $\beta_j$ at confidence level $1-\alpha$. Here
+      	$t_{n-p-1}(\alpha/2)$ is the $1-\alpha/2$ percentile of the $t$-distribution with
+      	degree of freedom $n-p-1$.
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{ Confidence intervals}
+      	
+      	
+      	For a given value of input $\bf x$ which is a $p+1$ vector (the first component is constant 1), its mean response is $ {\bf \beta}^T{\bf x}$.
+      	The confidence interval for this mean response is
+      	$$ \hat {\bf \beta}^T{\bf x} \pm t_{n-p-1}(\alpha/2) s \sqrt{ {\bf x}^T({\bf X}^T {\bf X})^{-1} { \bf x}}$$
+      	The confidence interval for $\beta_j$ is a special case of the above formula by taking
+      	${\bf x}$ as a vector that all zero except the $(j+1)$ entry corresponding $\beta_j$. (Because of
+      	$\beta_0$, $\beta_j$  is at the $j+1$th position of $\hat {\bf \beta}$.)
+      	
+      \end{frame}	
+      
+      \begin{frame}
+      	\frametitle{Prediction interval}
+      	\begin{itemize}
+      		
+      		\item To predict the actual response $y$, rather than its mean, we would use the same point estimator
+      		$\hat {\bf \beta}^T{\bf x}$, but the accuracy is much decreased as more uncertainty in the randomness
+      		of the actual response from the error is involved.
+      		\item
+      		The confidence interval, often called prediction interval, for $y$ is
+      		$$\hat {\bf \beta}^T{\bf x} \pm t_{n-p-1}(\alpha/2) s \sqrt{ 1+ {\bf x}^T({\bf X}^T {\bf X})^{-1} { \bf x}}.$$
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \section{3.5 \ The variance decomposition and analysis of variance (ANOVA).}
+      
+      \begin{frame}
+      	\frametitle{Variance decomposition }
+      	
+      	Recall that
+      	$$ \| {\bf y}\|^2  = \|\hat {\bf y}\|^2 + \|{\bf y} - \hat {\bf y}\|^2.$$
+      	The common variance decomposition takes a similar form, but leaving out sample mean,  
+      	$$ \| {\bf y} - \bar y \|^2  = \|\hat {\bf y} - \bar y \|^2 + \|{\bf y} - \hat {\bf y}\|^2;
+      	$$
+      	which is often written as
+      	$$ \hbox{SS}_{total} = \hbox{SS}_{reg} + \hbox{SS}_{error}.$$
+      	
+      	
+      \end{frame}
+      
+      
+      
+      
+      \begin{frame}
+      	\frametitle{Understanding}
+      	\begin{itemize}
+      		\item $ \hbox{SS}_{total}  $, the total sum of squares,  measures the total variation in response.
+      		
+      		\item $  \hbox{SS}_{reg}  $,
+      		the sum of squares due to regression or, more precisely, due to
+      		the inputs, measures variation in  response explained by that of the inputs.
+      		
+      		\item $   \hbox{SS}_{error},$ 
+      		the sum of squares due to error, measures the size of randomness due to error or
+      		noise. 
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{The ANOVA table}
+      	
+      	\begin{center}
+      		\begin{adjustbox}{width=1\textwidth}
+      			\small
+      			\begin{tabular}{lllll}
+      				Source of Variation & SumOfSquares & Degree of Freedom & Mean Squared & F-statistic \\
+      				\hline \\
+      				Regression  &$\hbox{SS}_{reg}$  & $ p$  & $\hbox{MS}_{reg}$  & $\hbox{MS}_{reg}/\hbox{MS}_{error}$ \\
+      				Error       &$\hbox{SS}_{error}$ & $n-p-1$  & $\hbox{MS}_{error}  $ &  \\
+      				Total       &$\hbox{SS}_{total}$ & $n-1$  &    &  \\
+      			\end{tabular}
+      		\end{adjustbox}
+      	\end{center}
+      \end{frame}
+      
+      
+      
+      
+      \begin{frame}
+      	\frametitle{ }
+      	where $\hbox{MS}_{reg} = \hbox{SS}_{reg}/ p$ and $\hbox{MS}_{error}= \hbox{SS}_{error}/(n-p-1)$.
+      	
+      	And the $F$-statistic follows $F_{p, n-p-1}$ distribution under the hypothesis that
+      	$\beta_1=\beta_2=...\beta_p=0$, i.e., all inputs are unrelated with the output.
+      	
+      	
+      	The $p$-value is the probability for the distribution $F_{p+1, n-p-1}$ taking value
+      	greater than the value of the $F$-statistic.
+      	
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{General variance decomposition}
+      	\begin{itemize}
+      		\item
+      		The above ANOVA is a special case of a general  variance decomposition.
+      		\item
+      		Let ${\cal L}$ be the linear space spanned by ${\bf 1}, {\bf x}_1, ..., {\bf x}_p$, all
+      		columns of $\bf X$. 
+      		\item The linear model assumption:
+      		$${\bf y} = {\bf X}{\bf \beta} + {\bf \epsilon}$$
+      		can be written as $E({\bf y}) = {\bf X}{\bf \beta} $, or
+      		$$ E({\bf y}) \in {\cal L}.$$
+      		\item 
+      		The fitted values $\hat {\bf y}$ is projection of $\bf y$ onto ${\cal L}$.
+      		\item 
+      		$s^2 = \|{\bf y} - \hat {\bf y}\|^2/(n-p-1)$ is the unbiased estimator of $\sigma^2$.
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      
+      \begin{frame}
+      	\frametitle{ }
+      	\begin{itemize}
+      		\item 
+      		Further assume that
+      		$$ E({\bf y}) \in {\cal L}_0$$
+      		where ${\cal L}_0$ is some linear subspace of ${\cal L}$ of dimension $r < p+1$.
+      		
+      		\item 
+      		Let $\hat {\bf y}_0$ be the project of $\bf y$ on to ${\cal L}_0$.
+      		
+      		\item
+      		Pythagorean theorem implies
+      		$$ \|{\bf y} - \hat {\bf y}_0\|^2 = \|{\bf y} - \hat {\bf y} \|^2 +\|\hat {\bf y} - \hat {\bf y}_0\|^2 $$
+      		\item By the same token,
+      		$s^2_0 = \|{\bf y} - \hat {\bf y}_0 \|^2/(n-r)$ is
+      		the unbiased estimator of $\sigma^2$ under the hypothesis $ E({\bf y}) \in {\cal L}_0$.
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{The F-test}
+      	$$ F = {\|\hat {\bf y} - \hat {\bf y}_0\|^2/(p+1-r)
+      		\over
+      		\|{\bf y} - \hat {\bf y}\|^2/(n-p-1) } \sim F_{p+1-r, n-p-r}
+      	$$
+      	This $F$-statistic is used to test the hypothesis that $H_0: E(\bfy) \in {\cal L}_0$, against
+      	the alternative $H_a: \hbox{otherwise}$.
+      	
+      	The commonly considered hypothesis, as dealt with in the ANOVA table, $H_0: \beta_1=\cdots = \beta_p=0$
+      	can be formulated as
+      	$H_0: E(\bfy) \in {\cal L}({\bf 1})$, where ${\cal L}({\bf 1})$ represent the linear space of a single vector
+      	${\bf 1}$.
+      	
+      	
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{Variable selection}
+      	\begin{itemize}
+      		\item We may be concerned with a subset of the $p$  variables are irrelevant
+      		with the response. 
+      		
+      		\item Let the subset be denoted as $A=\{ i_1, ..., i_r\}$, where $r \leq p$.
+      		Then, the null hypothesis is
+      		$$H_0: \beta_{i_1}= \beta_{i_2} = \cdots = \beta_{i_r} =0, $$
+      		which again is equivalent to
+      		$$ H_0: E(\bfy) \in {\cal L}(A^c), $$
+      		where ${\cal L}(A)$ is the linear space in $R^n$ spanned by $\bfx_{i_1}, ..., \bfx_{i_r}$, which is
+      		of $r$ dimension.	
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+     
+      \section{3.6. \ More about prediction }
+      
+      \begin{frame} 
+      	\frametitle{The expected prediction error (EPE)}
+      	
+      	Consider a general model
+      	$$ y= f(\bfx) + \epsilon$$
+      	Given a new input value $\bfx$, we wish to predict its response using $\hat y$, which is obtained 
+      	from analysis of existing data.
+      	
+      	The EPE is
+      	\begin{eqnarray*}
+      	 E \{ ( y- \hat y)^2 \} &=& E\{(\epsilon + f(\bfx) - \hat y)^2\} \\
+      	 &=& E\{ (\epsilon + f(\bfx) - E(\hat y) + - \hat y + E(\hat y) )^2 \} \\
+      	 &=& \sigma^2 + (f(\bfx)- E(\hat y))^2 + \hbox{var}(\hat y) \\
+      	 &=& \hbox{Irreducible error} + \hbox{bias}^2 + \hbox{variance} \\
+      	\end{eqnarray*}
+      	
+      \end{frame} 
+      
+      
+      \begin{frame} 
+      	\frametitle{Back to linear regression}
+      	
+      	\begin{itemize}
+      		\item Here the covariate $\bfx$ has its first component being $1$, slightly abusing the notatoin.
+      		\item Bias $ = 0$
+      		\begin{eqnarray*}
+      			\hbox{variance} &=& \var ( \bfx^T((\bfX^T \bfX)^{-1} \bfX^T \bfy) \\
+      			&=& \var ( \bfx^T((\bfX^T \bfX)^{-1} \bfX^T {\bf \epsilon} )  \\
+      			&=&  \sigma^2 \bfx^T (\bfX^T \bfX)^{-1} \bfx
+      		\end{eqnarray*}
+      		
+      		\item 	As a result, the EPE  for this particular covairate $\bfx$ is
+      		$$\sigma^2 + \sigma^2 \bfx^T (\bfX^T \bfX)^{-1} \bfx$$
+      	\end{itemize}
+      \end{frame}
+    
+       
+      \begin{frame} 
+      	\frametitle{The average EPE }
+      	
+      	 Take $\bfx$ as the observations $x_1, ..., x_n$ (first component is 1). Then the average EPE over all
+      	 observations in the data is
+      	 	\begin{eqnarray*}
+      	 		 \sigma^2 + \sigma^2 {1 \over n } \sum_{i=1}^n  x^T_i (\bfX^T \bfX)^{-1} x_i   
+      	 		&=& \sigma^2 + \sigma^2 {1 \over n } \sum_{i=1}^n trace( x^T_i (\bfX^T \bfX)^{-1} x_i ) \\
+      	 		&=& \sigma^2 + \sigma^2 {1 \over n } \sum_{i=1}^n trace(  (\bfX^T \bfX)^{-1} x_i x^T_i ) \\
+      	 		&=& \sigma^2 + \sigma^2 {1 \over n } trace ( \sum_{i=1}^n    (\bfX^T \bfX)^{-1} x_i x^T_i ) \\
+      	 		&=&   \sigma^2 + \sigma^2 {1 \over n } trace   (\bfX^T \bfX)^{-1} \bfX^T\bfX ) \\
+      	 		&=& \sigma^2 + \sigma^2 {1 \over n }  trace (I_{p+1}) \\
+      	 		&=& \sigma^2 ( 1 + {p+1  \over n} )   
+      	 	\end{eqnarray*}
+      \end{frame}
+      
+       \begin{frame} 
+       	\frametitle{The average EPE }
+       	The average EPE reflects the prediction accuracy of the model. 
+       	
+       	Suppose $p$ is large relative to $n$, and among $p$ inputs, only a few, say $q$, of them are
+       	relevant to the response. Assume $q$ is far smaller than $p$. 
+       	
+       	For simplicity, say $p \approx n/2$, if we use all $p$ variables, the average EPE is
+       	$$ \sigma^2 ( 1 + {p+1  \over n} )  \approx {3 \over 2} \sigma^2$$
+       	
+       	If we use those relevant $q$ inputs, the 
+       	average EPE is
+       	$$ \sigma^2 ( 1 + {q+1  \over n} )  \approx  \sigma^2.$$
+       	
+       	This implies,  using more inputs, although always increase the R-squared, may reduce the 
+       	prediction accuracy!!!
+       	
+       	\end{frame}
+       	 
+       	
+      
+      
+      \section{3.7. \ The optimality of the least squares estimation.}
+      
+      \begin{frame}
+      	\frametitle{Superiority of LSE}
+      	
+      	\begin{itemize}
+      		\item Easy computation 
+      		\item consistency 
+      		\item
+      		efficiency, etc.
+      		\item BLUE (best linear unbiased estimator), among 	
+      		estimates of ${\bf \beta}$,  that are linear unbiased estimates: $\sum_{i=1}^n \bfa_i y_i$, with
+      		$\bfa_i$ being nonrandom. 
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      
+      
+      \begin{frame}
+      	\frametitle{  }
+      	\begin{itemize}
+      		\item	
+      		{\bf Theorem} \ (Gauss-Markov Theorem). Among all linear unbiased estimates, the least squares estimate
+      		has the smallest variance, thus smallest mean squared error.	 
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{Proof}
+      	\begin{itemize}
+      		
+      		\item  Let $\bfA = (\bfa_1, \bfa_2, ..., \bfa_n)$. 
+      		Then, unbiased estimate of $\bf \beta$ is
+      		$\bfA \bfy$ with mean $\bfA \bfX {\bf \beta} = {\bf \beta}$ by the unbiasedness, and variance matrix
+      		$\bfA \bfA^T$.
+      		\item  Write $\bfA= (\bfX^T \bfX)^{-1} \bfX^T +\bfD$.   Then, $\bfD\bfX=0$. 
+      		\item Then, 
+      		$$\bfA \bfA^T =  (\bfX^T \bfX)^{-1}  + \bfD \bfD^T  \geq  (\bfX^T \bfX  )^{-1}.$$
+      		Here the inequality is for symmetric matrices, i.e., $\bfA \geq \bfB$ is defined
+      		as $\bfA -\bfB$ is nonnegative definite.  	 
+      	\end{itemize}
+      \end{frame}
+      
+      
+      \section{3.8. \  Assessing the regression model. }
+      
+      \begin{frame}
+      	\frametitle{a). Error distribution (normality check). }
+      	\begin{itemize}
+      		
+      		
+      		\item  Non-normality may cause the normality-based inference
+      		such as $t$-test and $F$-test being  inaccurate.
+      		
+      		
+      		\item Use graphics, such histogram, boxplot and qqnorm to visualize the
+      		the distribution of the residuals.
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{Adjusted residuals}
+      	\begin{itemize}
+      		
+      		\item  the residuals $\hat \epsilon_i$ does not
+      		follow the distribution $N(0, \sigma^2)$, even if all model assumptions are correct!
+      		
+      		\item $$ \hat {\bf \epsilon} = \bfy - \hat \bfy = ({\bf I}-{\bf H}) {\bf \epsilon}
+      		\sim N(0, \sigma^2 ({\bf I}-{\bf H})).$$
+      		So, $\hat \epsilon_i \sim N(0, (1- h_{ii})\sigma^2)$. 
+      		
+      		\item  Training error is one of the measurement of the quality of fit.
+      		
+      		\item  An (internally) studentized residual is
+      		$$e_i = {\hat \epsilon_i \over s \sqrt{1- h_{ii}}}.$$
+      		
+      		\item A more appropirate one is
+      		the (externally) studentized residual which uses an $s$ from the least squares fitting
+      		by deleting the $i$-th observation.	
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{b). Homoscedasticity versus heteroscedasticity.   }
+      	\begin{itemize}
+      		
+      		\item  Heteroscedasticity can cause
+      		the estimate being not the optimal one
+      		
+      		\item May be fixed by weighted least squares
+      		estimation. 
+      		
+      		\item Use scatter plot of residuals against the fitted values
+      		to check the heteroscedasticity (the variance of the errors are not equal).
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      
+      \begin{frame}
+      	\frametitle{c). Error dependence. }
+      	\begin{itemize}
+      		
+      		\item  The  error  dependence cause  the inference to be incorrect.
+      		
+      		\item 
+      		Use autocorrelation of the residuals (ACF) to check the independence assumption of the errors. 
+      		
+      		\item One can
+      		also use Durbin-Watson test, which tests whether the first few autocorrelations are 0.
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{ d). Leverage and Cook's D.}
+      	\begin{itemize}
+      		
+      		\item   Recall the hat matrix
+      		$$ {\bf H}= \bfX (\bfX^T\bfX)^{-1} \bfX^T.$$
+      		Let $h_{ij}   = \bfx_i^T(\bfX^T\bfX)^{-1} \bfx_j$
+      		be the $(i, j)$ elements of ${\bf H}$.
+      		\item   
+      		The leverage of the $i$-th observation is just the $i$-th diagonal element of ${\bf H}$, denoted
+      		as $h_{ii}$.
+      		\item A high leverage implies that observation is quite influential.  Note
+      		that the average of $h_{ii}$ is $(p+1)/n$.
+      		\item   
+      		So, if $h_{ii}$ is greater than $2(p+1)/n$, twice of the average, is generally considered large.
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      
+      \begin{frame} 
+      	\frametitle{   }
+      	\begin{itemize}
+      		
+      		\item     The Cook'D is often used measure how important an observation is.
+      		Cook's D is defined
+      		$$ D_i = { \sum_{k=1}^n ({\hat y}_k - {\hat y}_k^{(-i)})^2 \over (p+1) s^2 }$$
+      		where ${\hat y}_k$ is the $k$-th fitted value; and ${\hat y}_k^{(-i)}$ is the $k$-th fitted
+      		value by deleting the $i$-th observation. 
+      		\item   If $D_i$ is large, it implies once $i$-th observation
+      		is not available, the prediction would be much different, thus reflecting the importance of
+      		this observation.
+      		\item   
+      		In general, the observations with large $D_i$, such as larger than a quarter of the sample size, may be
+      		considered influential.
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      
+      \begin{frame}
+      	\frametitle{e). \ Multicollinearity. }
+      	\begin{itemize}
+      		
+      		\item  The multicollinarity can cause the parameter estimation
+      		to be very unstable. 
+      		
+      		\item   Suppose two inputs are strongly correlated, their separate effect on
+      		regression is difficult to identify from the regression. 
+      		
+      		\item   When data change slightly, the
+      		two regression coefficients can differ greatly, though their joint effect may stay little
+      		changed. 
+      		\item   Use variance inflation factor (VIF) to measure one input's correlation
+      		with the others. 
+      		
+      		$$\hbox{VIF}(\hat \beta_j ) = {1 \over 1- R^2_{X_j | X_{-j}}}$$
+      		
+      			\end{itemize}
+      		\end{frame}
+      		
+      	
+      	\begin{frame}
+      		\frametitle{  }
+      		\begin{itemize}	
+      		
+      		\item The largest value of VIF, $\infty$, means this input is perfectly linearly
+      		related with the other inputs. 
+      		
+      		\item The smallest value of VIF, $1$, means this input is uncorrelated
+      		with the other inputs. 
+      		\item In general, variable selection methods may be used to reduce
+      		the number of highly correlated variables.
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \section{3.9.  \ Variable selection.}
+      
+      \begin{frame}
+      	\frametitle{  }
+      	\begin{itemize}
+      		\item  
+      		Variable selection, or more generally, model selection, is an important tool
+      		in minimizing prediction error. 
+      		\item   There are substantial research development
+      		regarding methods of model selection. 
+      		\item   The aim is to minimize generalization
+      		error or prediction error. 
+      		\item   The naive approach is to exhaust all models.
+      		However, with the curse of dimensionality, this is quickly prohibitive when
+      		the number of variables increase.
+      		\item   
+      		More sophisticated methods such as cross validation
+      		or regularization methods, such as LASSO (Tibshirani 1996). 
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{Caution  }
+      	\begin{itemize}
+      		
+      		
+      		
+      		\item 	More inputs do not imply better prediction, particularly
+      		if the inputs in the model are irrelevant with the response.
+      		
+      		\item	 Moreover, more inputs
+      		also imply more danger of overfit, resulting in small training error but large test error.
+      		
+      		\item	Here we introduce more basic and simple methods.
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{a). Adjusted R-squared. }
+      	\begin{itemize}
+      		
+      		\item  The R-squared     is the percentage of the
+      		total variation in response due to the inputs. 			
+      		The R-squared is commonly used as
+      		a measurement of how good the linear fit is. 
+      		
+      		\item However, a model with larger R-squared
+      		is not necessarily better than another model with smaller R-squared!
+      		
+      		\item 
+      		If  model A has all the inputs of model B, then model A's R-squared will always be greater than
+      		or as large as that of
+      		model B.  
+      		
+      		\item If model A's additional inputs are entirely uncorrelated with the response, model
+      		A contain more noise than model B. As a result, the prediction based on model A would
+      		inevitably  be poorer or no better.
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{   }
+	      	\begin{itemize}
+      		
+      		
+      		\item b). 
+      		Recall that the R-squared is defined as:
+      		$$ R^2= {\hbox{SS}_{reg} \over \hbox{SS}_{total}} = 1- {\hbox{SS}_{error} \over \hbox{SS}_{total}}$$
+      		where $\hbox{SS}_{error} = \sum_{i=1}^n \hat \epsilon_i^2$ is often called residual sum of squares (RSS).
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      
+      
+      
+      \begin{frame}
+      	\frametitle{ }
+      	\begin{itemize}
+      		
+      		\item  
+      		The adjusted R-squared, taking into account of the degrees of freedom,   is defined as
+      		\begin{eqnarray*}
+      			\hbox{adjusted} \,\, R^2 &= & 1- { \hbox{MS}_{error} \over \hbox{MS}_{total}} \\
+      			&= & 1- {\hbox{SS}_{error} /(n-p-1) \over \hbox{SS}_{total}/(n-1) }\\
+      			&= &1 - {s^2 \over \sum_{i=1}^n (y_i - \bar y)^2/(n-1) }
+      		\end{eqnarray*}
+      		With more inputs, the $R^2$ always increase, but the adjusted $R^2$ could decrease since
+      		more inputs is penalized by the smaller degree of freedom of the residuals.
+      		
+      		\item
+      		The adjusted R-squared is preferred over the R-squared in evaluating models.
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{b). Mallows' $C_p$. }
+      	
+      	Recall that our linear model (2.1) has $p$ covariates, and $s^2= \hbox{SS}_{error}/(n-p-1)$ is
+      	the unbiased estimator of $\sigma^2$. 
+      	
+      	Assume now more covariates are available.
+      	Suppose we use only $p$ of the $K$ covariates with $K \geq p$.
+      	
+      	
+      	The statistic of Mallow's $C_p$ is defined as
+      	$$ {\hbox{SS}_{error}(p) \over s^2_K} - 2(p+1) -n.$$
+      	where $\hbox{SS}_{error}$ is the residual sum of squares for the linear  model with $p$ inputs
+      	and $s^2_K$ is the unbiased estimator of $\sigma^2$ based on $K$ inputs.
+      	
+      	
+      	The smaller Mallows' $C_p$ is, the better the model is. 
+      	
+      	The following AIC is more often used,
+      	despite that Mallws' $C_p$ and AIC usually give the same best model.
+      	
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{c). AIC.}
+      	
+      	
+      	AIC stands for Akaike information criterion, which is defined as
+      	$$\hbox{AIC} =   \log(s^2) + 2(1+p)/n, $$
+      	for a linear model with $p$ inputs, where $s^2  = \hbox{SS}_{error} /(n-p-1)$.
+      	AIC aims at maximizing the predictive likelihood.
+      	The model with the smallest AIC is preferred.
+      	
+      	The AIC criterion is try to maximize the expected 
+      	predictive likelihood. In general, it can be roughly derived in the following.
+      	Let $\theta $ be a parameter of $d$ dimension. $\hat \theta $ is the maximum likelihood estimator of $\theta$
+      	based on observations $y_1, ..., y_n$. Let $\theta_0$ be the true (unknown) value of $\theta$, and 
+      	${\cal I}(\theta_0)$ be the
+      	Fisher information. 
+      	
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{ the (expected) predictive log-likelihood }
+      	\begin{eqnarray*}
+      		&&
+      		E(\log f(Y|\theta)) |_{\theta= \hat \theta}
+      		\\
+      		&\approx& E(\log f(Y|\theta)) |_{\theta=  \theta_0} -{1 \over 2} (\hat \theta- \theta_0)^T {\cal I} (\theta_0) 
+      		(\hat \theta - \theta_0)
+      		\\
+      		&\approx& {1 \over n} \sum_{i=1}^n \log f(y_i | \hat \theta) -  {1 \over 2} (\hat \theta- \theta_0)^T {\cal I} (\theta_0) 
+      		(\hat \theta - \theta_0)
+      		\\ &&  -{1 \over 2} (\hat \theta- \theta_0)^T {\cal I} (\theta_0) 
+      		(\hat \theta - \theta_0)
+      		\\
+      		&\approx& {1 \over n} \hbox{(maximum log likelihood)} -   (\hat \theta- \theta_0)^T {\cal I} (\theta_0) 
+      		(\hat \theta - \theta_0) 
+      		\\
+      		&\approx& {1 \over n} \hbox{(maximum log likelihood)} -   d/n
+      	\end{eqnarray*}	
+      	The approximations are due to the Taylor expansion. 
+      \end{frame}
+      
+
+      
+      \begin{frame}
+      	\frametitle{  }
+      	\begin{itemize}
+      		
+      		\item  Then, maximizing the above predictive likelihood
+      		is the same as 
+      		minimize
+      		$$ -2 \hbox{(maximum log likelihood)} +  2 d $$
+      		where, the first term is called deviance. In the case of linear regression with normal errors, the deviance
+      		is the same as $\log(s^2)$. 
+      		
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{ d). BIC. }
+      	\begin{itemize}
+      		
+      		\item  BIC stands for Schwarz's Bayesian information criterion, which is defined as
+      		$$\hbox{BIC} =   \log(s^2) +  (1+p)\log(n)/n, $$
+      		for a linear model with $p$ inputs.
+      		Again, the model with the smallest BIC is perferred. The derivation of
+      		BIC results from Bayesian statistics and has Bayesian interpretation.
+      		It is seen that BIC is formally similar to AIC. The BIC penalizes more heavily
+      		the models with more number of inputs.
+      		
+      		
+      	\end{itemize}
+      \end{frame}
+      
+      \section{3.10. \ A comparison with KNN through a simulated example}
+      
+      
+      \begin{frame}
+      	\frametitle{Simulated Example of KNN}
+      	
+      	\begin{figure}[h]
+      		\centering
+      		\includegraphics[width=.6\textwidth]{ISLRFigures/3_16.pdf}	 
+      	
+      	\caption{ \small 3.16. Plots of  $\hat f (X)$ using KNN regression on a two-dimensional data
+      		set with 64 observations (orange dots). Left: K = 1 results in a rough step function
+      		fit. Right: K = 9 produces a much smoother fit. }
+      	\end{figure}
+      \end{frame}
+      
+      
+      
+      \begin{frame}
+      	\frametitle{Simulated Example of KNN}
+      	
+      	\begin{figure}[h]
+      		\centering
+      		\includegraphics[width=.7\textwidth]{ISLRFigures/3_17.pdf}	 
+      
+      	\caption{\small 3.17. Plots of $\hat f(X)$  using KNN regression on a one-dimensional data
+      		set with 100 observations. The true relationship is given by the black solid line.
+      		Left: The blue curve corresponds to K = 1 and interpolates (i.e. passes directly
+      		through) the training data. Right: The blue curve corresponds to K = 9, and
+      		represents a smoother fit. }
+      		\end{figure}
+      \end{frame}
+      
+      
+      \begin{frame}
+      	\frametitle{Simulated Example of KNN}
+      	
+      	\begin{figure}[h]
+      		\centering
+      		\includegraphics[width=.7\textwidth]{ISLRFigures/3_18.pdf}	
+      			\end{figure}
+      		\end{frame}
+      		
+      		 
+         \begin{frame}\frametitle{}
+       { FIGURE 3.18.The same data set shown in Figure 3.17 is investigated further.
+      		Left: The blue dashed line is the least squares fit to the data. Since $f(X)$ is in
+      		fact linear (displayed as the black line), the least squares regression line provides
+      		a very good estimate of f(X). Right: The dashed horizontal line represents the
+      		least squares test set MSE, while the green solid line corresponds to the MSE
+      		for KNN as a function of $1/K$ (on the log scale). Linear regression achieves a
+      		lower test MSE than does KNN regression, since $f(X)$ is in fact linear. For KNN
+      		regression, the best results occur with a very large value of $K$, corresponding to a
+      		small value of $1/K.$ }
+      		\end{frame}
+      	
+      
+      \begin{frame}
+      	\frametitle{Simulated Example of KNN}
+      	
+      	\begin{figure}[h]
+      		\centering
+      		\includegraphics[width=.6\textwidth]{ISLRFigures/3_19.pdf}	   
+      		\end{figure}
+      \end{frame}
+      
+      
+       \begin{frame}
+       	\frametitle{Simulated Example of KNN}
+      	 { FIGURE 3.19. Top Left: In a setting with a slightly non-linear relationship
+      		between $X$ and $Y$ (solid black line), the KNN fits with $K = 1$ (blue) and $K = 9$
+      		(red) are displayed. Top Right: For the slightly non-linear data, the test set MSE
+      		for least squares regression (horizontal black) and KNN with various values of
+      		$1/K$ (green) are displayed. Bottom Left and Bottom Right: As in the top panel,
+      		but with a strongly non-linear relationship between $X$ and $Y$. }
+      	\end{frame}
+      
+      \begin{frame}
+      	\frametitle{Simulated Example of KNN}
+      	
+      	\begin{figure}[h]
+      		\centering
+      		\includegraphics[width=.7\textwidth]{ISLRFigures/3_20.pdf}	 
+      	
+      	\caption{3.20.Test MSE for linear regression (black dashed lines) and KNN
+      		(green curves) as the number of variables p increases. The true function is non–
+      		linear in the first variable, as in the lower panel in Figure 3.19, and does not
+      		depend on the additional variables. The performance of linear regression deteriorates
+      		slowly in the presence of these additional noise variables, whereas KNN’s
+      		performance degrades much more quickly as p increases. } 
+      	\end{figure}
+      	
+      \end{frame}
+      
+      \begin{frame}
+      	\frametitle{Homework }
+      	
+      \begin{itemize}
+      	\item  ISLR Chapter 3: 1; 2; 5; 8.
+      \end{itemize}
+      \end{frame}
+      
+      
+     
+       \begin{frame}
+       	\frametitle{  }
+       	 
+       	 \begin{center}
+       	 	End of Chapter 3
+       	 \end{center}
+       \end{frame}
+    
+    
+ 
+\end{document}
