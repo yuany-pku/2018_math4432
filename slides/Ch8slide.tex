@@ -523,24 +523,20 @@
                 		
                 	\end{itemize}
                 \end{frame} 
-       \begin{frame}
-       	
+
+       \begin{frame} 	
        	\frametitle{ }
        	\begin{itemize}
+	       	\item Any of these three approaches might be used when pruning the tree.
        		\item  If $R$ is nearly pure, most of the observations 
        		are from one class, then 
-       		the Gini-index and cross-entropy would take smaller values than classfication error rate.
-       		 
-       		\item   Gini-index and cross-entropy are more sentive to node purity.
-       		
-       		\item To evaluate the quality of a particluar split, the Gini-index and cross-entropy  are more popularly used as error measurement 
-       		crietria than 
-       		classification error rate. 
-       		\item Any of these three approaches might be used when
-       		pruning the tree.
-       		
-       		\item  The classification error rate is preferable if prediction
-       		accuracy of the final pruned tree is the goal.
+       		the Gini-index and cross-entropy would take smaller values than classification error rate.
+		$$ \hat{p}_1=[0.5,0.25,0.25] \Rightarrow E=0.5, G=0.625, D=1.0397 $$
+       		 $$ \hat{p}_2=[0.5,0.4,0.1] \Rightarrow E=0.5, G= {\bf 0.580}, D= {\bf 0.9433} $$
+       		\item   Gini-index and cross-entropy are more sensitive to node purity.
+       		\item To evaluate the quality of a particular split, the Gini-index and cross-entropy are more popularly used as error measurement 
+       		criteria than classification error rate. ($E$ can't distinguish $\hat{p}_1$ and $\hat{p}_2$ above, while $G/D$ are more informative for $\hat{p}_2$)
+       		\item  The classification error rate is preferable if only prediction accuracy of the final pruned tree is the goal. 
        	\end{itemize}
        \end{frame}              
                 
