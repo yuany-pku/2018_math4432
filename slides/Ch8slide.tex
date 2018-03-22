@@ -1,0 +1,1234 @@
+\documentclass{beamer}
+
+\mode<presentation> {
+	\usetheme{Pittsburgh}
+}
+
+ 
+
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\graphicspath{{./graphics/}}
+\usepackage{booktabs}
+\usepackage{picture}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{animate}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{adjustbox}
+\setbeamercovered{transparent}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\hypersetup{
+	colorlinks,
+	linkcolor={red!50!black},
+	citecolor={blue!50!black},
+	urlcolor={blue!80!black}
+}
+\def\calA{{\cal A}}
+\def\calF{{\cal F}}
+\def\calP{{\cal P}}
+\def\calE{{\cal E}}
+\def\var{{\rm var}}
+
+\def\bfA{{\bf A}}
+\def\bfB{{\bf B}}
+\def\bfC{{\bf C}}
+\def\bfD{{\bf D}}
+\def\bfE{{\bf E}}
+\def\bfF{{\bf F}}
+\def\bfG{{\bf G}}
+\def\bfU{{\bf U}}
+\def\bfV{{\bf V}}
+\def\bfW{{\bf W}}
+\def\bfX{{\bf X}}
+\def\bfY{{\bf Y}}
+\def\bfZ{{\bf Z}}
+
+\def\bfa{{\bf a}}
+\def\bfb{{\bf b}}
+\def\bfc{{\bf c}}
+\def\bfd{{\bf d}}
+\def\bfe{{\bf e}}
+\def\bff{{\bf f}}
+\def\bfg{{\bf g}}
+\def\bfu{{\bf u}}
+\def\bfv{{\bf v}}
+\def\bfw{{\bf w}}
+\def\bfx{{\bf x}}
+\def\bfy{{\bf y}}
+\def\bfz{{\bf z}}
+
+\setbeamertemplate{footline}{\insertframenumber}
+
+\usetheme{Montpellier}  
+\useoutertheme{infolines}
+\usefonttheme{serif}
+
+
+\title[]{Tree-Based Methods} 
+
+\author{Yuan YAO} 
+\institute[HKUST]
+{
+	Chapter 8 \\ 
+	\medskip
+	\textit{ } 
+}
+%\date{\today}
+
+\begin{document}
+	 	
+	 	\begin{frame}
+	 		\titlepage % Print the title page as the first slide
+	 	\end{frame}
+		
+      \begin{frame}
+      	\frametitle{Best Machine Learning Algorithms in history?}
+      	\begin{itemize}
+      		\item Boosting (chapter 8): CART, adaBoost, random forests (Leo Breiman), etc. 
+      		\item Support Vector Machines (chapter 9): or kernel methods (V. Vapnik), etc.
+      		\item Neural Networks (supplementary): perceptrons (1950s), deep learning (2010s), etc.
+        	\end{itemize}
+        \end{frame}
+
+
+ \begin{frame}
+ 	\frametitle{ }
+ 	\tableofcontents
+ \end{frame}
+ %###################################################################
+ %###################################################################
+     
+
+      
+      \begin{frame}
+      	\frametitle{About this chapter}
+      	\begin{itemize}
+      		\item  Decisions trees: splitting each variable sequentially, creating rectangular regions. 
+      		\item  Making fitting/prediction locally at each region.
+      		\item It is intuitive and easy to implement, may have good interpretation.
+      		\item  Generally of lower prediction accuracy (weak learners).
+		\item ``The Boosting problem'' (Kearns \& Valiant): \emph{Can a set of weak learners create a single strong learner?}
+      		\item  Bagging, random forests and boosting ... make fitting/prediction based on a 
+      		number of trees.
+      		\item Bagging and Boosting are general methodologies, not just limited to trees.
+        	\end{itemize}
+        \end{frame}
+
+        \begin{frame}{}
+
+                    \begin{figure}
+              \centering
+                \includegraphics[width=.4\linewidth]{ISLRFigures/CART.jpg}\quad
+                \includegraphics[width=.4\linewidth]{ISLRFigures/C45.png}
+                %\caption{A subfigure}
+              \caption{CART and C4.5}
+            \end{figure}
+
+        \end{frame}
+
+                \begin{frame}{}
+
+                    \begin{figure}
+              \centering
+                \includegraphics[width=.45\linewidth]{ISLRFigures/CART_preface1.png}\quad
+                \includegraphics[width=.45\linewidth]{ISLRFigures/CART_preface2.png}
+                %\caption{A subfigure}
+              \caption{Historical story about CART}
+            \end{figure}
+
+        \end{frame}
+        
+\section{The basics of decision trees.}        
+       \begin{frame}
+       	\frametitle{Regression trees}
+       	\begin{itemize}
+       		\item Trees can be applied to both regression and classification.
+       		\item CART refers to classification and regression trees.
+       		\item We first consider regression trees through an example of predicting 
+       		Baseball players' salaries.	
+       	\end{itemize}
+       \end{frame} 
+       
+            \begin{frame}
+            	\frametitle{The Hitters data}
+            	\begin{itemize}
+            		\item Response/Outputs: Salary.
+            	 
+            		\item Predictors/Inputs/Covariates:
+            		
+            		Years (the number of years that he has played in the major leagues) 
+            		
+            		Hits (the number of hits that he made in the previous year).
+            		
+            		\item preparing data: remove the observations with missing data and 
+            	 log-transformed the Salary (preventing heavy right-skewness)
+            		
+            	\end{itemize}
+            \end{frame} 
+            
+  
+         
+            
+        
+         
+           
+           \begin{frame}
+           	\frametitle{ }
+           	\begin{figure}
+           		\centering
+           			\includegraphics[width=.5\linewidth]{ISLRFigures/8_1.pdf}
+           			%\caption{A subfigure}
+           		\caption{1. Next page
+           		}
+           	\end{figure}
+           \end{frame}
+           
+              
+              \begin{frame}
+              
+              		  Figure 1. For the Hitters data, a regression tree for predicting the log
+              		 	salary of a baseball player, based on the number of years that he has played in
+              		 	the major leagues and the number of hits that he made in the previous year. At a
+              		 	given internal node, the label (of the form $X_j < t_k$) indicates the left-hand branch
+              		 	emanating from that split, and the right-hand branch corresponds to $ X_j \geq t_k$.
+              		 	For instance, the split at the top of the tree results in two large branches. The
+              		 	left-hand branch corresponds to Years$<4.5$, and the right-hand branch corresponds
+              		 	to Years$\geq 4.5$. The tree has two internal nodes and three terminal nodes, or
+              		 	leaves. The number in each leaf is the mean of the response for the observations
+              		 	that fall there.
+              		
+              \end{frame}
+              
+               
+               \begin{frame}
+               	\frametitle{ }
+               	\begin{figure}
+               		\centering
+               		
+               		\centering
+               		\includegraphics[width=.7\linewidth]{ISLRFigures/8_2.pdf}
+               		%\caption{A subfigure}
+               		\caption{2. The three-region partition for the Hitters data set from the
+               			regression tree illustrated in Figure 1.}
+               		 
+               		 
+               	\end{figure}
+               \end{frame}
+              
+ 
+
+  \begin{frame}
+    \frametitle{Estimation/prediction}
+    \begin{itemize}
+       \item On Regions $R_1$, $R_2$, $R_3$, the mean-log-salary is 
+       5.107, and 6.74. 
+       \item Our prediction for any players in $R_1$, $R_2$ and $R_3$ are, respectively
+       
+       $1,000 \times e^{ 5.107}=\$165,174,$ 
+       $1,000\times e^{ 5.999 }=\$402,834 $, and 
+       $1,000\times e^{6.740 } =\$845,346 $.
+       
+                 		
+                 	\end{itemize}
+                 \end{frame}  
+       
+    
+    \begin{frame}
+    	\frametitle{Estimation/prediction}
+    	\begin{itemize}   
+      \item  Trees involve a series of splittings of the data, each time by one variable.
+       \item  The series of actions taken place sequentially creates a tree-like results.
+      \item  As in Figure 1, the terminal nodes are the three indexed by the numbers, which represent
+      the 
+      regions $R_1$, $R_2$ and $R_3$. These regions constitute he final partiation of the data. 
+       \item  Terminal nodes are also called leaves.
+       \item  Each {\it internal node}    represents a splitting, 
+       \item In Figure 1, the two internal nodes are indexed by $Y<4.5$ and $Hits <117.5$.  
+        \item The lines connecting nodes are called branches.
+        \item Trees are typically drawn upside down.     		
+    \end{itemize}
+  \end{frame} 
+  
+  \begin{frame}
+  	\frametitle{ Two step towards prediction}
+  	\begin{itemize}
+  		\item 
+  	  Run the splitting according to input values sequentially, and obtain final partition of the data in regions
+  	  $R_1, ..., R_J$. 
+  		
+  		\item For any new observation with covariates in region $R_k$, we predict its response 
+  		by the average of the reponses of the data points in region $R_k$. 
+  		 
+  		
+  	\end{itemize}
+  \end{frame} 
+  
+   \begin{frame}
+   	\frametitle{How to split}
+   	\begin{itemize}
+   		\item  Suppose we wish to partition a region $R$. In other words, we wish to separate
+   		the data in region $R$ into two parts, day $R_1$ and $R_2$, according to one input values.
+   		
+   		\item What would be the optimal or efficient split in some sense?
+   		\item Only two flexibility in the split: 1. Choice of the input variable to split, 
+   		2. the cutpoint of the split of that chose input.
+   		
+   		\item Imagine that this is the final split of $R$:  $R_1$ and $R_2$ would be leaves.
+   		 
+   		 And we would use the mean response of data in $R_1 $ and $R_2$ to predict the response
+   		 of any new/old observations.
+   		 
+   		 We wish our choice of $R_1$ and $R_2$ would be optimal in the sense of achieving miminum prediction error on the training
+   		 data in region $R$.  
+   				
+   			\end{itemize}
+   		\end{frame} 
+   	 \begin{frame}
+   	 	\frametitle{Recursive binary splitting}
+   	 	\begin{itemize}	
+        \item A greedy algorithm (geedy means it is optimal at the current step):
+        
+        For $j=1, ..., p$ and all real value $s$, 
+        let $R_1(j, s)= \{i \in R: X_j < s \}$ and $ R_2(j, s) = \{i \in R: X_j \geq s\}$.
+        And let $\hat y_1 $ and $\hat y_2$ be the mean response of all observations  in $R_1(j, s)$ and $R_2(j, s)$, respectively.
+        
+        Consider the following prediction error:
+        $$\hbox{RSS}_{new}= \sum_{i\in R_1(j, s)} (y_i - \hat y_1)^2 + \sum_{i \in R_2(j, s) } (y_i - \hat y_2)^2$$
+        Choose the split  which has the smallest prediction error. This split is the optimal one, denoted as
+        $R_1$ and $R_2$. 
+   	  
+   	 \item Continue the split till the final partition. 
+   	 
+   		
+   	\end{itemize}
+   \end{frame} 
+   
+   \begin{frame}
+   	\frametitle{ }
+   	\begin{figure}
+   		\centering
+   		
+   		\centering
+   		\includegraphics[width=.7\linewidth]{ISLRFigures/8_3.pdf}
+   		%\caption{A subfigure}\\
+   		 	\end{figure}
+   		 \end{frame}
+   		 
+   		  \begin{frame}
+   		  	\frametitle{ } 
+   		  	
+   		  	
+   		 Figure 3. Top Left: A partition of two-dimensional feature space that could
+   			not result from recursive binary splitting. Top Right: The output of recursive
+   			binary splitting on a two-dimensional example. Bottom Left: A tree corresponding
+   			to the partition in the top right panel. Bottom Right: A perspective plot of the
+   			prediction surface corresponding to that tree.
+   		 
+   
+   \end{frame}
+   
+    \begin{frame}
+    	\frametitle{ When to stop split}
+    	\begin{itemize}	
+    		\item The problem of when to stop.
+    		\item If too many steps of splitting: many leaves, too complex model, small bias but large variance, 
+    		may overfit.
+    		\item If too few steps of splitting: few leaves,  too simple model, large bias but small variance,
+    		may underfit.
+    		
+    		
+    	 
+    		 
+    	\end{itemize}
+    \end{frame} 
+    
+ 
+     \begin{frame}
+     	\frametitle{ One natural idea}
+     	\begin{itemize}	
+     		\item  When splitting $R$ into $R_1$ and $R_2$,
+     		consider  the RSS before the split
+     		$$ \hbox{RSS}_{old} = \sum_{i \in R} (y_i - \hat y)^2$$
+     		where $\hat y$ is the average of the response of data in $R$.
+     		With the optimal split, the reduction of RSS 
+     		is $$ \hbox{RSS}_{old} -\hbox{RSS}_{new}$$
+     		\item We can pre-choose a threshold, $h$, and decide the worthiness of 
+     		the split.
+     		\item If the reduction is smaller than $h$, we do not do it, and stop right there; then $R$ is one terminal node (a leave).
+     		\item If the reduction is greater than $h$, we make the split, and continue with next step.  
+     	 
+     	\end{itemize}
+     \end{frame} 
+     
+     \begin{frame}
+     	\frametitle{ One natural idea}
+     	\begin{itemize}	
+     		\item  The idea is seemingly reasonable, but is too near-sighted. 
+     	 
+     		\item  Only look at the effect of the current split.
+     		\item It is possible that even if the current split is not effective, the future splits
+     		could be effective and, maybe, very effective.
+     	 
+     	\end{itemize}
+     \end{frame} 
+     
+      \begin{frame}
+      	\frametitle{Tree pruning}
+      	\begin{itemize}	
+      		\item  Grow a very large tree. 
+      		\item Prune the tree back to obtain a subtree.
+      		\item Objective: find the subtree that has the best test error.
+      		\item Use cross-validation to examine the test errors for a \emph{sequence} (parametrized by $\alpha$) of subtrees during the growth/pruning, instead of all possible subtrees which is too large a model space. 
+%      		\item Even if we can, this would probably be overfitting, since model space is too large.
+      	\end{itemize}
+      \end{frame} 
+      
+       \begin{frame}
+       	\frametitle{ Cost complexity pruning}
+       	\begin{itemize}	
+       		\item Let $T_0$ be the original (large) tree. Let $T$ be any subtree. Use 
+       		$|T_0|$ and $|T|$ to denote their numbers of teminal nodes, which represent complexity. 
+       		\item  Consider ``Loss + Penalty":
+       		$$ \sum_{m=1}^T \sum_{i \in R_m} (y_i - \hat y_m)^2  + \alpha |T|$$
+       		where $R_m$ are the terminal nodes of the subtree $T$, and the mean response 
+       		of $R_m$ is $\hat y_m$;   $\alpha$ is tuning parameter.
+       		\item  Denote the minimized subtree as $T_\alpha$. 
+       		\item If $\alpha =0$, no penalty the optimal tree is the original $T_0$.
+       		\item If $\alpha=\infty$, the tree has no split at all. The predictor is just 
+       		$\bar y$.
+       		\item The larger the $\alpha$, the more penalty for model complexity.
+       		  	\end{itemize}
+       		  \end{frame} 
+       		  \begin{frame}
+       		  	\frametitle{ Cost complexity pruning}
+       		  	\begin{itemize}	
+      
+       		\item Just like Lasso, there   exists efficient computation algorithm to compute the entire sequence of $T_\alpha$ for all $\alpha$. 
+       	 
+       		\item Use cross-validation to find the best $\alpha$ to minimize the test error.
+       	 
+       	\end{itemize}
+       \end{frame} 
+       
+         \begin{frame}
+         	\frametitle{The algorithm}
+         	\begin{itemize}	
+         	\item 1. Use recursive binary splitting to grow a large tree on the training
+         	data, stopping only when each terminal node has fewer than some
+         	minimum number of observations.
+         	\item 2. Apply cost complexity pruning to the large tree in order to obtain a
+         	sequence of best subtrees, as a function of  $\alpha$.
+         
+         	\end{itemize}
+         \end{frame} 
+          \begin{frame}
+          	\frametitle{The algorithm}
+          	\begin{itemize}	
+          		\item 	3. Use $K$-fold cross-validation to determine best  $\alpha$. That is, divide the training
+          		observations into $K$ folds. For each $k = 1, . . .,K$
+          		
+          		(a) Repeat Steps 1 and 2 on all but the $k$th fold of the training data.
+          		
+          		(b) Evaluate the mean squared prediction error on the data in the
+          		left-out $k$-th fold, as a function of  $\alpha$.
+          		
+          		(c)
+          		Average the results for each value of  $\alpha$, and pick  $\alpha$ to minimize the
+          		average error.
+          		
+          		\item 4. Return the subtree from Step 2 that corresponds to the chosen value
+          		of  $\alpha$.
+          	\end{itemize}
+          \end{frame} 
+         
+         
+            
+             \begin{frame}
+             	\frametitle{ }
+             	\begin{figure}
+             		\centering
+             		
+             		\centering
+             		\includegraphics[width=.65\linewidth]{ISLRFigures/8_4.pdf}
+             		%\caption{A subfigure}
+             		\caption{4. Regression tree analysis for the Hitters data. The unpruned tree
+             			that results from top-down greedy splitting on the training data is shown.
+             		}
+             	\end{figure}
+             \end{frame}
+             
+              
+              \begin{frame}
+              	\frametitle{ }
+              	\begin{figure}
+              		\centering
+              		
+              		\centering
+              		\includegraphics[width=.65\linewidth]{ISLRFigures/8_5.pdf}
+              		%\caption{A subfigure}
+              		\caption{5. Regression tree analysis for the Hitters data. The training,
+              			cross-validation, and test MSE are shown as a function of the number of terminal
+              			nodes in the pruned tree. Standard error bands are displayed. The minimum
+              			cross-validation error occurs at a tree size of three.
+              		}
+              	\end{figure}
+              \end{frame}
+              
+         
+              \begin{frame}
+              	\frametitle{Classification trees}
+              	\begin{itemize}
+              		\item Regression has numerical responses; and classification has
+              		qualitative responses. 
+              		\item  Recall that for regression trees, we chose to 
+              		obtain the greatest reduction of RSS.
+              		
+              		 RSS is using sum of squares to measure
+              		the error.  
+              		\item  For classification trees, one can follow the same line of 
+                       procedure as that of regression trees, but using error measurements that are
+                       more appropriate for classification.
+              
+              	\end{itemize}
+              \end{frame} 
+              
+                \begin{frame}
+                	\frametitle{Classification error rates}
+                	\begin{itemize}
+                		\item  For a region $R$, let $\hat p_k$ be the percentage of observations
+                		in this region that belong to class $k$. 
+                		\item  We assign any new observation in region $R$ as from 
+                		the class with largest $\hat p_k$, which is the so-called {\it  most commonly occuring class } in training data. 
+                		 
+                		\end{itemize}
+                	\end{frame} 
+                	
+                	\begin{frame}
+                		\frametitle{The impurity measure}
+                		\begin{itemize}
+                		
+                		
+                		\item  The classification error rate (for this region $R$) is 
+                		$$ E = 1 - \hbox{max}_k \hat p_k.$$
+                		\item The Gini index is 
+                		$$ G = \sum_{k=1}^K \hat p_k (1- \hat p_k)$$
+                		\item  The cross-entropy is 
+                		$$ D = - \sum_{k=1}^K \hat p_k \log (\hat p_k)$$.
+                		 
+                		
+                	\end{itemize}
+                \end{frame} 
+       \begin{frame}
+       	
+       	\frametitle{ }
+       	\begin{itemize}
+       		\item  If $R$ is nearly pure, most of the observations 
+       		are from one class, then 
+       		the Gini-index and cross-entropy would take smaller values than classfication error rate.
+       		 
+       		\item   Gini-index and cross-entropy are more sentive to node purity.
+       		
+       		\item To evaluate the quality of a particluar split, the Gini-index and cross-entropy  are more popularly used as error measurement 
+       		crietria than 
+       		classification error rate. 
+       		\item Any of these three approaches might be used when
+       		pruning the tree.
+       		
+       		\item  The classification error rate is preferable if prediction
+       		accuracy of the final pruned tree is the goal.
+       	\end{itemize}
+       \end{frame}              
+                
+    
+  
+               \begin{frame}
+               	\frametitle{ }
+               	\begin{figure}
+               		\centering
+               		
+               		\centering
+               		\includegraphics[width=.6\linewidth]{ISLRFigures/8_6.pdf}
+               		%\caption{A subfigure}
+               		
+               	\end{figure}
+               \end{frame}
+               
+                \begin{frame}
+               
+               
+               Figure 6. Heart data. Top: The unpruned tree. Bottom Left: 
+               Cross-validation error, training, and test error, for different sizes of the pruned tree.
+               Bottom Right: The pruned tree corresponding to the minimal cross-validation
+               error.
+                 \end{frame} 
+                
+               \begin{frame}
+               	\frametitle{Trees vs. Linear models}
+               	\begin{itemize}
+               		\item For regression model:
+               		$$ Y = f(X) + \epsilon$$
+               		\item  Linear model assumes
+               		$$f(X) = \beta_0 + \sum_{j=1}^p X_j \beta_j$$
+               		\item  Regression trees assume
+               		$$ f(X)= \sum_{m=1}^M c_m 1(X \in R_m)$$
+               		where $R_1, ..., R_M$ are rectagular partitions of the input space.
+               		\item  If the underlying realation is close to linear, linear model is
+               		better. Otherwise, regression trees are generally better.
+               		(Useless comments)
+               		
+             
+               	\end{itemize}
+               \end{frame} 
+               
+               
+           
+           \begin{frame}
+           	\frametitle{ }
+           	\begin{figure}
+           		\centering
+           		
+           		\centering
+           		\includegraphics[width=.7\linewidth]{ISLRFigures/8_7.pdf}
+           		%\caption{A subfigure}
+           		
+           	\end{figure}
+           \end{frame}
+           
+           \begin{frame}
+           	
+           	
+           	
+           	
+           	Figure 7. Top Row: A two-dimensional classification example in which
+           	the true decision boundary is linear, and is indicated by the shaded regions.
+           	A classical approach that assumes a linear boundary (left) will outperform a decision
+           	tree that performs splits parallel to the axes (right). Bottom Row: Here the
+           	true decision boundary is non-linear. Here a linear model is unable to capture
+           	the true decision boundary (left), whereas a decision tree is successful (right).
+           	
+           \end{frame}     
+               
+                 \begin{frame}
+                 	\frametitle{Advantages of Trees  }
+                 	\begin{itemize}
+                 	 
+                 	\item  Trees are very easy to explain to people. In fact, they are even easier
+                 	to explain than linear regression!
+                 	\item Some people believe that decision trees more closely mirror human
+                 	decision-making than do the regression and classification approaches
+                 	seen in previous chapters.
+                 	\item Trees can be displayed graphically, and are easily interpreted even by
+                 	a non-expert (especially if they are small).
+                 	\item Trees can easily handle qualitative predictors without the need to
+                 	create dummy variables.
+                  
+                 	 	\end{itemize}
+                 	 \end{frame} 
+                 	 
+                 	 \begin{frame}
+                 	 	\frametitle{Disadvantages of Trees  }
+                 	 	\begin{itemize}
+                 	 		
+                 	\item Trees generally do not have the same level of predictive
+                 	accuracy as some of the other regression and classification approaches
+                 	seen in this book.
+                 	\item Trees can be very non-robust. In other words, a small
+                 	change in the data can cause a large change in the final estimated
+                 	tree.
+                 	
+                 \item 	
+                 	However, by aggregating many decision trees, using methods like bagging,
+                 	random forests, and boosting, the predictive performance of trees can be
+                 	substantially improved. We introduce these concepts in the next section.
+                 	  
+                 	\end{itemize}
+                 \end{frame} 
+                 
+\section{Bagging, random forests and boosting}       
+
+\begin{frame}{}
+
+                \begin{figure}
+                    \centering
+                    
+                    \centering
+                    \includegraphics[width=.45\linewidth]{ISLRFigures/LittleBootstrap.png}\quad
+                    \includegraphics[width=.45\linewidth]{ISLRFigures/NonnegativeGarrote.png}
+                    %\caption{A subfigure}
+                    %\caption{
+                    %}
+                  \end{figure}
+
+\end{frame}
+
+                  \begin{frame}
+                  	\frametitle{Bagging (Boostrap Aggregating)  }
+                  	\begin{itemize}
+                  		\item A general purpose procedure to reduce variance of a learning method.
+                  		
+                  		\item A model averaging technique.
+                  		
+                  		\item Decision tree is generally a high variance method. (Apply the method based on 
+                  		different data based on same sampling scheme would lead to very different result.)
+                  		 
+                  	   \item Average of iid random variables would have a reduced variance $\sigma^2/n$
+                  		
+                  	\end{itemize}
+                  \end{frame} 
+               
+                   \begin{frame}
+                   \frametitle{The procedure.  }
+                   \begin{itemize}
+                   \item  Model
+                   $$ y_i = f(x_i) +\epsilon_i, \quad i=1,..., n.$$
+                   \item Suppose a statistical learning method gives $\hat f(\cdot)$ based on the training data
+                   $ (y_i, x_i), i=,1..., n$.
+                   \item  For example, 
+                   \begin{enumerate} 
+                   	\item Linear model: $\hat f(x) = \hat \beta_0  + \hat \beta^Tx_i$
+                 
+                   \item  KNN: $\hat f(x) = \sum_{j=1}^J \bar y_{\tilde R_j}$ with least distance to $K$-cluster partition. 
+                   \item  Decision tree: $\hat f(x) = \sum_{j=1}^J \bar y_{R_j}$ with rectangular partition.
+                   \item ...
+               \end{enumerate}
+              	\end{itemize}
+              \end{frame}   
+                     
+                     \begin{frame}
+                     	\frametitle{The procedure of Bagging  }
+                     	\begin{itemize}
+                     		\item Data $(y_i, x_i), i=1,..., n$; and a learning method 
+                     		$\hat f$  
+                     		\item Draw a boostrap sample from the data, and compute a $\hat f^*_1$ based on 
+                     		this set of bootstrap sample. 
+                     		\item    Draw another boostrap sample from the data, and 
+                     		compute a $\hat f^*_2$ based on 
+                     		this set of bootstrap sample. 
+                     		\item .... 
+                     		\item Repeat $M$ times, obtain $\hat f^*_1, ...., \hat f^*_M$.
+                     		\item Produce the  learning method with bagging as
+                     		
+                     		$$ \frac{1}{M} \sum_{j=1}^M \hat f^*_j $$
+                     		
+                     		
+                     		
+                   \end{itemize}
+                   \end{frame} 
+                   
+                   \begin{frame}
+                   	\frametitle{The     Bagging  }
+                   	\begin{itemize}
+                   		\item Bagging is general-purpose.
+                   	 
+                   
+                   		\item  It works best for high variance low bias learning methods.
+                   		\item  This is the case for decision trees, particularly deep trees.
+                   		\item  Also the case for large $p$. 
+                   		
+                   		\item  If the response is qualitative, we can take the majority vote (not averaging) of the 
+                   		predicted class based on all learning methods based on boostrap samples. 
+                       		
+                   		
+                   	\end{itemize}
+                   \end{frame} 
+               
+             
+         
+               
+                 \begin{frame}
+                 	\frametitle{ }
+                 	\begin{figure}
+                 		\centering
+                 		
+                 		\centering
+                 		\includegraphics[width=.5\linewidth]{ISLRFigures/8_8.pdf}
+                 		%\caption{A subfigure}
+                 		\caption{\scriptsize 8. Bagging and random forest results for the Heart data. The test
+                 			error (black and orange) is shown as a function of B, the number of bootstrapped
+                 			training sets used. Random forests were applied with $m = \sqrt{p}$.  The dashed line
+                 			indicates the test error resulting from a single classification tree. The green and
+                 			blue traces show the OOB error, which in this case is considerably lower
+                 		}
+                 	\end{figure}
+                 \end{frame}
+                    \begin{frame}
+                    	\frametitle{Out-of-Bag (OOB) error estimation  }
+                    	\begin{itemize}
+                    		\item  Estimation of test error for the bagged model.	
+                    		
+                    		\item  For each bootstrap sample, observation $i$ is bootstrap sampled with probabilty $(1-1/n)^n \approx 1/e $.
+                    		\item   For each bootstrap sample,  the number of observations not taken into 
+                    		 this bootstrap sample is $n (1-1/n)^n \approx n/e$. These are referred to 
+                    		 as out-of-bag (OOB) observations.
+                    		\item For totally $B$ bootstrap samples, about $B/e$ times, the bootstrap sample does not contain observation $i$.
+                    		\item  The trees based on these bootstrap sample can be used to predict the response of 
+                    		observation $i$.
+                    		Totally about $B/e$ predictions.
+                    		\item We average these predictions (for regression) or take majority vote (for classification) to produce the Bagged prediction for observation $i$, denote it as $\hat f^*(x_i)$. 
+                    		
+                    		
+                    	\end{itemize}
+                    \end{frame} 
+                       \begin{frame}
+                       	\frametitle{Out-of-Bag (OOB) error estimation  }
+                       	\begin{itemize}
+                       		\item  The OOB MSE is
+                       		$$ \sum_{i=1}^n (y_i - \hat f^*(x_i))^2$$
+                       		
+                       		\item The OOB classification error is 
+                       		$$ \sum_{i=1}^n I(y_i \notin \hat f^*(x_i))$$
+                       		
+                       		\item The resulting OOB error is a valid
+                       		estimate of the test error for the bagged model, since the response for each
+                       		observation is predicted using only the trees that were not fit using that
+                       		observation.
+                       	 
+                       	  \item	It can
+                       		be shown that with $B$ sufficiently large, OOB error is virtually equivalent
+                       		to leave-one-out cross-validation error.
+                       		
+                       	\end{itemize}
+                       \end{frame} 
+                  
+                  \begin{frame}
+                  	\frametitle{Variable importance measures  }
+                  	\begin{itemize}
+                  		\item Bagging improves prediction
+                  		accuracy at the expense of interpretability.
+                  	 	
+                  	 	 
+                  		\item  An overall summary of the importance of
+                  		each predictor using the RSS (for bagging regression trees) or the Gini index
+                  		(for bagging classification trees).
+                  		\item Bagging regression trees, we
+                  		can record the total amount that the RSS   is decreased due to splits
+                  		over a given predictor, averaged over all $B$ trees.
+                  		\item  A large value indicates
+                  		an important predictor.
+                  		\item Bagging classification
+                  		trees, we can add up the total amount that the Gini index   is decreased
+                  		by splits over a given predictor, averaged over all $B$ trees.
+                  		
+                  	\end{itemize}
+                  \end{frame} 
+              
+                
+                   \begin{frame}
+                   	\frametitle{ }
+                   	\begin{figure}
+                   		\centering
+                   		
+                   		\centering
+                   		\includegraphics[width=.6\linewidth]{ISLRFigures/8_9.pdf}
+                   		%\caption{A subfigure}
+                   		\caption{\scriptsize 9. A variable importance plot for the Heart data. Variable importance
+                   			is computed using the mean decrease in Gini index, and expressed relative
+                   			to the maximum.
+                   		}
+                   	\end{figure}
+                   \end{frame}
+                     
+                     \begin{frame}{Motivation of Random Forest}
+                     \begin{itemize}
+                     \item An average of $B$ i.i.d random variables, each with variance $\sigma^2$, has variance $\frac{1}{B}\sigma^2$.
+                     \item What if not independent but correlated?
+                     \item If the variables are simply i.d. (identically distributed but not necessarily independent) with positive pairwise correlation $\rho$, the variance of the average is $$\rho \sigma^2 +\frac{1-\rho}{B}\sigma^2.$$
+                     \item The idea of random forests is to improve the variance reduction of bagging by reducing the correlation between trees, without increasing the variance too much.
+                   \end{itemize}
+                     \end{frame}
+                    
+                    \begin{frame}
+                    	\frametitle{Random Forest  }
+                    	\begin{itemize}
+                    		\item Same as bagging decision trees, except  ...
+                    		\item When building these
+                    		decision trees, each time a split in a tree is considered, a random sample of
+                    		$m$ predictors is chosen as split candidates from the full set of $p$ predictors
+                    		\item  Typically $ m \approx \sqrt{p}$.
+                    		 
+                    		
+                    	\end{itemize}
+                    \end{frame} 
+                    
+                      \begin{frame}
+                      	\frametitle{Random Forest  }
+                      	\begin{itemize}
+                      		\item Every step, the split  is constrained on a small number $m$ and randomly 
+                      		selected inputs. 
+                      		\item  Avoid all trees are too similar to each other. 
+                      		\item  Too similar trees are too highly correlated, average highly correlated  trees
+                      		cannot achieve large amount of variance reduction.
+                      		\item  Extreme case: If all trees are the same, average of them is still the same one.
+                      		\item Averaging uncorrelated or low-correlated trees can achieve large amount of variance reduction.
+                      		\item Random forest    produces less correlated trees.
+                      		\item Random forest reduces to bagging if $m=p$.
+                      		
+                      		
+                      	\end{itemize}
+                      \end{frame} 
+                   
+                     \begin{frame}
+                      
+                     	\begin{figure}
+                     		\centering
+                     		
+                     		\centering
+                     		\includegraphics[width=.6\linewidth]{ISLRFigures/8_10.pdf}
+                     		%\caption{A subfigure}
+                     		\caption{\scriptsize 10. Results from random forests for the 15-class gene expression
+                     			data set with $p = 500$ predictors. The test error is displayed as a function of
+                     			the number of trees. Each colored line corresponds to a different value of $m$, the
+                     			number of predictors available for splitting at each interior tree node. Random
+                     			forests ($m < p$) lead to a slight improvement over bagging $(m=p)$. A single
+                     			classification tree has an error rate of 45.7\%.
+                     		}
+                     	\end{figure}
+                     \end{frame}
+                     
+                          
+                     
+                     \begin{frame}
+                     	\frametitle{Boosting}
+                     	\begin{itemize}
+                     		\item General purpose for improving learning methods by combining many weaker learners in attempt to produce a strong learner.
+                     		\item Like bagging, boosting involves combining
+                     		a large number of weaker learners.
+                     		\item The weaker learners are created sequentially. (no boostrap involved).
+                     		\item   Bagging create   large variance and possibly 
+                     		over-fit boostrap learners  and try to reduce their variance by averaging.
+                     		\item  Boosting create weak learners sequentially and slowly (to avoid over-fit).
+                     
+                     	\end{itemize}
+                     \end{frame} 
+
+                     \begin{frame}{Adaboost}%by Yoav Freund Robert E. Schapire (1996)
+                     \begin{itemize}
+                     \item 1. Initialize the data weights $\{w_n\}$ by setting $w_n^{(1)}= 1/N$ for $n=1,\dots,N$.
+                     \item 2. For $m=1,\dots,M$:
+                     \begin{itemize}
+                      \item (a) Fit a classifier $f_m(\bfx)$ to the training data by minimizing the weighted error function
+                        \begin{align}  \label{Jm}
+                        J_m = \sum^N_{n=1}w_n^{(m)} \mathbb{I}(f_m(\bfx_n)\ne y_n),
+                        \end{align}
+                      where $\mathbb{I}(f_m(\bfx_n)\ne y_n)$ is the indicator function and equals 1 when $f_m(\bfx_n)\ne y_n$ and 0 otherwise.
+                      % \item Evaluate the quantities
+                      % \begin{align}\label{Em}
+                      % \epsilon_m = \frac{\sum^N_{n=1} w_n^{(m)}\mathbb{I}(f_m(\bfx_n)\ne y_n)}{\sum^N_{n=1} w_n^{(m)}}
+                      % \end{align}
+                      % and then use these to evaluate 
+                      % \begin{align}\label{alpham}
+                      % \alpha_m = \log \left\{\frac{1-\epsilon_m}{\epsilon_m} \right\}
+                      % \end{align}
+                      % \item Update the data weights
+                      % \begin{align}\label{wn}
+                      % w_n^{(m+1)} = w_n^{(m+1)} \exp\{\alpha_m \mathbb{I}(f_m(\bfx_n)\ne y_n) \}
+                      % \end{align}
+                     \end{itemize}
+                     %\item Make prediction by $$F_M(\bfx)=\mathrm{sign}\left( \sum^M_{m=1} \alpha_m f_m(\bfx) \right).$$
+                     \end{itemize}
+                     \end{frame}
+
+                     \begin{frame}{Adaboost}%by Yoav Freund Robert E. Schapire (1996)
+                      \begin{itemize}
+                     % % \item Initialize the data weights $\{w_n\}$ by setting $w_n^{(1)}= 1/N$ for $n=1,\dots,N$.
+                      \item 2. (Continued)
+                      \begin{itemize}
+                     %  % \item Fit a classifier $f_m(\bfx)$ to the training data by minimizing the weighted error function
+                     %  %   \begin{align}  \label{Jm}
+                     %  %   J_m = \sum^N_{n=1}w_n^{(m)} \mathbb{I}(f_m(\bfx_n)\ne y_n)
+                     %  %   \end{align}
+                     %  % where $\mathbb{I}(f_m(\bfx_n)\ne y_n)$ is the indicator function and equals 1 when $f_m(\bfx_n)\ne y_n$ and 0 otherwise.
+                        \item (b) Evaluate the quantities
+                       \begin{align}\label{Em}
+                       \epsilon_m = \frac{\sum^N_{n=1} w_n^{(m)}\mathbb{I}(f_m(\bfx_n)\ne y_n)}{\sum^N_{n=1} w_n^{(m)}}
+                       \end{align}
+                       and then use these to evaluate 
+                       \begin{align}\label{alpham}
+                       \alpha_m = \log \left\{\frac{1-\epsilon_m}{\epsilon_m} \right\}
+                       \end{align}
+                       \item (c) Update the data weights
+                       \begin{align}\label{wn}
+                       w_n^{(m+1)} = w_n^{(m+1)} \exp\{\alpha_m \mathbb{I}(f_m(\bfx_n)\ne y_n) \}
+                       \end{align}
+                      \end{itemize}                     
+                      \item 3. Make prediction by 
+                      \begin{align}\label{Ym}
+                      F_M(\bfx)=\mathrm{sign}\left( \sum^M_{m=1} \alpha_m f_m(\bfx) \right).
+                      \end{align}
+                      \end{itemize}
+
+                     \end{frame}
+
+                     \begin{frame}{Illustration of Adaboost}
+
+                      \begin{figure}
+                        \centering
+                        
+                        \centering
+                        \includegraphics[width=.7\linewidth]{ISLRFigures/Adaboost.png}
+                        %\caption{A subfigure}
+                        \caption{\footnotesize Each figure shows the number m of base learners trained so far, along with the decision
+boundary of the most recent base learner (dashed black line) and the combined decision boundary of the ensemble
+(solid green line). Each data point is depicted by a circle whose radius indicates the weight assigned to
+that data point when training the most recently added base learner. Thus, for instance, we see that points that
+are misclassified by the $m = 1$ base learner are given greater weight when training the $m = 2$ base learner. Bishop (2006).
+                        }
+                      \end{figure}
+
+                     \end{frame}
+
+                    
+
+                     \begin{frame}{Statistical view of Adaboost}
+                     \begin{itemize}\footnotesize
+                      \item Consider the exponential error function 
+                      \begin{align}\label{exp_loss}
+                      E = \sum^N_{n=1} \exp\{-y_n F_M(\bfx_n)\},
+                      \end{align}
+                      where $F_M(\bfx)=\frac{1}{2}\sum^M_{m=1} \alpha_m f_m(\bfx)$ and $y_n\in \{-1,1\}$. 
+                      \item Our goal is to minimize $E$ w.r.t. both $\alpha_m$ and $f_m(\bfx)$.
+                      \item Instead of doing a global error function miminization, we shall suppose that the base classifiers $f_1(\bfx),\dots, f_{m-1}(\bfx)$ are fixed, as are their coefficients $\alpha_1,\dots,\alpha_{m-1}$, and so we are minimizing only w.r.t. $\alpha_m$ and $f_m(\bfx)$.
+                      \begin{align}\label{E-sep}
+                      E&=\sum^N_{n=1}\exp\left\{ -y_n F_{m-1}(\bfx_n) - \frac{1}{2} y_n \alpha_m f_m(\bfx_n)\right\}\nonumber\\
+                      &=\sum^N_{n=1}w_n^{(m)}\exp\{-\frac{1}{2}y_n \alpha_m f_m(\bfx_n)\}
+                      \end{align}
+                      where $w_n^{(m)}=\exp\{-y_n F_{m-1}(\bfx_n)\}$ can be viewed as constants.
+                     \end{itemize}
+                     \end{frame}
+                     
+                     \begin{frame}{}
+                     \begin{itemize}\small
+                      \item Denote $\mathcal{T}_m$ and $\mathcal{M}_m$ as the sets of correctly classifed data points by $f_m(\bfx)$ and the misclassified points, respectively.
+                      \item We have
+                      \begin{align}
+                      E&=e^{-\alpha_m/2}\sum_{n\in \mathcal{T}_m}w_n^{(m)} + e^{\alpha_m/2}\sum_{n\in \mathcal{M}_m} w_n^{(m)}\nonumber\\
+                      &=(e^{\alpha_m/2} - e^{-\alpha_m/2})\sum^N_{n-1}w_n^{(m)}\mathcal{I}(f_m(\bfx_n)\ne y_n) + e^{-\alpha_m/2}\sum^N_{n=1}w_n^{(m)}.
+                      \end{align}
+                      \item When we minimize this w.r.t. $f_m(\bfx)$, the second term is constant, and so the is equivalent to minimizing (\ref{Jm}) because the overall multiplicative factor in front of the summation does not affect the location of the minimum.
+                      \item Similarly, minimizing w.r.t. $\alpha_m$, we obtain (\ref{alpham}) in which $\epsilon_m$ is defined by (\ref{Em}).
+                     \end{itemize}
+                     \end{frame}
+
+                     \begin{frame}{}
+                     \begin{itemize}
+                     \item From (\ref{E-sep}), we see that, having found $\alpha_m$ and $f_m(\bfx)$, the weights on the data points are updated using
+                     $$w_n^{(m+1)} = w_n^{(m)}\exp\left\{-\frac{1}{2} y_n \alpha_m f_m(\bfx_n)\right\}.$$
+                     \item Making use of the fact that
+                     $$y_n f_m(\bfx_n) = 1-2\mathbb{I}(\bfy_m \ne y_n),$$
+                     we see that the weight $w_n^{(m)}$ are updated at the next iteration using
+                     $$w_n^{(m+1)} = w_n^{m}\exp(-\alpha_m/2)\exp \{\alpha_m \mathbb{I}(f_m(\bfx_n) \ne y_n)\}.$$
+                     \item Because the term $\exp(-\alpha_m/2)$ is independent of $n$, we see that it weights all data points by the same factor and so can be discarded. Thus we obtain (\ref{wn}).
+                     \item Finally, once all the base classifiers are trained, new data points are classified by evaluating the \textbf{sign} of the combined function. Because the factor of $1/2$ does not affect the sign, this gives (\ref{Ym}). 
+                     \end{itemize}
+                     \end{frame}
+
+                     \begin{frame}{Why exponiental loss function?}
+                     \begin{itemize}\small
+                      \item We have shown that the Adaboost algorithm minimizes the exponential loss function (\ref{exp_loss}). How to justify the minimization of the exponential loss function?
+                      \item Consider the population version of the exponential loss function, 
+                      $$\mathbb{E}_{\bfx,y}[\exp \{-y F(\bfx)\}]=\sum_y \int \exp\{-y F(\bfx)p(y|\bfx)p(\bfx)\}d\bfx$$
+                      \item Taking the functional derivative w.r.t. $F(\bfx)$, we get
+                      \begin{align*}
+                      &\frac{\partial}{\partial F(\bfx)}\mathbb{E}_{\bfx,y}[\exp\{-y F(\bfx)\} ]=-\sum_y y\exp\{-y F(\bfx)\}p(y|\bfx)p(\bfx)\\
+                      &=\{\exp\{F(\bfx)\}p(y=-1|\bfx)-\exp\{-F(\bfx)\}p(y=1|\bfx) \}p(\bfx).
+                      \end{align*}
+                      \item Setting this equal to zero and rearranging, we obtain
+                      $$F(\bfx)= \frac{1}{2}\log \left\{\frac{p(y=1|\bfx)}{p(y=-1|\bfx)}\right\},$$
+                      justifying the use of the sign function to arrive the final classification decision.
+                      \end{itemize}
+                     \end{frame}
+
+                     \begin{frame}{Friedman's Gradient Boost algorithm}
+                     \begin{itemize}
+\item Initialize $\hat F_0(\mathbf{x})$ to be a constant, $\hat F_0(\mathbf{x}) = \arg \min_{\rho} \sum_{i=1}^N L(y_i,\rho)$. \\
+\item For $m$ in $1,\ldots,M$ do
+\begin{enumerate}
+\item Compute the negative gradient as the working response
+    \begin{equation}
+    r_i = -\frac{\partial}{\partial F_{m-1}(\mathbf{x}_i)} L(y_i,F_{m-1}(\mathbf{x}_i)) \mbox{\Huge $|$}_{F_{m-1}(\mathbf{x}_i)=\hat F_{m-1}(\mathbf{x}_i)}
+    \end{equation}
+\item Fit a regression model, $g(\mathbf{x})$, predicting $r_i$ from the covariates $\mathbf{x}_i$. \item Choose a gradient descent step size as
+    \begin{equation}
+    \rho = \arg \min_{\rho} \sum_{i=1}^N L(y_i,\hat F_{m-1}(\mathbf{x}_i)+\rho g(\mathbf{x}_i))
+    \end{equation}
+\item Update the estimate of $F(\mathbf{x})$ as
+    \begin{equation}
+    \hat F_m(\mathbf{x}) = \hat F_{m-1}(\mathbf{x}) + \rho g(\mathbf{x})
+    \end{equation}
+\end{enumerate} 
+\end{itemize}
+                     \end{frame}
+                         
+\begin{frame}{Gradient Boosting Tree}
+\footnotesize
+Initialize $\hat F_0(\mathbf{x})$ to be a constant, $\hat F_0(\mathbf{x}) = \arg \min_{\rho} \sum_{i=1}^N L(y_i,\rho)$ \\
+For $m$ in $1,\ldots,M$ do
+\begin{enumerate}\footnotesize
+\item Compute the negative gradient as the working response
+    \begin{equation}
+    r_i = -\frac{\partial}{\partial F_{m-1}(\mathbf{x}_i)} L(y_i,F_{m-1}(\mathbf{x}_i)) \mbox{\Huge $|$}_{F_{m-1}(\mathbf{x}_i)=\hat F_{m-1}(\mathbf{x}_i)}
+    \end{equation}
+\item Randomly select $\mathrm{prop}\times N$ cases from the dataset, e.g., $\mathrm{prop} = 0.5$.
+\item Fit a regression tree with $K$ terminal nodes, $g(\mathbf{x})=\mathbb{E}(r|\mathbf{x})$. This tree is fit using only those randomly selected observations
+\item Compute the optimal terminal node predictions, $\rho_1,\dots,\rho_K$, as
+    \begin{equation}
+    \rho_k = \arg \min_{\rho} \sum_{\mathbf{x}_i\in S_k} L(y_i,\hat F_{m-1}(\mathbf{x}_i)+\rho)
+    \end{equation}
+where $S_k$ is the set of $\mathbf{x}$s that define terminal node $k$. Again this step uses only the randomly selected observations.
+\item Update $\hat F_{m}(\mathbf{x})$ as
+    \begin{equation}
+    \hat F_m(\mathbf{x}) = \hat F_{m-1}(\mathbf{x}) + {\color{red}{\lambda}} \rho_{k(\mathbf{x})}
+    \end{equation}
+where $k(\mathbf{x})$ indicates the index of the terminal node into which an observation with features $\mathbf{x}$ would fall.
+\end{enumerate}
+\end{frame}
+
+
+                         % \begin{frame}
+                         % 	\frametitle{Boosting}
+                         % 	\begin{itemize}
+                         % 		\item  Suppose we have model
+                         % 		$$ y_i = f(x_i) + \epsilon_i$$
+                         % 		and a learning method to produce $\hat f$ based on $(y_i, x_i), i=1,..,n$.
+                         % 		\item Start with an initial predictor $\hat f =0$. Let $r_i= y_i$.
+                         % 		\item Start loop:
+                         % 		\begin{enumerate}
+                         % 		\item  Fit the data $(x_i, r_i), i=1,.., n$, to produce $\hat g$.
+                         % 		\item  Update $\hat f$ by $\hat f + \lambda \hat g$. 
+                         % 		\item  Update $ r_i $ by $r_i - \lambda \hat g(x_i)$. 
+                         % 		\end{enumerate}
+                         % 		\item  Continue the loop ... till a stop. 
+                         % 		\item Output $\hat f$
+                         % 		\item Note that the output $\hat f$ is the sum of $\lambda  \hat g$ at each step. 
+                         		
+                         	
+                         % 	\end{itemize}
+                         % \end{frame} 
+                     
+                             
+                            % \begin{frame}
+                            % 	\frametitle{Algorithm for tree boosting}
+                            % 	\begin{itemize}
+                            % 		\item 1. Set $f(x) = 0$ and $r_i=y_i$ for all $i$ in the training set.
+                            % 		\item 2. For $b=1, 2, ..., B$, repeat:
+                            % 		\begin{enumerate} 
+                            % 		\item Fit a tree   with $d$ splits ($d+1$ terminal nodes) to the training
+                            % 		data $(x_i , r_i)$.  
+                            % 	\item Update  $\hat f$ by adding in a shrunken version of the new tree:
+                            % 		$$ \hat f(x) \leftarrow \hat f(x) +  \lambda \hat f_b(x)$$
+                            % 	\item  Update the residuals,
+                            % 	$$r_i  \leftarrow r_i - \lambda \hat f_b(x_i)= y_i - \hat f(x_i).  $$
+                            % 	\end{enumerate}
+                            % 	\item 3.	 Output the boosted model $\hat f$. In fact,
+                            % 	$$	\hat  f(x) = \sum_{i=1}^B \lambda \hat f^b(x).
+                            % 	 $$
+                            		
+                            % 	\end{itemize}
+                            % \end{frame} 
+
+                           
+                             \begin{frame}
+                             	\frametitle{Tuning parameters for boosting trees}
+                             	\begin{itemize}
+                             		\item  The number of trees $M$. Large $M$ leads to overfit. (not a tuning parameter for bagging)
+                             		 
+                             		\item  The learning rate $\lambda$. 
+                             		\item   The number $d$ in splits in each tree (the size of each tree). 
+                             		Often $d=1$ works well, in which case each
+                             		tree is a {\it stump}, consisting of a single split
+                             	 
+                             	 
+                             		
+                             	\end{itemize}
+                             \end{frame}   
+                            
+                       \begin{frame}
+                       	\frametitle{}
+                       	\begin{figure}
+                       		\centering
+                       		
+                       		\centering
+                       		\includegraphics[width=.6\linewidth]{ISLRFigures/8_11.pdf}
+                       		%\caption{A subfigure}
+                       		\caption{\scriptsize 8.11. Results from performing boosting and random forests on the
+                       			15-class gene expression data set in order to predict cancer versus normal. The
+                       			test error is displayed as a function of the number of trees. For the two boosted
+                       			models, $\lambda=0.01$. Depth-1 trees slightly outperform depth-2 trees, and both outperform
+                       			the random forest, although the standard errors are around 0.02, making
+                       			none of these differences significant. The test error rate for a single tree is 24\%.
+                       		}
+                       	\end{figure}
+                       \end{frame}
+
+
+                            \begin{frame}{Forward Stagewise linear regression}
+                            Consider a set of fixed basis functions $\{T_k\}_{k=1,\dots,K}$. 
+                            \begin{itemize}
+                              \item Initialze $\check{\alpha}_k=0, k = 1, \dots, K$. Set $\epsilon>0$ to some small constant, and $M$ large.
+                              \item For $m = 1$ to $M$:
+                              \begin{itemize}
+                                \item (a) $(\beta^*, k^*) = \arg\min_{\beta,k} \sum^N_{i=1} \left(y_i - \sum^K_{l=1} \check{\alpha}_l T_l(\bfx_i) -\beta T_k(\bfx_i)\right)$
+                                \item (b) $\check{\alpha}_{k^*} \leftarrow \check{\alpha}_{k^*} + \epsilon \cdot \mathrm{sign}(\beta^*).$
+                              \end{itemize}
+                              \item Output $F_M(\bfx) = \sum^K_{k=1} \check{\alpha}_k T_k(\bfx).$
+                            \end{itemize}
+                            \end{frame}
+
+                            \begin{frame}{}
+                                        \begin{figure}
+                          \centering
+                          
+                          \centering
+                          \includegraphics[width=.7\linewidth]{ISLRFigures/LassoBoostingLinear.png}
+                          %\caption{A subfigure}
+                          \caption{Profiles of estimated coefficients from linear regression, for the
+prostate data. The left panel shows the results from the Lasso,
+for different values of the bound parameter $t = \sum_k|\alpha_k|$. The right panel shows
+the results of the forward stagewise linear regression, using $M = 220$ consecutive steps of size $\epsilon=0.01$.
+                          }
+                        \end{figure}
+                            \end{frame}
+
+              \begin{frame}{Summary: Statistical view of boosting methods}
+                    Boosting methods have three important properties that contribute to their success:
+                     \begin{itemize}
+                      \item they fit an additive model in a flexible set of basis functions.
+
+                      \item they use a suitable loss function for the fitting process.
+
+                      \item they regularize by forward stagewise fitting; with shrinkage this mimics an $L_1$ (Lasso) penalty on the weights.
+                     \end{itemize}
+                     \end{frame}
+                      
+      		% \begin{frame}
+      		% 	\frametitle{Exercises  }
+      			
+      			
+      		% 	{\sl  Run the R-Lab codes in Section *.3 of ISLR
+      				
+      		% 		Exercises
+      	 % 1-4 and 7-8 of Section  8.4 of ISLR 
+      		% 	}
+      			
+   
+      		% \end{frame}
+      		
+      			% \begin{frame}
+      			% 	\frametitle{  }
+      				
+      				
+      				
+      			% 	End of Chapter 8. 
+      				
+      				
+      			% \end{frame}
+      
+    \end{document}
+    
+    
+ 
