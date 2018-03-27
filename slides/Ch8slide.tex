@@ -964,7 +964,7 @@
                        \end{align}
                        \item (c) Update the data weights
                        \begin{align}\label{wn}
-                       w_n^{(m+1)} = w_n^{(m+1)} \exp\{\alpha_m \mathbb{I}(f_m(\bfx_n)\ne y_n) \}
+                       w_n^{(m+1)} = w_n^{(m)} \exp\{\alpha_m \mathbb{I}(f_m(\bfx_n)\ne y_n) \}
                        \end{align}
                       \end{itemize}                     
                       \item 3. Make prediction by 
@@ -1105,11 +1105,11 @@ For $m$ in $1,\ldots,M$ do
     \end{equation}
 \item Randomly select $\mathrm{prop}\times N$ cases from the dataset, e.g., $\mathrm{prop} = 0.5$.
 \item Fit a regression tree with $K$ terminal nodes, $g(\mathbf{x})=\mathbb{E}(r|\mathbf{x})$. This tree is fit using only those randomly selected observations
-\item Compute the optimal terminal node predictions, $\rho_1,\dots,\rho_K$, as
+\item Compute the optimal terminal node predictions, $\rho_1\subseteq \rho_2 \subseteq \dots \subseteq \rho_K=g$, as
     \begin{equation}
-    \rho_k = \arg \min_{\rho} \sum_{\mathbf{x}_i\in S_k} L(y_i,\hat F_{m-1}(\mathbf{x}_i)+\rho)
+    \rho_k = \arg \min_{\rho\in \{\rho_1,\ldots,\rho_K\}} \sum_{\mathbf{x}_i\in S_k} L(y_i,\hat F_{m-1}(\mathbf{x}_i)+\rho)
     \end{equation}
-where $S_k$ is the set of $\mathbf{x}$s that define terminal node $k$. Again this step uses only the randomly selected observations.
+where $S_k$ is the set of $\mathbf{x}$'s that define terminal node $k$. Again this step uses only the randomly selected observations.
 \item Update $\hat F_{m}(\mathbf{x})$ as
     \begin{equation}
     \hat F_m(\mathbf{x}) = \hat F_{m-1}(\mathbf{x}) + {\color{red}{\lambda}} \rho_{k(\mathbf{x})}
@@ -1235,28 +1235,26 @@ the results of the forward stagewise linear regression, using $M = 220$ consecut
                      \end{itemize}
                      \end{frame}
                       
-      		% \begin{frame}
-      		% 	\frametitle{Exercises  }
+\begin{frame}
+\frametitle{Exercises  }
       			
       			
-      		% 	{\sl  Run the R-Lab codes in Section *.3 of ISLR
+{\sl  Run the R-Lab codes in Section *.3 of ISLR
       				
-      		% 		Exercises
-      	 % 1-4 and 7-8 of Section  8.4 of ISLR 
-      		% 	}
+Exercises 3, 4, 7, 8, 9, 10 of Section  8.4 of ISLR 
+}
       			
-   
-      		% \end{frame}
+\end{frame}
       		
-      			% \begin{frame}
-      			% 	\frametitle{  }
+      			\begin{frame}
+      			\frametitle{  }
       				
       				
       				
-      			% 	End of Chapter 8. 
+      			End of Chapter 8. 
       				
       				
-      			% \end{frame}
+      			\end{frame}
       
     \end{document}
     
