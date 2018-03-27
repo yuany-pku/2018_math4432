@@ -700,16 +700,16 @@
                      	\begin{itemize}
                      		\item Data $(y_i, x_i), i=1,..., n$; and a learning method 
                      		$\hat f$  
-                     		\item Draw a boostrap sample from the data, and compute a $\hat f^*_1$ based on 
+                     		\item Draw a bootstrap sample from the data, and compute a $\hat f^*_1$ based on 
                      		this set of bootstrap sample. 
-                     		\item    Draw another boostrap sample from the data, and 
+                     		\item    Draw another bootstrap sample from the data, and 
                      		compute a $\hat f^*_2$ based on 
                      		this set of bootstrap sample. 
                      		\item .... 
-                     		\item Repeat $M$ times, obtain $\hat f^*_1, ...., \hat f^*_M$.
+                     		\item Repeat $B$ times, obtain $\hat f^*_1, ...., \hat f^*_B$.
                      		\item Produce the  learning method with bagging as
                      		
-                     		$$ \frac{1}{M} \sum_{j=1}^M \hat f^*_j $$
+                     		$$ \frac{1}{B} \sum_{b=1}^B \hat f^*_b$$
                      		
                      		
                      		
@@ -720,11 +720,10 @@
                    	\frametitle{The     Bagging  }
                    	\begin{itemize}
                    		\item Bagging is general-purpose.
-                   	 
-                   
                    		\item  It works best for high variance low bias learning methods.
-                   		\item  This is the case for decision trees, particularly deep trees.
-                   		\item  Also the case for large $p$. 
+				\item  When the trees are grown deep, and are not pruned, each individual tree has high variance, but low bias.
+                   		\item  Averaging these trees reduces the variance. 
+%                   		\item  Also the case for large $p$. 
                    		
                    		\item  If the response is qualitative, we can take the majority vote (not averaging) of the 
                    		predicted class based on all learning methods based on boostrap samples. 
@@ -735,37 +734,18 @@
                
              
          
-               
-                 \begin{frame}
-                 	\frametitle{ }
-                 	\begin{figure}
-                 		\centering
-                 		
-                 		\centering
-                 		\includegraphics[width=.5\linewidth]{ISLRFigures/8_8.pdf}
-                 		%\caption{A subfigure}
-                 		\caption{\scriptsize 8. Bagging and random forest results for the Heart data. The test
-                 			error (black and orange) is shown as a function of B, the number of bootstrapped
-                 			training sets used. Random forests were applied with $m = \sqrt{p}$.  The dashed line
-                 			indicates the test error resulting from a single classification tree. The green and
-                 			blue traces show the OOB error, which in this case is considerably lower
-                 		}
-                 	\end{figure}
-                 \end{frame}
                     \begin{frame}
                     	\frametitle{Out-of-Bag (OOB) error estimation  }
                     	\begin{itemize}
                     		\item  Estimation of test error for the bagged model.	
                     		
-                    		\item  For each bootstrap sample, observation $i$ is bootstrap sampled with probabilty $(1-1/n)^n \approx 1/e $.
+                    		\item  For each bootstrap sample, observation $i$ is bootstrap sampled with probability $(1-1/n)^n \approx 1/e $.
                     		\item   For each bootstrap sample,  the number of observations not taken into 
                     		 this bootstrap sample is $n (1-1/n)^n \approx n/e$. These are referred to 
                     		 as out-of-bag (OOB) observations.
                     		\item For totally $B$ bootstrap samples, about $B/e$ times, the bootstrap sample does not contain observation $i$.
-                    		\item  The trees based on these bootstrap sample can be used to predict the response of 
-                    		observation $i$.
-                    		Totally about $B/e$ predictions.
-                    		\item We average these predictions (for regression) or take majority vote (for classification) to produce the Bagged prediction for observation $i$, denote it as $\hat f^*(x_i)$. 
+                    		\item  For each observation $z_i = (x_i,y_i)$, construct its bagged predictor by averaging (for regression) or taking majority vote (for classification) of only those trees corresponding to bootstrap samples in which $z_i$ did not appear, denoted as $\hat f^*_{-i}(x_i)$.
+ %                   		\item We average these predictionsto  or take majority vote (for classification) produce the Bagged prediction for observation $i$, . 
                     		
                     		
                     	\end{itemize}
@@ -774,10 +754,10 @@
                        	\frametitle{Out-of-Bag (OOB) error estimation  }
                        	\begin{itemize}
                        		\item  The OOB MSE is
-                       		$$ \sum_{i=1}^n (y_i - \hat f^*(x_i))^2$$
+                       		$$ \sum_{i=1}^n  (y_i - \hat f^*_{{-i}}(x_i))^2$$
                        		
                        		\item The OOB classification error is 
-                       		$$ \sum_{i=1}^n I(y_i \notin \hat f^*(x_i))$$
+                       		$$ \sum_{i=1}^n  I(y_i \notin \hat f^*_{{-i}}(x_i))$$
                        		
                        		\item The resulting OOB error is a valid
                        		estimate of the test error for the bagged model, since the response for each
@@ -790,12 +770,30 @@
                        		
                        	\end{itemize}
                        \end{frame} 
-                  
+                   
+                 \begin{frame}
+                 	\frametitle{ }
+                 	\begin{figure}
+                 		\centering
+                 		
+                 		\centering
+                 		\includegraphics[width=.5\linewidth]{ISLRFigures/8_8.pdf}
+                 		%\caption{A subfigure}
+                 		\caption{\scriptsize 8. Bagging and random forest results for the Heart data. The test
+                 			error (black and orange) is shown as a function of $B$, the number of bootstrapped
+                 			training sets used. Random forests were applied with $m = \sqrt{p}$.  The dashed line
+                 			indicates the test error resulting from a single classification tree. The green and
+                 			blue traces show the OOB error, which in this case is considerably lower
+                 		}
+                 	\end{figure}
+                 \end{frame}
+
+              
                   \begin{frame}
                   	\frametitle{Variable importance measures  }
                   	\begin{itemize}
-                  		\item Bagging improves prediction
-                  		accuracy at the expense of interpretability.
+                  		\item Bagging improves {\bf prediction}
+                  		accuracy at the expense of {\bf interpretability}.
                   	 	
                   	 	 
                   		\item  An overall summary of the importance of
@@ -854,20 +852,37 @@
                       \begin{frame}
                       	\frametitle{Random Forest  }
                       	\begin{itemize}
-                      		\item Every step, the split  is constrained on a small number $m$ and randomly 
+                      		\item Every step, the split is constrained on a small number $m$ and randomly 
                       		selected inputs. 
                       		\item  Avoid all trees are too similar to each other. 
                       		\item  Too similar trees are too highly correlated, average highly correlated  trees
                       		cannot achieve large amount of variance reduction.
                       		\item  Extreme case: If all trees are the same, average of them is still the same one.
                       		\item Averaging uncorrelated or low-correlated trees can achieve large amount of variance reduction.
-                      		\item Random forest    produces less correlated trees.
+                      		\item Random forest  produces less correlated trees.
                       		\item Random forest reduces to bagging if $m=p$.
                       		
                       		
                       	\end{itemize}
                       \end{frame} 
-                   
+ 
+                  \begin{frame}
+                 	\frametitle{ }
+                 	\begin{figure}
+                 		\centering
+                 		
+                 		\centering
+                 		\includegraphics[width=.5\linewidth]{ISLRFigures/8_8.pdf}
+                 		%\caption{A subfigure}
+                 		\caption{\scriptsize 8. Bagging and random forest results for the Heart data. The test
+                 			error (black and orange) is shown as a function of $B$, the number of bootstrapped
+                 			training sets used. Random forests were applied with $m = \sqrt{p}$.  The dashed line
+                 			indicates the test error resulting from a single classification tree. The green and
+                 			blue traces show the OOB error, which in this case is considerably lower
+                 		}
+                 	\end{figure}
+                 \end{frame}
+                  
                      \begin{frame}
                       
                      	\begin{figure}
@@ -894,9 +909,9 @@
                      		\item General purpose for improving learning methods by combining many weaker learners in attempt to produce a strong learner.
                      		\item Like bagging, boosting involves combining
                      		a large number of weaker learners.
-                     		\item The weaker learners are created sequentially. (no boostrap involved).
-                     		\item   Bagging create   large variance and possibly 
-                     		over-fit boostrap learners  and try to reduce their variance by averaging.
+                     		\item The weaker learners are created sequentially (no bootstrap involved).
+                     		\item   Bagging create large variance and possibly 
+                     		over-fit bootstrap learners and try to reduce their variance by averaging.
                      		\item  Boosting create weak learners sequentially and slowly (to avoid over-fit).
                      
                      	\end{itemize}
@@ -968,7 +983,7 @@
                         \centering
                         \includegraphics[width=.7\linewidth]{ISLRFigures/Adaboost.png}
                         %\caption{A subfigure}
-                        \caption{\footnotesize Each figure shows the number m of base learners trained so far, along with the decision
+                        \caption{\footnotesize Each figure shows the number $m$ of base learners trained so far, along with the decision
 boundary of the most recent base learner (dashed black line) and the combined decision boundary of the ensemble
 (solid green line). Each data point is depicted by a circle whose radius indicates the weight assigned to
 that data point when training the most recently added base learner. Thus, for instance, we see that points that
@@ -1015,7 +1030,7 @@ are misclassified by the $m = 1$ base learner are given greater weight when trai
                      \item From (\ref{E-sep}), we see that, having found $\alpha_m$ and $f_m(\bfx)$, the weights on the data points are updated using
                      $$w_n^{(m+1)} = w_n^{(m)}\exp\left\{-\frac{1}{2} y_n \alpha_m f_m(\bfx_n)\right\}.$$
                      \item Making use of the fact that
-                     $$y_n f_m(\bfx_n) = 1-2\mathbb{I}(\bfy_m \ne y_n),$$
+                     $$y_n f_m(\bfx_n) = 1-2\mathbb{I}(f_m(\bfx_n) \ne y_n),$$
                      we see that the weight $w_n^{(m)}$ are updated at the next iteration using
                      $$w_n^{(m+1)} = w_n^{m}\exp(-\alpha_m/2)\exp \{\alpha_m \mathbb{I}(f_m(\bfx_n) \ne y_n)\}.$$
                      \item Because the term $\exp(-\alpha_m/2)$ is independent of $n$, we see that it weights all data points by the same factor and so can be discarded. Thus we obtain (\ref{wn}).
@@ -1038,6 +1053,25 @@ are misclassified by the $m = 1$ base learner are given greater weight when trai
                       justifying the use of the sign function to arrive the final classification decision.
                       \end{itemize}
                      \end{frame}
+
+                     \begin{frame}{Convex Losses}
+
+                      \begin{figure}
+                        \centering
+                        
+                        \centering
+                        \includegraphics[width=.8\linewidth]{../graphics/ESLFigures/figures10_4.pdf}
+                        %\caption{A subfigure}
+%                       \caption{\footnotesize Each figure shows the number $m$ of base learners trained so far, along with the decision
+%boundary of the most recent base learner (dashed black line) and the combined decision boundary of the ensemble
+%(solid green line). Each data point is depicted by a circle whose radius indicates the weight assigned to
+%that data point when training the most recently added base learner. Thus, for instance, we see that points that
+%are misclassified by the $m = 1$ base learner are given greater weight when training the $m = 2$ base learner. Bishop (2006).
+%                        }
+                      \end{figure}
+
+                     \end{frame}
+
 
                      \begin{frame}{Friedman's Gradient Boost algorithm}
                      \begin{itemize}
@@ -1193,7 +1227,7 @@ the results of the forward stagewise linear regression, using $M = 220$ consecut
               \begin{frame}{Summary: Statistical view of boosting methods}
                     Boosting methods have three important properties that contribute to their success:
                      \begin{itemize}
-                      \item they fit an additive model in a flexible set of basis functions.
+                      \item they fit (by coordinate descent) an additive model in a flexible set of basis functions.
 
                       \item they use a suitable loss function for the fitting process.
 
