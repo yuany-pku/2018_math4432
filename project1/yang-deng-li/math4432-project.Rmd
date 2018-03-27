@@ -1,0 +1,267 @@
+---
+title: "4432-project"
+author: 'Deng,Yibo'
+date: "2018年3月12日"
+output: html_document
+---
+
+```{r}
+library("boot", lib.loc="D:/R-3.4.3/library")
+library("class", lib.loc="D:/R-3.4.3/library")
+library("MASS", lib.loc="D:/R-3.4.3/library")
+setwd("C:/Users/Administrator/Desktop")
+getwd()
+wells = read.csv("wells.csv",header=TRUE)
+names(wells)
+```
+
+```{r}
+dim(wells)
+```
+
+```{r}
+summary(wells)
+```
+
+```{r}
+cor(wells[,-3][,-1]) 
+pairs(wells) # correlation
+```
+
+```{r}
+attach(wells)
+contrasts(switch)
+contrasts(unsafe)
+```
+
+```{r}
+glm.fit = glm(switch~(arsenic+unsafe+distance+x+y+community+education)^2,
+              data=wells,family=binomial) # all the predictors and their interaction
+summary(glm.fit)
+```
+
+```{r}
+glm.fit.inter = glm(switch~arsenic+unsafe+distance+x+y+education+
+                      arsenic:x+unsafe:distance+unsafe:x+unsafe:y+distance:education+x:y
+              ,data=wells,family=binomial) # Insignificant terms were dropped for alpha=0.01
+summary(glm.fit.inter)
+```
+
+```{r}
+set.seed(17)
+cv.error.11=rep(0,11)
+for (i in 1:10){
+  glm.fit=glm(switch~I(arsenic^i),data=wells,family=binomial)
+  cv.error.11[i]=cv.glm(wells,glm.fit,K=10)$delta[1]
+}
+cv.error.11[11]=cv.glm(wells,glm(switch~sqrt(arsenic),data=wells,family=binomial),K=10)$delta[1]
+cv.error.11
+plot(cv.error.11)
+```
+# sqrt(arsenic)
+
+```{r}
+set.seed(17)
+cv.error.11=rep(0,11)
+for (i in 1:10){
+  glm.fit=glm(switch~I(distance^i),data=wells,family=binomial)
+  cv.error.11[i]=cv.glm(wells,glm.fit,K=10)$delta[1]
+}
+cv.error.11[11]=cv.glm(wells,glm(switch~sqrt(distance),data=wells,family=binomial),K=10)$delta[1]
+cv.error.11
+plot(cv.error.11)
+```
+# sqrt(distance)
+
+```{r}
+set.seed(17)
+cv.error.11=rep(0,11)
+for (i in 1:10){
+  glm.fit=glm(switch~I(x^i),data=wells,family=binomial)
+  cv.error.11[i]=cv.glm(wells,glm.fit,K=10)$delta[1]
+}
+cv.error.11[11]=cv.glm(wells,glm(switch~sqrt(x),data=wells,family=binomial),K=10)$delta[1]
+cv.error.11
+plot(cv.error.11)
+```
+# x^9
+
+```{r}
+set.seed(17)
+cv.error.11=rep(0,11)
+for (i in 1:10){
+  glm.fit=glm(switch~I(y^i),data=wells,family=binomial)
+  cv.error.11[i]=cv.glm(wells,glm.fit,K=10)$delta[1]
+}
+cv.error.11[11]=cv.glm(wells,glm(switch~sqrt(y),data=wells,family=binomial),K=10)$delta[1]
+cv.error.11
+plot(cv.error.11)
+```
+# y^4
+
+```{r}
+set.seed(17)
+cv.error.11=rep(0,11)
+for (i in 1:10){
+  glm.fit=glm(switch~I(education^i),data=wells,family=binomial)
+  cv.error.11[i]=cv.glm(wells,glm.fit,K=10)$delta[1]
+}
+cv.error.11[11]=cv.glm(wells,glm(switch~sqrt(education),data=wells,family=binomial),K=10)$delta[1]
+cv.error.11
+plot(cv.error.11)
+```
+# education^5
+
+```{r}
+glm.fit.final = glm(switch~sqrt(arsenic)+unsafe+sqrt(distance)+I(x^9)+I(y^4)+I(education^5)+
+                    arsenic:x+unsafe:distance+unsafe:x+unsafe:y+distance:education+x:y
+                    ,data=wells,family=binomial) # final model
+summary(glm.fit.final)
+```
+
+```{r}
+set.seed(1)
+train = sample(dim(wells)[1],dim(wells)[1]/2)
+glm.fit.final = glm(switch~sqrt(arsenic)+unsafe+sqrt(distance)+I(x^9)+I(y^4)+I(education^5)+
+                    arsenic:x+unsafe:distance+unsafe:x+unsafe:y+distance:education+x:y
+                    ,data=wells,family=binomial,subset=train)
+glm.pred = rep("FALSE", dim(wells)[1]/2)
+glm.probs = predict(glm.fit.final, wells[-train,], type="response")
+glm.pred[glm.probs>.5] = "TRUE"
+table(glm.pred,wells[-train,]$switch)
+mean(glm.pred == wells[-train,]$switch) # the accuracy of logistic regression
+```
+
+```{r}
+941/(316+941) # true positive rate of logistic regression
+```
+
+```{r}
+474/(1493+474) # false positive rate of logistic regression
+```
+
+```{r}
+data <- data.frame(prob=glm.probs,obs=wells[1][-train,])
+data <- data[order(data$prob),]
+n <- nrow(data)
+tpr <- fpr <- rep(0,n)
+for (i in 1:n) {
+  threshold <- data$prob[i]
+  tp <- sum(data$prob > threshold & data$obs == 1)
+  fp <- sum(data$prob > threshold & data$obs == 0)
+  tn <- sum(data$prob < threshold & data$obs == 0)
+  fn <- sum(data$prob < threshold & data$obs == 1)
+  tpr[i] <- tp/(tp+fn) 
+  fpr[i] <- fp/(tn+fp) 
+}
+plot(fpr,tpr,type='l')
+abline(a=0,b=1)
+```
+
+```{r}
+sum=0
+for (i in 1:n){
+  sum=sum+tpr[i]
+}
+sum/n # AUC
+```
+
+```{r}
+set.seed(1)
+glm.fit.final = glm(switch~sqrt(arsenic)+unsafe+sqrt(distance)+I(x^9)+I(y^4)+I(education^5)+
+                    arsenic:x+unsafe:distance+unsafe:x+unsafe:y+distance:education+x:y
+              ,data=wells,family=binomial)
+cv.error=cv.glm(wells,glm.fit.final,K=10)$delta[1]
+cv.error # MSE
+```
+
+```{r}
+set.seed(2)
+train = sample(dim(wells)[1],dim(wells)[1]/2)
+lda.fit=lda(switch~sqrt(arsenic)+unsafe+sqrt(distance)+I(x^9)+I(y^4)+I(education^5)+
+                    arsenic:x+unsafe:distance+unsafe:x+unsafe:y+distance:education+x:y
+            ,data=wells,subset=train)
+lda.pred=predict(lda.fit,wells[-train,])
+names(lda.pred)
+lda.class=lda.pred$class
+table(lda.class,wells[-train,]$switch)
+mean(lda.class==wells[-train,]$switch) # accuracy of LDA
+```
+
+```{r}
+953/(359+953) # true positive rate of LDA
+```
+
+```{r}
+447/(1465+447) # false positive rate of LDA
+```
+```{r}
+qda.fit=qda(switch~sqrt(arsenic)+unsafe+sqrt(distance)+I(x^9)+I(y^4)+I(education^5)+
+                    arsenic:x+unsafe:distance+unsafe:x+unsafe:y+distance:education+x:y
+            ,data=wells,subset=train)
+qda.class=predict(qda.fit,wells[-train,])$class
+table(qda.class,wells[-train,]$switch)
+mean(qda.class==wells[-train,]$switch) # accuracy of QDA
+```
+
+```{r}
+1090/(222+1090) # true positive rate of QDA
+```
+
+```{r}
+623/(1289+623) # false positive rate of QDA
+```
+
+```{r}
+standardized.X=scale(wells[,-3][,-1])
+set.seed(2)
+test=sample(dim(wells)[1],dim(wells)[1]/2)
+train.X=standardized.X[-test,]
+test.X=standardized.X[test,]
+train.Y=switch[-test]
+test.Y=switch[test]
+rate=rep(0,100)
+for (i in 1:100){
+  knn.pred=knn(train.X,test.X,train.Y,k=i)
+  rate[i]=mean(knn.pred==test.Y)
+}
+which.max(rate) # KNN achieves the highest accuracy when K=22.
+max(rate) # highest accuracy of KNN
+```
+
+```{r}
+plot(rate,type='l') 
+```
+
+```{r}
+table(knn(train.X,test.X,train.Y,k=22),test.Y)
+```
+
+```{r}
+696/(518+696) # true positive rate of KNN when k=22
+```
+
+```{r}
+310/(1700+310) # false positive rate of KNN when k=22
+```
+
+```{r}
+set.seed(1)
+boot.fn=function(data,index)
+  return(coef(glm(switch~sqrt(arsenic)+unsafe+sqrt(distance)+I(x^9)+I(y^4)+I(education^5)+
+                    arsenic:x+unsafe:distance+unsafe:x+unsafe:y+distance:education+x:y
+                  ,data=data,family=binomial,subset=index)))
+boot.fn(wells,1:dim(wells)[1]) # 用bootstrap估计logistic regression系数
+```
+
+```{r}
+set.seed(1)
+boot(wells,boot.fn,100) # 用bootstrap估计标准误差
+```
+
+```{r}
+glm.fit.final = glm(switch~sqrt(arsenic)+unsafe+sqrt(distance)+I(x^9)+I(y^4)+I(education^5)+
+                    arsenic:x+unsafe:distance+unsafe:x+unsafe:y+distance:education+x:y
+              ,data=wells,family=binomial)
+summary(glm.fit.final)$coef # 与实际的标准误差做对比
+```
