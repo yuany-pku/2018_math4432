@@ -1082,13 +1082,13 @@ are misclassified by the $m = 1$ base learner are given greater weight when trai
     \begin{equation}
     r_i = -\frac{\partial}{\partial F_{m-1}(\mathbf{x}_i)} L(y_i,F_{m-1}(\mathbf{x}_i)) \mbox{\Huge $|$}_{F_{m-1}(\mathbf{x}_i)=\hat F_{m-1}(\mathbf{x}_i)}
     \end{equation}
-\item Fit a regression model, $g(\mathbf{x})$, predicting $r_i$ from the covariates $\mathbf{x}_i$. \item Choose a gradient descent step size as
+\item Fit a regression model, $\hat{g}(\mathbf{x})$, predicting $r_i$ from the covariates $\mathbf{x}_i$. \item Choose a gradient descent step size as
     \begin{equation}
-    \rho = \arg \min_{\rho} \sum_{i=1}^N L(y_i,\hat F_{m-1}(\mathbf{x}_i)+\rho g(\mathbf{x}_i))
+    \hat\lambda = \arg \min_{\lambda\in R} \sum_{i=1}^N L(y_i,\hat F_{m-1}(\mathbf{x}_i)+\lambda \hat{g}(\mathbf{x}_i))
     \end{equation}
 \item Update the estimate of $F(\mathbf{x})$ as
     \begin{equation}
-    \hat F_m(\mathbf{x}) = \hat F_{m-1}(\mathbf{x}) + \rho g(\mathbf{x})
+    \hat F_m(\mathbf{x}) = \hat F_{m-1}(\mathbf{x}) + \hat\lambda \hat{g}(\mathbf{x})
     \end{equation}
 \end{enumerate} 
 \end{itemize}
@@ -1104,15 +1104,15 @@ For $m$ in $1,\ldots,M$ do
     r_i = -\frac{\partial}{\partial F_{m-1}(\mathbf{x}_i)} L(y_i,F_{m-1}(\mathbf{x}_i)) \mbox{\Huge $|$}_{F_{m-1}(\mathbf{x}_i)=\hat F_{m-1}(\mathbf{x}_i)}
     \end{equation}
 \item Randomly select $\mathrm{prop}\times N$ cases from the dataset, e.g., $\mathrm{prop} = 0.5$.
-\item Fit a regression tree with $K$ terminal nodes, $g(\mathbf{x})=\mathbb{E}(r|\mathbf{x})$. This tree is fit using only those randomly selected observations
-\item Compute the optimal terminal node predictions, $\rho_1\subseteq \rho_2 \subseteq \dots \subseteq \rho_K=g$, as
+\item Fit a regression tree with $K$ terminal nodes, $\hat g(\mathbf{x})=\mathbb{E}(r|\mathbf{x})$. This tree is fit using only those randomly selected observations
+\item Compute the optimal terminal node predictions, $\rho_1\subseteq \rho_2 \subseteq \dots \subseteq \rho_K=\hat g$, as
     \begin{equation}
     \rho_k = \arg \min_{\rho\in \{\rho_1,\ldots,\rho_K\}} \sum_{\mathbf{x}_i\in S_k} L(y_i,\hat F_{m-1}(\mathbf{x}_i)+\rho)
     \end{equation}
 where $S_k$ is the set of $\mathbf{x}$'s that define terminal node $k$. Again this step uses only the randomly selected observations.
 \item Update $\hat F_{m}(\mathbf{x})$ as
     \begin{equation}
-    \hat F_m(\mathbf{x}) = \hat F_{m-1}(\mathbf{x}) + {\color{red}{\lambda}} \rho_{k(\mathbf{x})}
+    \hat F_m(\mathbf{x}) = \hat F_{m-1}(\mathbf{x}) + {\color{red}{\lambda}} \rho_{k}(\mathbf{x})
     \end{equation}
 where $k(\mathbf{x})$ indicates the index of the terminal node into which an observation with features $\mathbf{x}$ would fall.
 \end{enumerate}
