@@ -1,0 +1,1127 @@
+\documentclass{beamer}
+
+\mode<presentation> {
+	\usetheme{Pittsburgh}
+}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\graphicspath{{./graphics/}}
+\usepackage{booktabs}
+\usepackage{picture}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{animate}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{adjustbox}
+\setbeamercovered{transparent}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\hypersetup{
+	colorlinks,
+	linkcolor={red!50!black},
+	citecolor={blue!50!black},
+	urlcolor={blue!80!black}
+}
+\def\calA{{\cal A}}
+\def\calF{{\cal F}}
+\def\calP{{\cal P}}
+\def\calE{{\cal E}}
+\def\var{{\rm var}}
+
+\def\bfA{{\bf A}}
+\def\bfB{{\bf B}}
+\def\bfC{{\bf C}}
+\def\bfD{{\bf D}}
+\def\bfE{{\bf E}}
+\def\bfF{{\bf F}}
+\def\bfG{{\bf G}}
+\def\bfU{{\bf U}}
+\def\bfV{{\bf V}}
+\def\bfW{{\bf W}}
+\def\bfX{{\bf X}}
+\def\bfY{{\bf Y}}
+\def\bfZ{{\bf Z}}
+
+\def\bfa{{\bf a}}
+\def\bfb{{\bf b}}
+\def\bfc{{\bf c}}
+\def\bfd{{\bf d}}
+\def\bfe{{\bf e}}
+\def\bff{{\bf f}}
+\def\bfg{{\bf g}}
+\def\bfu{{\bf u}}
+\def\bfv{{\bf v}}
+\def\bfw{{\bf w}}
+\def\bfx{{\bf x}}
+\def\bfy{{\bf y}}
+\def\bfz{{\bf z}}
+
+\setbeamertemplate{footline}{\insertframenumber}
+
+\usetheme{Montpellier}  
+\useoutertheme{infolines}
+\usefonttheme{serif}
+
+
+\title[Chapter 9]{Support Vector Machines} 
+
+\author{ } 
+\institute[ ]
+{
+	Chapter 9 \\ 
+	\medskip
+	\textit{ } 
+}
+%\date{\today}
+
+\begin{document}
+	 	
+	 	\begin{frame}
+	 		\titlepage % Print the title page as the first slide
+	 	\end{frame}
+	
+ \begin{frame}
+ 	\frametitle{ }
+ 	\tableofcontents
+ \end{frame}
+ %###################################################################
+ %###################################################################
+     
+      
+      
+      \begin{frame}
+      	\frametitle{About this chapter}
+      	\begin{itemize}
+      		\item  Support vector machine is one of the most popular machine learning methodologies.
+      		\item  Empirically successful, with well developed theory.
+      		\item  One of the best off-the-shelf methods.
+      		\item  We mainly address classification.
+      	 
+        	\end{itemize}
+        \end{frame}
+        
+        	
+        
+\section{9.1. Maximal margin classifier}    
+    
+       \begin{frame}
+       	\frametitle{Hyperplane in $R^p$}
+       	\begin{itemize}
+       		\item   ${\bf x} \in R^p$ (p-dimensional real space)
+       		with components ${\bf x} = (x_1, ..., x_p)^T$.
+       		\item Consider all ${\bf x}$ satisfying 
+   %    		$$ f({\bf x}) = {\bf b}^T {\bf x} - c= \left< {\bf b}, {\bf x} \right> -c = b_1 x_1 + ... + b_p x_p -c = 0.$$
+   		$$ f({\bf x}) = \beta_0 + \beta^T {\bf x} = \left< \beta, {\bf x} \right> = \beta_0 + \beta_1 x_1 + ... + \beta_p x_p = 0.$$
+     		where $\beta=(\beta_1,\ldots,\beta_p)^T$. 
+      
+       		All such $\bf x$ defines a hyperplane: All ${\bf x}$ such that its projection on  $\beta$
+       		is %$c{\bf b}/\|{\bf b}\|^2 = \left< {\bf b}/\|{\bf b}\|, {\bf x} \right>  {\bf b}/\|{\bf b}\|$.
+		$$\left<  \frac{\beta}{\|{\beta}\|}, {\bf x} \right>  \frac{\beta}{\|{\beta}\|}=-\beta_0 \frac{\beta}{\|{\beta}\|^2} .$$
+       	\end{itemize}
+       	\end{frame}
+       	
+       	  \begin{frame}
+       	  	\frametitle{Hyperplane in $R^p$}
+       	  	\begin{itemize}
+       		
+       	    
+       	  \item  $$ f( {\bf x})=0  \iff   {\bf x}= -\beta_0 \frac{\beta}{\|{\beta}\|^2} + y \qquad \hbox{  with  }  y \bot {\beta}.$$
+	  %$$ f( {\bf x})=0  \iff   {\bf x}= c {\bf b}/ \|\bfb\|_2 + y \qquad \hbox{  with  }  y \bot {\bf b}.$$
+       	  \item  $$ f( {\bf x}) > 0  \iff   {\bf x}= \tilde  \beta_0 \frac{\beta}{\|{\beta}\|^2} + y \qquad \hbox{  with  } y \bot {\beta},  \,\,  \tilde \beta_0 > -\beta_0 $$
+	  %$$ f( {\bf x}) > 0  \iff   {\bf x}= \tilde c {\bf b}/ \|\bfb\|^2 + y \qquad \hbox{  with  } y \bot {\bf b},  \,\,  \tilde c > c $$
+       	  \item   $$ f( {\bf x}) < 0  \iff   {\bf x}= \tilde \beta_0 \frac{\beta}{\|{\beta}\|^2} + y  \qquad \hbox{  with  } y \bot {\beta},  \,\, \tilde \beta_0 < -\beta_0 $$
+	  here $\tilde \beta_0 = \left< {\bf x}  , {\beta} \right> $ and $f(\bfx)= \tilde{\beta}_0-(-\beta_0)$.
+	  %$$ f( {\bf x}) < 0  \iff   {\bf x}= \tilde c {\bf b}/ \|\bfb\|^2 + y  \qquad \hbox{  with  } y \bot {\bf b},  \,\, 
+       	  %\tilde c < c $$
+       	    %here $\tilde c = \left< {\bf x}  , {\bf b} \right> $ and $f(\bfx)= \tilde c-c$.
+       		        		 		
+       		 	\end{itemize}
+       		 \end{frame} 
+       		
+       	
+      
+      
+       
+            \begin{frame}
+            	\frametitle{ }
+            	\begin{itemize}
+            		\item  $f({\bf x}) > 0 \iff {\bf x} $ is on one side of the hyperplane (at the same direction as ${\beta}$.)
+            	
+            	$f({\bf x}) <  0 \iff {\bf x} $ is on the other side of the hyperplane (at the opposite direction as ${\beta}$.)
+            	 
+            		\item For any vector ${\bf z} \in R^p$,
+            		the signed distance of a point ${\bf z} \in R^p$ to this hyperplane is
+		         $$f({\bf z})/\|\bfb\| =  ( \left <{\bf z}, {\beta} \right > +\beta_0 )/\|\beta\| = 
+            		   \left <{\bf z}, {\beta}/\|{\beta}\| \right> + \beta_0  /\|\beta\|.$$
+%            		$$f({\bf z})/\|\bfb\| =  ( \left <{\bf z}, {\bf b} \right > -c )/\|\bfb\| = 
+%            		   \left <{\bf z}, {\bf b}/\|{\bf b}\| \right> - c  /\|\bfb\|.$$
+            		\item If $\|\beta \|=1$, $f({\bf z})$ is the signed distance of ${\bf z}$ to the hyperplane 
+            		defined by $f({\bfx})=0$.
+            		
+            	
+            	\end{itemize}
+            \end{frame} 
+            
+    
+    \begin{frame}
+    	\frametitle{ }
+    	\begin{figure}
+    		\centering
+    		\includegraphics[width=.6\linewidth]{ISLRFigures/9_1.pdf}
+    		%\caption{A subfigure}
+    		\caption{\scriptsize 9.1. The hyperplane $1 + 2X_1 + 3X_2 = 0$ is shown. The blue region is
+    			the set of points for which $1+2X_1 +3X_2 > 0$, and the purple region is the set of
+    			points for which $1 + 2X_1 +3X_2 < 0$.
+    		}
+    	\end{figure}
+    \end{frame}
+  
+  \begin{frame}
+  	\frametitle{ Separating hyperplane}
+  	\begin{itemize}
+  		\item   Training Data:$(y_i, \bfx_i), i=1,..., n$,  with input $\bfx_i = (x_{i1}, ..., x_{ip})$ and 
+  		two-class output
+  		$y_i = \pm 1$.
+  		
+  	  \item Suppose the two classes are seperated by one hyperplane
+  	  $$f(\bfx ) = \beta_0 + \beta_1 x_1 + ... + \beta_p x_p,$$
+  	  meaning that, for all $i$ in one class $y_i = 1$, 
+  	  $$ f(\bfx_i ) > 0,  \quad \hbox{ one side of the hyperplane;}$$
+  	  and for all $i$ in the other class $y_i = -1$,
+  	  $$ f(\bfx_i) < 0,  \quad \hbox{ the other  side of the hyperplane;}$$
+  	  \item It can be equivalently expressed as
+  	  $$ y_i f(\bfx_i) > 0, \quad \hbox{ for all $i=1,.., n$}$$
+  	  \end{itemize}
+  	   \end{frame}
+  	   
+  	   \begin{frame}
+  	   	\frametitle{ }
+  	   	\begin{itemize}
+  	  
+  	  \item If such separating hyperplane exists, it can be our classification rule:
+  	  
+  	  For any new/old observation with
+  	   ${\bf x}^*$ such that $f(\bfx^*) > 0$, classify it as in the class $ + 1$.
+  	  Otherwise, classify it as in class $-1$.
+  	  
+  	  \item Problem: If the two classes in training data
+  	   are indeed separable by a hyperplane, which hyperplane is 
+  	  the best?
+  	
+  \end{itemize}
+\end{frame} 
+
+  	 
+ \begin{frame}
+ 	\frametitle{ }
+ 	\begin{figure}
+ 		\centering
+ 		\includegraphics[width=.7\linewidth]{ISLRFigures/9_2.pdf}
+ 		%\caption{A subfigure}
+ 		\caption{\scriptsize 9.2. Left: There are two classes of observations, shown in blue and
+ 			in purple, each of which has measurements on two variables. Three separating
+ 			hyperplanes, out of many possible, are shown in black. Right: A separating hyperplane
+ 			is shown in black. The blue and purple grid indicates the decision rule
+ 			made by a classifier based on this separating hyperplane: a test observation that
+ 			falls in the blue portion of the grid will be assigned to the blue class, and a test
+ 			observation that falls into the purple portion of the grid will be assigned to the
+ 			purple class.
+ 			
+ 		}
+ 	\end{figure}
+ \end{frame}
+ 
+           \begin{frame}
+           	\frametitle{Maximal margin classifier }
+           	\begin{itemize}
+           		
+           		\item  Maximal margin hyperplane: the separating hyperplane that
+           		optimal
+           		separating
+           		hyperplane
+           		is farthest from the training observations.
+           		\item The seperating hyperplane such that the minimum
+           		 distance of any training
+           		point to the hyperplane is the largest.
+           		
+           		\item Creates a widest gap between the two classes.
+           		
+           		\item Points on the boundary hyperplane, those with smallest distance to 
+           		the max margin   hyperplane, are called {\it support vectors}.
+           		
+           		They ``support" the maximal margin hyperplane in the sense vector
+           		that if these points were moved slightly then the maximal margin hyperplane
+           		would move as well
+           		
+           	\end{itemize}
+           \end{frame} 
+            
+         
+         \begin{frame}
+         	\frametitle{ }
+         	\begin{figure}
+         		\centering
+         		\includegraphics[width=.55\linewidth]{ISLRFigures/9_3.pdf}
+         		%\caption{A subfigure}
+         		\caption{\scriptsize 9.3. There are two classes of observations, shown in blue and in purple.
+         			The maximal margin hyperplane is shown as a solid line. The margin is the
+         			distance from the solid line to either of the dashed lines. The two blue points and
+         			the purple point that lie on the dashed lines are the support vectors, and the distance
+         			from those points to the hyperplane is indicated by arrows. The purple and
+         			blue grid indicates the decision rule made by a classifier based on this separating
+         			hyperplane.
+         		}
+         	\end{figure}
+         \end{frame}
+           
+           \begin{frame}
+           	\frametitle{ Computing the max margin hyperplane }
+            
+           	   
+           		$$ \hbox{maximize}_{\beta_0, \beta_1, ..., \beta_p} M $$
+           		$$ \hbox{subject to }  \sum_{j=1}^p \beta_j^2 = 1,  $$
+           		$$ \hbox{and } y_i(\beta_0 + \beta_1 x_{i1} + ... + \beta_p x_{ip} ) \geq M \,\, 
+           		\hbox{for all $i$ }$$
+           		
+           		
+           		
+           		
+            
+           \end{frame} 
+
+             
+             \begin{frame}
+             	\frametitle{ }
+             	\begin{itemize}
+             		\item    Note that $M >0$ is the half of the width of the strip separating the two classes.
+             		
+             		\item  The eventual solution, the max margin hyperplane is determined by
+             		the support vectors.  
+             		
+             		If $x_i$ on the correct side of the trip varies, the solution would 
+             		remain same. 
+             		
+             		\item  The max margin hyperplane may vary a lot when the support vectors vary.
+             		(high variance; see Figure 9.5)
+             		
+             		
+             	\end{itemize}
+             \end{frame} 
+         
+         
+         \begin{frame}
+         	\frametitle{ }
+         	\begin{figure}
+         		\centering
+         		\includegraphics[width=.6\linewidth]{ISLRFigures/9_4.pdf}
+         		%\caption{A subfigure}
+         		\caption{\scriptsize 9.4. There are two classes of observations, shown in blue and in purple.
+         			In this case, the two classes are not separable by a hyperplane, and so the
+         			maximal margin classifier cannot be used.
+         		}
+         	\end{figure}
+         \end{frame}
+         
+   \section{9.2. Support vector classifiers} 
+   
+   
+   \begin{frame}
+   	\frametitle{The non-seperable case }
+   	\begin{itemize}
+   		\item   In general, the two classes are usually not separable by any hyperplane.
+   		
+   		\item Even if they are, the max margin may not be desirable because of its high variance, and thus possible over-fit.
+   		
+   		\item  The generalization of the maximal margin classifier to the
+   		non-separable case is known as the {\it  support vector classifier.}
+   		
+   		\item Use a soft-margin in place of the max margin. 
+   		
+   	\end{itemize}
+   \end{frame}      
+         
+           
+            	 
+            		
+             
+         
+         \begin{frame}
+         	\frametitle{ }
+         	\begin{figure}
+         		\centering
+         		\includegraphics[width=.7\linewidth]{ISLRFigures/9_5.pdf}
+         		%\caption{A subfigure}
+         		\caption{\scriptsize 9.5. Left: Two classes of observations are shown in blue and in
+         			purple, along with the maximal margin hyperplane. Right: An additional blue
+         			observation has been added, leading to a dramatic shift in the maximal margin
+         			hyperplane shown as a solid line. The dashed line indicates the maximal margin
+         			hyperplane that was obtained in the absence of this additional point.
+         		}
+         	\end{figure}
+         \end{frame}
+         
+          \begin{frame}
+          	\frametitle{  Non-perfect separation }
+          	\begin{itemize}
+          		\item   Consider a classifier based on a hyperplane
+          		that does not perfectly separate the two classes, in the interest of
+          		\begin{enumerate}
+          			\item Greater robustness to individual observations, and
+          			\item  Better classification of most of the training observations.
+          		\end{enumerate}
+          		
+          		\item Soft-margin classifier (support vector classifier) allow some violation of
+          		the margin: some can be on the wrong side of the margin (in the river) or even
+          		wrong side of the hyperplane; see Figure 9.6.
+          		
+          	\end{itemize}
+          \end{frame}    
+         
+         
+         \begin{frame}
+         	\frametitle{ }
+         	\begin{figure}
+         		\centering
+         		\includegraphics[width=.8\linewidth]{ISLRFigures/9_6.pdf}
+         		%\caption{A subfigure}
+         		\caption{\scriptsize  9.6. next page
+         		}
+         	\end{figure}
+         \end{frame}
+         
+         
+         
+           
+              
+              \begin{frame}
+              
+              		  FIGURE 9.6. Left: A support vector classifier was fit to a small data set. The
+              		  hyperplane is shown as a solid line and the margins are shown as dashed lines.
+              		  Purple observations: Observations 3, 4, 5, and 6 are on the correct side of the
+              		  margin, observation 2 is on the margin, and observation 1 is on the wrong side of
+              		  the margin. Blue observations: Observations 7 and 10 are on the correct side of
+              		  the margin, observation 9 is on the margin, and observation 8 is on the wrong side
+              		  of the margin. No observations are on the wrong side of the hyperplane. Right:
+              		  Same as left panel with two additional points, 11 and 12. These two observations
+              		  are on the wrong side of the hyperplane and the wrong side of the margin.
+              		
+              \end{frame}
+              
+                \begin{frame}
+                	\frametitle{ Computing the support vector classifier   }
+                    
+                		$$ \hbox{maximize}_{\beta_0, \beta_1, ..., \beta_p} M $$
+                		$$ \hbox{subject to } \qquad \qquad \sum_{j=1}^p \beta_j^2 = 1,  \qquad  \hbox{and } $$
+                		$$ y_i(\beta_0 + \beta_1 x_{i1} + ... + \beta_p x_{ip} ) \geq M(1-\epsilon_i), \,\, \, \epsilon_i \geq 0 \,\, 
+                		\hbox{for all $i$ }$$
+                		$$ \hbox{and } \sum_{i=1}^n \epsilon_i \leq C,$$
+                		
+                		
+                	  where $C$ is a nonnegative tuning parameter. $\epsilon_i$ are {\it slack variables}.
+                		
+                		 		
+                		  
+                		 \end{frame} 
+                		 
+                		  \begin{frame}
+                		  	\frametitle{ The support vector classifier   }
+                		   
+                		  		
+                		  The solution of this optimization is the support vector classsifier:
+                		$$f({\bf x}) = \beta_0 + \beta_1 x_1 + ...+ \beta_p x_p.$$
+                		And we classify an observation in $+ 1$ class if $f({\bf x}) > 0$; else into
+                		$-1$ class. 	
+                
+                \end{frame} 
+                
+                
+                \begin{frame}
+                	\frametitle{ Understaning the slack variable $\epsilon_i$   }
+                	\begin{itemize}
+                		\item  $\epsilon_i = 0 \iff $ the $i$-th observation is on the correct side of the margin
+                		
+                		\item   $\epsilon_i > 0 \iff $ the $i$-th observation is on the wrong side of the margin
+                		 \item $\epsilon_i >1   \iff $ the $i$-th observation is on the wrong side of the hyperplane.
+                		
+                	\end{itemize}
+                \end{frame}   
+                
+                 
+                 \begin{frame}
+                 	\frametitle{ Understanding tuning parameter $C$ }
+                 	\begin{itemize}
+                 		\item $C$ is a $budget$ for the amount that the margin can be violated
+                 		by the $n$ observations
+                 		
+                 		\item   $C=0 \iff$ no budget 
+                 		       
+                 		       As a result $\epsilon_i = 0$ for all $i$.
+                 		       
+                 		       The classifier is a maximal margin classifier, which exists only if the two classes are separable by hyperplanes.
+                 		 \item Larger $C$, more tolerance of margin violation. 
+                 		\item  No more than $C$ observations can be on the wrong side of 
+                 		    the soft-margin classifier hyperplane.
+                 		
+                 		\item As $C$ increases, the margin widens and more violations of the margin.
+                 	\end{itemize}
+                 \end{frame}   
+                 
+                 \begin{frame}
+                 	\frametitle{ Understanding tuning parameter $C$ }
+                 	\begin{itemize}
+                 		\item $C$ controls the bias-variance trade-off.
+                 		
+                 		\item  Small $C$ high variance, small bias. 
+                 		
+                 		\item Large $C$: small variance, high bias. 
+                 		
+                 		\item $C$ can be determined by using cross validation.
+                 		
+                 	 
+                 	\end{itemize}
+                 \end{frame}   
+                 
+                       
+                       	       \begin{frame}
+                       	       	\frametitle{ Support vectors}
+                       	       	\begin{itemize}
+                       	       		\item Observations
+                       	       		that lie directly on the margin, or on the wrong side of the margin for
+                       	       		their class, are known as support vectors.
+                       	       		
+                       	       		\item  Only the support vectors affect the 
+                       	       		support vector classifier.
+                       	       	 
+                       	       		\item Those strictly on the correct side of the margin do  not.
+                       	       		(robustness, analgous to median)
+                       	       		\item Larger $C$ $\Longrightarrow$ more 
+                       	       		violations, $\Longrightarrow$ more 
+                       	       	support vectors, $\Longrightarrow$ smaller variance and
+                       	       	more robust classfier.
+                       	       		
+                       	       		
+                       	       	\end{itemize}
+                       	       \end{frame}   
+               
+               \begin{frame}
+               	\frametitle{ }
+               	\begin{figure}
+               		\centering
+               		
+               		\centering
+               		\includegraphics[width=.7\linewidth]{ISLRFigures/9_7.pdf}
+               		%\caption{A subfigure}
+               		\caption{ 9.7.  
+               		 }
+               		 
+               		 
+               	\end{figure}
+               \end{frame}
+              
+               
+               \begin{frame}
+                
+             
+               	 
+               	 
+               		%\caption{A subfigure}
+               	 {Figure 9.7. A support vector classifier was fit using four different values of the
+               			tuning parameter $C$ in (9.12) and €“(9.15). The largest value of $C$ was used in the top
+               			left panel, and smaller values were used in the top right, bottom left, and bottom
+               			right panels. When $C$ is large, then there is a high tolerance for observations being
+               			on the wrong side of the margin, and so the margin will be large. As $C$ decreases,
+               			the tolerance for observations being on the wrong side of the margin decreases,
+               			and the margin narrows.
+               		}
+               		
+               		
+             
+               \end{frame}
+               
+  \section{9.3. Support vector machines}
+  
+  
+     
+     \begin{frame}
+     	\frametitle{ }
+     	\begin{figure}
+     		\centering
+     		
+     		\centering
+     		\includegraphics[width=.7\linewidth]{ISLRFigures/9_8.pdf}
+     		%\caption{A subfigure}
+     		\caption{ 9.8. Nonlinear boundaries. Left: The observations fall into two classes, with a non-linear
+     			boundary between them. Right: The support vector classifier seeks a linear boundary,
+     			and consequently performs very poorly.}
+     		
+     		
+     	\end{figure}
+     \end{frame}
+  
+               
+                   \begin{frame}
+                   	\frametitle{ Extending to nonlinear boundary}
+                   	\begin{itemize}
+                   		\item In practice, we are sometimes faced with non-linear class boundaries
+                   		
+                   		\item   Linear classifier could perform poorly.
+                   		
+                   		\item  Need nonlinera classifier.
+                   		
+                   		\item  As in the extension to the polynomial regression from linear regression, we can consider {\it enlarge the feature space} from the original
+                   		$p$ inputs to polynomials (of certain order) of the inputs. 
+                   	 
+                   		
+                   	\end{itemize}
+                   \end{frame}   
+               
+                   \begin{frame}
+                   	\frametitle{ Extending to  quadratic inputs  }
+                   	\begin{itemize}
+                   		\item Rather than constructing the support vector classifier using $p$ features:
+                   		$$X_1, ..., X_p.$$
+                   		\item   we use $2p$ features:
+                   			$$X_1, X_1^2, ..., X_p, X_p^2.$$
+                   		
+                   		\item  Treat them as $2p$ original inputs, and fit the support vector classifier.
+                   		
+                   		\item  The separating hyperplane is a hyperplane in $R^{2p}$, which should
+                   		be a linear equation:
+                   		$$\beta_0 + \beta_1X_1 + \beta_2 X_p+ \beta_{p+1} X_1^2 
+                   		+ ... +\beta_{2p} X_p^2 =0$$
+                   		
+                   		\item This is a quadrtic equation in $X_1, ..., X_p$. Thus 
+                   		the separating surface in $R^p$ in terms of $X_1, ..., X_p$ corresponds 
+                   		to a quadratic surface in $R^p$.
+              
+                   	\end{itemize}
+                   \end{frame}   
+                   
+                    \begin{frame}
+                    	\frametitle{ Extending to polynomial inputs  }
+                    	\begin{itemize}
+                    		\item  Can extend to polynomial of any given order $d$. 
+                    		
+                    		\item   Could lead to too many features, too large feature space; thus overfit.  
+                    		
+                    		\item   Higher powers are unstable. 
+                    		
+                    	\end{itemize}
+                    \end{frame}   
+                   
+            
+            \begin{frame}
+            	\frametitle{ Key observation}
+            	\begin{itemize}
+            		\item  The linear support vector classifier can be represented as
+            	$$	f(\bfx ) = \beta_0 + \sum_{i=1}^n \alpha_i \left< {\bf x}_i , {\bf x}\right>$$
+            	 
+            	 
+            	\item  $\alpha_i \not=0$ only for all  support vectors. 
+            	
+            	\item $\alpha_i$ can also be computed based on $\left<\bfx_j , \bfx_k\right>$.
+            	
+            	\item Only the inner product of the feature space is relevant in computing
+            	the linear support vector classifier.	
+            	\end{itemize}
+            \end{frame}   
+            
+            
+            
+               \begin{frame}
+               	\frametitle{ The kernel trick}
+               	\begin{itemize}
+               		\item  The inner product $\left< \cdot, \cdot\right>$ 
+               		is a bivariate function (satisfying some property).
+               		
+               		
+               		
+               		\item  It can be genearlized to kernel functions
+               		$$ K({\bfx} , {\bf z})$$
+               		which is positive definite.
+               		
+               		\item  The classifier can be expressed
+               		as 
+               		$$ f(\bfx) = \beta_0 + \sum_{i=1}^n a_i K({\bfx}, {\bfx}_i)$$
+               		
+               		
+               		  	\end{itemize}
+               		  \end{frame} 
+               		  
+               		 \begin{frame}
+               		 	\frametitle{ Examples of kernels}
+               		 	\begin{itemize}
+               		\item Examples of the kernel function are:
+               	 
+               			\item linear kernel 
+               			$$K(x_i, x_j) = \left< x_i, x_j\right> = x_i^T x_j.$$
+               			\item polynomial kernel of degree $d$:
+               			$$K(x_i, x_j) = (1+  \left< x_i, x_j\right> )^d .$$ 
+               		\item Gaussian radial kernel:
+               		
+              $$K(x_i, x_j) = \exp(-\gamma   \| x_j - x_j\|^2 ), \quad \gamma > 0 .$$ 
+               		\item Only the inner product of the feature space is relevant in computing
+               		the linaer support vector classfier.	
+               		
+               	\end{itemize}
+               \end{frame}  
+                \begin{frame}
+                	\frametitle{ }
+                	\begin{figure}
+                		\centering
+                		\includegraphics[width=.7\linewidth]{ISLRFigures/9_9.pdf}
+                		%\caption{A subfigure}
+                		\caption{\scriptsize 9.9. Left: An SVM with a polynomial kernel of degree 3 is applied to
+                			the non-linear data from Figure 9.8, resulting in a far more appropriate decision
+                			rule. Right: An SVM with a radial kernel is applied. In this example, either kernel
+                			is capable of capturing the decision boundary.
+                			In
+                		}
+                	\end{figure}
+                \end{frame}
+                
+             \begin{frame}
+             	\frametitle{ }
+             	\begin{itemize}
+             		\item The radial kernel has local behavior.
+             		
+             		\item To predict the class for a new observation with input $\bfx$, 
+             		
+             $$ f(\bfx) = \beta_0 + \sum_{i=1}^n a_i \exp(-\gamma   \| \bfx - {\bf x}_i\|^2 )$$ 
+             		
+             		\item A training data point ${\bf x}_i$ being far away from ${\bf x}$ will 
+             		have little effect to the sign of $f(\bfx)$.
+             	
+             		
+             	\end{itemize}
+             \end{frame}  
+            
+                \begin{frame}
+                	\frametitle{The enlarged feature space. }
+                	\begin{itemize}
+                		\item  The support vector machine actually enlarges the original 
+                		feature space to a space of kernel functions.
+                		$$ {\bf x_i} \to K(\cdot, {\bfx}_i).$$
+                	
+                		\item  The original space of $p$ inputs has dimension $p$.
+                		\item The enlarged space of features, the function space, is infinite
+                		dimension!
+                		
+                	    \item  In actual fitting of the support vector machine, we only need to 
+                	    compute the $K(x_i, x_j)$ for all $x_i, x_j$ in training data. 
+                	    
+                	    \item Do not have to work with the enlarged feature space of infinite dimension.
+                	\end{itemize}
+                \end{frame}  
+            
+             \begin{frame}
+             	\frametitle{Example: the Heart data. }
+             	\begin{itemize}
+          \item   In Chapter 8 we apply decision trees and related methods to the Heart data.
+          \item   The aim is to use 13 predictors such as Age, Sex, and Chol in order to predict
+            whether an individual has heart disease.
+            
+           \item  We now investigate how an SVM
+            compares to LDA on this data.
+            
+            \item 297 subjects,   randomly split into 207 training and
+            90 test observations.
+            	\end{itemize}
+            \end{frame}
+              
+             
+              		 
+             
+                 
+                 
+                 	 
+                 
+                 
+                   \begin{frame}
+                   	\frametitle{ }
+                   	\begin{figure}
+                   		\centering
+                   		\includegraphics[width=.7\linewidth]{ISLRFigures/9_10.pdf}
+                   		%\caption{A subfigure}
+                   		\caption{\scriptsize ROC curves for the Heart data training set. Left: The support
+                   			vector classifier and LDA are compared. Right: The support vector classifier is
+                   			compared to an SVM using a radial basis kernel with $\gamma=10^{-3},
+                   			10^{-2}$ and $10^{-1}$.
+                   			 
+                   		}
+                   	\end{figure}
+                   \end{frame}
+                   
+                   
+                     \begin{frame}
+                     	\frametitle{ }
+                     	\begin{figure}
+                     		\centering
+                     		\includegraphics[width=.7\linewidth]{ISLRFigures/9_11.pdf}
+                     		%\caption{A subfigure}
+                     		\caption{\scriptsize 9.11. ROC curves for the test set of the Heart data. Left: The support
+                     			vector classifier and LDA are compared. Right: The support vector classifier is
+                     			compared to an SVM using a radial basis kernel with $\gamma=10^{-3},
+                     			10^{-2}$ and $10^{-1}$.
+                     		}
+                     	\end{figure}
+                     \end{frame}
+                     
+  \section{Appendix: Primal-Dual support vector classifiers}
+
+           \begin{frame}
+           	\frametitle{ Appendix: Equivalent reformulation of Hard Margin}
+            
+           	   
+           		$$ \hbox{maximize}_{\beta_0, \beta_1, ..., \beta_p} M $$
+           		$$ \hbox{subject to }  \sum_{j=1}^p \beta_j^2 = 1,  $$
+           		$$ \hbox{and } y_i(\beta_0 + \beta_1 x_{i1} + ... + \beta_p x_{ip} ) \geq M \,\, 
+           		\hbox{for all $i$ }$$
+           		$$\Leftrightarrow $$
+          		$$ \hbox{minimize}_{\beta_0, \beta_1, ..., \beta_p} \|\beta\|^2 := \sum_j \beta_j^2 $$
+           		$$ \hbox{subject to }  y_i(\beta_0 + \beta_1 x_{i1} + ... + \beta_p x_{ip} ) \geq1 \,\, 
+           		\hbox{for all $i$ },$$
+		using $M=1/\|\beta\|$.
+           		
+           \end{frame} 
+
+   \begin{frame}
+    	\frametitle{ }
+    	\begin{figure}
+    		\centering
+    		\includegraphics[width=.6\linewidth]{ISLRFigures/hardmargin.pdf}
+    		\caption{Separating hyperplane with margin}
+    	\end{figure}
+    \end{frame}
+
+
+            \begin{frame}
+           	\frametitle{ Appendix: Lagrangian }
+            
+           	   Lagrangian: for $\alpha_i\geq 0$,
+         	$$ \max_{\alpha\geq 0} \min_{\beta} L(\beta,\alpha) := \frac{1}{2}\|\beta\|^2 - \sum_{i=1}^n \alpha_i (y_i(\beta_0 + \beta_1 x_{i1} + ... + \beta_p x_{ip}) -1 )$$ 		
+		So 
+		$$ 0=\frac{\partial L}{\partial \beta}\Rightarrow \hat\beta = \sum_i \alpha_i y_i \bfx_i $$
+       \    	$$ 0=\frac{\partial L}{\partial \beta_0}\Rightarrow  \sum_i \hat\alpha_i y_i =0 $$
+	and complementary condition
+		$$  \hat\alpha_i (y_i (\hat\beta_0 +\left< \hat\beta, \bfx_i\right>)-1) =0,\ \ \  \hbox{for all $i$ } $$
+           \end{frame} 
+
+            \begin{frame}
+           	\frametitle{ Appendix: Support Vectors }
+            
+           	Complementary condition $  \hat\alpha_i (y_i (\hat\beta_0 +\left< \hat\beta, \bfx_i\right>)-1) =0,\ \ \  \hbox{for all $i$ } $ implies that
+	$$  y_i (\hat\beta_0 +\left< \hat\beta, \bfx_i\right>) > 1 \Rightarrow \hat\alpha_i =0 $$
+	$$  y_i (\hat\beta_0 +\left< \hat\beta, \bfx_i\right> )= 1 \Rightarrow \hat\alpha_i \geq 0 $$
+	
+	Those sample point $i$'s such that $\hat\alpha_i>0$, are called \emph{support vectors} (sv), which decided the maximal margin hyperplane 
+		$$ \hat\beta = \sum_{i\in sv} \hat\alpha_i y_i \bfx_i $$
+           and $\hat\beta_0$ can be uniquely decided by any support vector $s$ using $\hat\beta_0 = y_s -  \left< \hat\beta,\bfx_s\right>$. 
+           \end{frame} 
+
+              \begin{frame}
+           	\frametitle{ Appendix: Dual Formulation }
+            
+           	After plugging $\hat\beta$ in the Lagrangian, it gives 
+	$$ \min_\alpha \frac{1}{2} \sum_{i,j=1}^n \alpha_i \alpha_j y_i y_j \bfx_i^T \bfx_j   $$
+	subject to 
+		$$  \alpha_i \geq 0 $$
+		$$  \sum_i \alpha_i y_i =0 $$
+
+           \end{frame} 
+           
+            \begin{frame}
+           	\frametitle{ Appendix: Equivalent reformulation of Soft-margin Classifier }
+            
+           	   
+           		$$ \hbox{maximize}_{\beta_0, \beta_1, ..., \beta_p} M $$
+           		$$ \hbox{subject to }  \sum_{j=1}^p \beta_j^2 = 1,  $$
+           		$$ \hbox{and } y_i(\beta_0 + \beta_1 x_{i1} + ... + \beta_p x_{ip} ) \geq M (1-\epsilon_i), \,\, \epsilon_i\geq 0, 
+           		\hbox{   for all $i$ }$$
+		$$ \hbox{and } \sum_{i=1}^n \epsilon \leq C, $$ 
+           		$$\Leftrightarrow $$
+          		$$ \hbox{minimize}_{\beta_0, \beta_1, ..., \beta_p} \|\beta\|^2 + C \sum_{i=1}^n \xi_i $$
+           		$$ \hbox{subject to }  y_i(\beta_0 + \beta_1 x_{i1} + ... + \beta_p x_{ip} ) \geq 1 - \xi_i, \,\, \xi_i\geq 0 
+           		\hbox{ for all $i$ },$$
+%		using $M=1/\|\beta\|$.          		
+           \end{frame} 
+
+   \begin{frame}
+    	\frametitle{ }
+    	\begin{figure}
+    		\centering
+    		\includegraphics[width=.6\linewidth]{ISLRFigures/softmargin.pdf}
+    		\caption{Separating hyperplane with margin}
+    	\end{figure}
+    \end{frame}
+
+
+            \begin{frame}
+           	\frametitle{ Appendix: The Lagrangian }
+            
+           	   Lagrangian: for $\alpha_i\geq 0$, $\mu_i\geq 0$, $\xi_i\geq 0$,
+          	$$L(\beta,\xi,\alpha,\mu) = \frac{1}{2}\|\beta\|^2 +C \sum_{i=1}^n \xi_i - \sum_{i=1}^n \alpha_i [y_i(\beta_0 + \bfx_i^T \beta) -(1-\xi_i)] - \sum_{i=1}^n \mu_i \xi_i,$$
+		So for all $i$,
+		\begin{equation}  \label{eq:p1}
+		0=\frac{\partial L}{\partial \beta}\Rightarrow \hat\beta = \sum_i \hat\alpha_i y_i \bfx_i 
+		\end{equation}
+         	\begin{equation} \label{eq:p2} 
+		0=\frac{\partial L}{\partial \beta_0}\Rightarrow  \sum_i \hat\alpha_i y_i =0 
+		\end{equation}
+       		\begin{equation} \label{eq:p3} 
+		0=\frac{\partial L}{\partial \xi_i}\Rightarrow  \hat\alpha_i + \mu_i = C
+		\end{equation}
+	and complementary condition
+		$$  \hat\alpha_i [y_i (\hat\beta_0 +\bfx_i^T \hat\beta)-(1-\xi_i)] =0$$
+		$$ \mu_i \xi_i = 0 $$
+           \end{frame} 
+
+           \begin{frame}
+           	\frametitle{ Appendix: Support Vectors }
+            
+           	Complementary condition $  \hat\alpha_i [y_i (\hat\beta_0 +\bfx_i^T\hat\beta)-(1-\xi_i)] =0$, $\xi_i\geq 0$, $\Rightarrow$
+	$$  y_i (\hat\beta_0 +\left< \hat\beta, \bfx_i\right>) > 1 \Rightarrow \hat\alpha_i =0 $$
+	$$  y_i (\hat\beta_0 +\left< \hat\beta, \bfx_i\right> )= 1-\xi_i \Rightarrow C\geq \hat\alpha_i \geq 0 $$
+	$$ \mu_i\xi_i =0 \Rightarrow \xi_i>0, \mu_i =0, \hat\alpha_i = C - \mu_i = C $$
+	Those samples such that $C\geq \hat\alpha_i>0$, are called \emph{support vectors} (sv),
+		$$ \hat\beta = \sum_{i\in sv} \hat\alpha_i y_i \bfx_i $$
+            and those s.t. $\alpha_i = C$ are within margin (violators), $\xi_i=0$ are on margin (deciding $\hat\beta_0$). 
+           \end{frame} 
+
+                \begin{frame}
+           	\frametitle{ Appendix: Dual Problem }
+            
+           	Substituting \eqref{eq:p1}-\eqref{eq:p3} into the Lagrangian, it gives the dual optimization problem
+	$$ \min_\alpha \frac{1}{2} \sum_{i,j=1}^n \alpha_i \alpha_j y_i y_j \bfx_i^T \bfx_j  -\sum_{i=1}^n \alpha_i  $$
+	subject to 
+		$$  C\geq \alpha_i \geq 0 $$
+		$$  \sum_i \alpha_i y_i =0 $$
+One can replace $\bfx_i^T \bfx_j$ by $K(\bfx_i,\bfx_j)$ using the kernel trick for nonlinear SVMs. 
+           \end{frame} 
+                   
+\section{9.4. SVMs with more than two classes}
+
+     \begin{frame}
+     	\frametitle{One-versus-one approach  }
+     	\begin{itemize}
+     		\item    With $K>2$ classes.
+     		
+     		\item Run a SVM on each of the ${K \choose 2}$ pairs of classes. 
+     		
+     		\item We obtain ${K\choose 2}$ SVMs.
+     		
+     		\item  For every test observations, compute the number of times it is classified 
+     		into class $k$ by all the SVMs, denote as $d_k$.
+     		
+     		\item Classify it into the class with highest $d_k$ (majortiy vote).
+     		
+     		
+     	\end{itemize}
+     \end{frame}
+
+\begin{frame}
+	\frametitle{One-versus-all approach  }
+	\begin{itemize}
+		\item    With $K>2$ classes.
+		
+		\item Run a SVM on class $k$ (coded as $+ 1$) versus  class  ``not-$k$" (coded as
+		$-1$): 
+		$f_k({\bfx})$. (Note that the larger $f_k(\bfx)$, the more likely ${\bfx}$ is in class $k$.
+		
+		\item For a new test observation with {\bfx}, compute 
+	 assign to the class with largest $f_k({\bfx})$. 
+		
+	
+		
+	\end{itemize}
+\end{frame}
+
+\section{9.5. Relationshiop to logistic regression}
+
+
+\begin{frame}
+	\frametitle{Recall the ``Loss + Penalty" formula  }
+	\begin{itemize}
+		\item   Minimize, for $f $ in certain space,
+		$$\sum_{i=1}^n L(y_i, f({\bf x}_i)) + \lambda P(f) $$ 
+		\item  Ridge regression: for linear $f$,
+		
+			$$\sum_{i=1}^n  (y_i-  f({\bf x}_i))^2 + \lambda \sum_{j=1}^p \beta_j^2 $$ 
+		\item  Lasso regression: for linear $f$
+			$$\sum_{i=1}^n  (y_i-  f({\bf x}_i))^2 + \lambda \sum_{j=1}^p |\beta_j| $$ 
+
+		
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Logistic regression for classification  }
+	\begin{itemize}
+		\item Data: $(y_i, {\bf x}_i)$, $y_i = \pm 1$.
+		\item The logistic model assumes 
+		$$P(Y= 1|X) = 1/(1+e^{-f(X)}); \quad P(Y=-1|X) = 1/(1+ e^{f(X)})$$
+		That is 
+		$$ P(Y=y|X)= 1/(1+e^{-yf(X)})$$
+		
+				
+			\end{itemize}
+		\end{frame}
+		
+		\begin{frame}
+			\frametitle{Logistic regression for classification  }
+			\begin{itemize}
+				
+		\item   The negative of logistic likelihood (a.k.a. binomial deviance, cross-entropy)
+		$$     \sum_{i=1}^n   \log(1+ e^{-y_if({\bfx_i}) } ) $$ 
+		
+		\item Note that in AdaBoost, exponential loss is used
+		$$     \sum_{i=1}^n   e^{-y_if({\bfx_i}) } $$ 
+						
+	\end{itemize}
+\end{frame}
+
+
+		\begin{frame}
+			\frametitle{Logistic regression with regularization  }
+			\begin{itemize}
+				
+		\item Logistic loss with ridge $l_2$ penalty
+		$$   \sum_{i=1}^n   \log(1+ e^{-y_if({\bfx_i}) } ) + \lambda \sum_{j=1}^p \beta_j^2 $$ 
+		\item Logistic loss with Lasso $l_1$ penalty: 
+		$$  \sum_{i=1}^n   \log (1+ e^{-y_if({\bfx_i}) } )+ \lambda \sum_{j=1}^p |\beta_j| $$ 
+		\item AdaBoost uses \emph{coordinate descent} to solve $l_1$-penalty approximately
+		$$  \sum_{i=1}^n   e^{-y_if({\bfx_i}) }+ \lambda \sum_{j=1}^p |\beta_j| $$ 				
+	\end{itemize}
+\end{frame}
+
+		
+
+\begin{frame}
+	\frametitle{The SVM    }
+	\begin{itemize}
+		\item Data: $(y_i, {\bf x}_i)$, $y_i = \pm 1$.
+		
+		\item   SVM is a result of ``hige loss + ridge penalty":
+		$$    \sum_{i=1}^n   \hbox{max} [0, 1-y_i f(x_i)] + \lambda \sum_{j=1}^p \beta_j^2.$$ 
+		
+	 where $f(\bfx)= \beta_0 + \beta_1 x_1 + ... + \beta x_p$. Note that $\xi_i = \max[0,1-y_i f(x_i)]\geq 0$. 
+	 
+	  \item the hinge loss function : $l(u)=(1-u)_+$.
+	  \item the logistic loss function: $l(u)=\log(1+e^{-u})$.
+	  \item the exponential loss function: $l(u)=e^{-u}$.		
+		
+	\end{itemize}
+\end{frame}
+
+
+
+                    
+                       \begin{frame}
+                       	\frametitle{ }
+                       	\begin{figure}
+                       		\centering
+                       		\includegraphics[width=.5\linewidth]{ISLRFigures/9_12.pdf}
+                       		%\caption{A subfigure}
+                       		\caption{\scriptsize 9.12. The SVM and logistic regression loss functions are compared,
+                       			as a function of 
+                       			$y_i(\beta_0 + \beta_1 x_{i1} +... \beta_p x_{ip})$.
+                       		 When $y_i(\beta_0 + \beta_1 x_{i1} +... \beta_p x_{ip})$ is
+                       			greater than 1, then the SVM loss is zero, since this corresponds to an observation
+                       			that is on the correct side of the margin. Overall, the two loss functions have quite
+                       			similar behavior.
+                       			 
+                       		}
+                       	\end{figure}
+                       \end{frame}
+                       
+               
+               
+                   
+                       \begin{frame}
+                       	\frametitle{ }
+                       	\begin{figure}
+                       		\centering
+                       		\includegraphics[width=.6\linewidth]{ISLRFigures/ESL_figures10_4.pdf}
+                       		%\caption{A subfigure}
+%                       		\caption{\scriptsize 9.12. The SVM and logistic regression loss functions are compared,
+%                       			as a function of 
+%                       			$y_i(\beta_0 + \beta_1 x_{i1} +... \beta_p x_{ip})$.
+%                       		 When $y_i(\beta_0 + \beta_1 x_{i1} +... \beta_p x_{ip})$ is
+%                       			greater than 1, then the SVM loss is zero, since this corresponds to an observation
+%                       			that is on the correct side of the margin. Overall, the two loss functions have quite
+%                       			similar behavior.
+%                       			 
+%                       		}
+                       	\end{figure}
+                       \end{frame}
+
+                        \begin{frame}
+                       	\frametitle{A Separable Two-Class Problem}
+                       	\begin{figure}
+                       		\centering
+                       		\includegraphics[width=.6\linewidth]{ISLRFigures/separable.png}
+                       		%\caption{A subfigure}
+%                       		\caption{\scriptsize 9.12. The SVM and logistic regression loss functions are compared,
+%                       			as a function of 
+%                       			$y_i(\beta_0 + \beta_1 x_{i1} +... \beta_p x_{ip})$.
+%                       		 When $y_i(\beta_0 + \beta_1 x_{i1} +... \beta_p x_{ip})$ is
+%                       			greater than 1, then the SVM loss is zero, since this corresponds to an observation
+%                       			that is on the correct side of the margin. Overall, the two loss functions have quite
+%                       			similar behavior.
+%                       			 
+%                       		}
+                       	\end{figure}
+                       \end{frame}
+
+                        \begin{frame}
+                       	\frametitle{Logistic Regression has Max-Margin Solution Asymptotically at $\infty$}
+                       	\begin{figure}
+                       		\centering
+                       		\includegraphics[width=.6\linewidth]{ISLRFigures/logisticloss.png}
+                       		%\caption{A subfigure}
+                       		\caption{\scriptsize Logistic loss surface: the line indicates the direction of max-margin solution of support vector machine for the separable two-class problem.                        			 
+                       		}
+                       	\end{figure}
+                       \end{frame}
+
+                        \begin{frame}
+                       	\frametitle{Exponential Loss Minimization has Max-Margin Solution Asymptotically at $\infty$}
+                       	\begin{figure}
+                       		\centering
+                       		\includegraphics[width=.5\linewidth]{ISLRFigures/exploss.png}
+                       		%\caption{A subfigure}
+                       		\caption{\scriptsize Exponential loss surface and the max-margin solution of SVM (line direction).                        			 
+                       		}
+                       	\end{figure}
+                       \end{frame}
+                  
+      		\begin{frame}
+      			\frametitle{Exercises  }
+      			
+      			
+      			{\sl  Run the R-Lab codes in Section 9.6 of ISLR
+      				
+      				Exercises
+      	 1-3  of Section  9.7 of ISLR 
+      			}
+      			
+   
+      		\end{frame}
+      		
+      			\begin{frame}
+      				\frametitle{  }
+      				
+      				
+      				
+      				End of Chapter 9. 
+      				
+      				
+      			\end{frame}
+      
+    \end{document}
+    
+    
+ 
