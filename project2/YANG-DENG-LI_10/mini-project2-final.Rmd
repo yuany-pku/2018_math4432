@@ -1,0 +1,279 @@
+---
+title: "Untitled"
+author: "DengYibo-20531483"
+date: "2018年4月8日"
+output: html_document
+---
+
+
+## 1. Load and check data
+### 1.1 Load the library
+```{r}
+library(readr)
+library(dplyr)
+library(randomForest)
+library(ggplot2)
+library(lattice)
+library(mice)
+library(party)
+library(MLmetrics)
+```
+
+
+### 1.2 Load the data
+```{r}
+setwd("C:\\Users\\Administrator\\Desktop\\mini-project2")
+train = read_csv("train.csv")
+test = read_csv("test.csv")
+```
+
+
+### 1.3 Fix some errors in this dataset
+#### The following fixes SibSp/Parch values for two passengers (Id=280 and Id=1284). Because a 16 year old can’t have a 13 year old son! He goes further and confirm it with historical data.
+```{r}
+train$SibSp[train$PassengerId==280] = 0
+train$Parch[train$PassengerId==280] = 2
+test$SibSp[test$PassengerId==1284] = 1
+test$Parch[test$PassengerId==1284] = 1
+```
+
+
+### 1.4 Combine data
+```{r}
+test$Survived = rep(NA, dim(test)[1])
+total = bind_rows(train, test)
+```
+
+
+### 1.5 Transform Survived to a categorical target for binary classification
+```{r}
+total$Survived = as.factor(total$Survived)
+total$Sex = as.factor(total$Sex)
+total$Pclass = as.ordered(total$Pclass)
+total$Embarked = as.ordered(total$Embarked)
+```
+
+
+## 2. Exploring some important variables
+### 2.1 Pclass
+```{r}
+ggplot(total[!is.na(total$Survived),], aes(x = Pclass, fill = Survived)) +
+geom_bar(stat='count', position='dodge') +
+labs(x = 'Pclass') + theme_bw() +
+scale_x_discrete (limits = c('1', '2', '3')) +
+geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), vjust=-0.5)
+```
+
+#### Pclass=1的乘客大部分幸存，Pclass=2的乘客接近一半幸存，而Pclass=3的乘客只有不到25%幸存。
+
+
+### 2.2 Surname
+#### Name变量里包含了姓氏信息，有一定的辨识作用，而姓氏相同的乘客，可能是一家人，而一家人同时幸存或遇难的可能性较高。考虑到只出现一次的姓氏不可能同时出现在训练集和测试集中，不具辨识度和预测作用，因此将只出现一次的姓氏均命名为’Small’。
+```{r}
+total$FamilySize = total$SibSp + total$Parch + 1
+
+total$Surname = sapply(total$Name, FUN=function(x) {strsplit(x, split='[,.]')[[1]][1]})
+total$FamilyID = paste(as.character(total$FamilySize), total$Surname, sep="")
+total$FamilyID[total$FamilySize <= 2] = 'Small'
+famIDs = data.frame(table(total$FamilyID))
+famIDs = famIDs[famIDs$Freq <= 2,]
+total$FamilyID[total$FamilyID %in% famIDs$Var1] = 'Small'
+total$FamilyID = factor(total$FamilyID)
+```
+
+
+### 2.3 Title
+#### The name variable contains some information about title and family(e.g. Surname), so we create some significative variables.
+```{r}
+total$title =  gsub("^.*, (.*?)\\..*$", "\\1", total$Name)
+table(total$title)
+```
+#### The table shows that there are too many titles to analyze, so we try to reduce the number of titles.
+```{r}
+total$title[total$title == 'Capt']  = 'Officer'
+total$title[total$title == 'Col']   = 'Officer'
+total$title[total$title == 'Don']   = 'Officer'
+total$title[total$title == 'Dr']    = 'Officer'
+total$title[total$title == 'Major']    = 'Officer'
+total$title[total$title == 'Rev']    = 'Officer'
+
+total$title[total$title == 'Lady']  = 'Miss'
+total$title[total$title == 'Mlle']  = 'Miss'
+total$title[total$title == 'Mme']   = 'Miss'
+total$title[total$title == 'Ms']    = 'Miss'
+
+total$title[total$title == 'Jonkheer']    = 'Mr'
+total$title[total$title == 'Sir']    = 'Mr'
+
+total$title[total$title == 'Dona']  = 'Mrs'
+total$title[total$title == 'the Countess'] = 'Mrs'
+
+total$title = as.factor(total$title)
+
+table(total$Sex, total$title)
+```
+```{r}
+ggplot(total[!is.na(total$Survived),], aes(x = title, fill = Survived)) +
+geom_bar(stat='count', position='dodge') +
+labs(x = 'Title') + theme_bw() +
+scale_x_discrete (limits = c('Master', 'Miss', 'Mr', 'Mrs', 'Officer')) +
+geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), vjust=-0.5)
+```
+
+
+### 2.4 Sex
+```{r}
+ggplot(total[!is.na(total$Survived),], aes(x = Sex, fill = Survived)) +
+geom_bar(stat='count', position='dodge') + theme_bw() +
+labs(x = 'Training data only') +
+geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), vjust=-0.5)
+```
+
+```{r}
+468/(468+81)
+```
+#### The 85.25% of dead people are male within the training data.
+
+
+### 2.5 Age
+```{r}
+ggplot(total[!is.na(total$Survived),], aes(x = Age, color=Survived)) + 
+  geom_line(aes(label = ..count..), stat = 'bin', binwidth=5)  + theme_bw() +
+  labs(title = "How Age impact survivor", x = "Age", y = "Count", fill = "Survived")
+```
+
+#### 年轻人存活下来的比较多，年幼和年长的差不多。
+
+
+### 2.6 Family Size
+#### The variables sibsp and parch represent the family size, we can create a new variable to combine these relation.
+```{r}
+total$FamilySize = total$SibSp + total$Parch + 1 
+
+total$FamilySized[total$FamilySize == 1] = 'solo'
+total$FamilySized[total$FamilySize == 2] = 'duble'
+total$FamilySized[total$FamilySize >=3 & total$FamilySize <=4] = 'group'
+total$FamilySized[total$FamilySize >= 5] = 'large group'
+total$FamilySized = as.factor(total$FamilySized)
+
+ggplot(total[!is.na(total$Survived),], aes(x = FamilySize, fill = Survived)) +
+geom_bar(stat='count', position='dodge') +
+scale_x_continuous(breaks=c(1:11)) +
+labs(x = 'Family Size') + theme_bw()+
+geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), vjust=-0.5)
+```
+```{r}
+ggplot(total[!is.na(total$Survived),], aes(x = FamilySized, fill = Survived)) +
+geom_bar(stat='count', position='dodge') +
+labs(x = 'Final Group Categories') + theme_bw() +
+scale_x_discrete (limits = c('solo', 'duble', 'group', 'large group')) + 
+geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), vjust=-0.5)
+```
+
+
+### 2.7 Ticket
+#### 票号相同的乘客，是一家人，很可能同时幸存或者同时遇难。现将所有乘客按照Ticket分为两组，一组是使用单独票号，另一组是与他人共享票号，并统计出各组的幸存与遇难人数。
+```{r}
+ticket.count = aggregate(total$Ticket, by = list(total$Ticket), function(x) sum(!is.na(x)))
+total$TicketCount = apply(total, 1, function(x) ticket.count[which(ticket.count[, 1] == x['Ticket']), 2])
+total$TicketCount = factor(sapply(total$TicketCount, function(x) ifelse(x > 1, 'Share', 'Unique')))
+ggplot(total[!is.na(total$Survived),], mapping = aes(x = TicketCount, y = ..count.., fill=Survived)) + 
+geom_bar(stat = 'count', position='dodge') + 
+xlab('TicketCount') + 
+ylab('Count') + theme_bw() +
+ggtitle('How TicketCount impact survivor') + 
+geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+
+
+### 2.8 Embarked
+#### The city of Embarked may be another significant factors, due to the difference of the level of economy.
+```{r}
+ggplot(total[!is.na(total$Survived),], mapping = aes(x = Embarked, y = ..count.., fill = Survived)) +
+geom_bar(stat = 'count', position='dodge') + 
+xlab('Embarked') +
+ylab('Count') + theme_bw() +
+ggtitle('How Embarked impact survivor') +
+geom_text(stat = "count", aes(label = ..count..), position=position_dodge(width=1), , vjust=-0.5) + 
+theme(plot.title = element_text(hjust = 0.5), legend.position="bottom")
+```
+#### Obviously, passengers from "C" and "Q" were more likely to survive.
+
+
+## 3. Missing data
+### 3.1 Fare values: 1 passengers(PassengerId=1044)
+```{r}
+total[1044,]
+```
+#### This passenger embarked from 'S', and his Pclass was 3. We reasonably use the value of median for this Pclass and embarkment to replace the NA Fare.
+```{r}
+total$Fare[1044] = median(total[total$Pclass == '3' & total$Embarked == 'S', ]$Fare, na.rm = TRUE)
+```
+
+
+### 3.2 Embarked values: 2 passengers(PassengerId=62, 830)
+#### Embarked could be important to Fare, as different Embarkement cities mean longer or shorter journeys.
+```{r}
+rbind(total[62,],total[830,])
+```
+#### We use the most common code to replace NAs in the Embarked feature.
+```{r}
+total$Embarked[c(62, 830)] = 'S'
+```
+
+
+### 3.3 Cabin values: 77% missing
+#### We don't use this variable to predict.
+
+
+### 3.4 Age values: 20% missing
+#### We choose mice package to predict the missing data.
+```{r}
+set.seed(319)
+mice.Age = mice(total[, names(total) %in% c('Pclass','Sex','Age','Fare','Embarked','FamilySize', 'FamilySized',  'title', 'FamilyID', 'TicketCount')], method='rf')
+```
+```{r}
+mice.output = complete(mice.Age)
+```
+#### Let’s compare the results we get with the original distribution of passenger ages to ensure that nothing has gone completely awry.
+```{r}
+par(mfrow=c(1,2))
+hist(total$Age, freq=F, main='Age: Original Data', 
+  col='skyblue', ylim=c(0,0.04))
+hist(mice.output$Age, freq=F, main='Age: MICE Output', 
+  col='blue', ylim=c(0,0.04))
+```
+
+#### It seems reasonable, thus we use the mice model to predict the missing value of Age.
+```{r}
+total$Age = mice.output$Age
+```
+
+
+## 4. Prediction
+# Random Forest model
+```{r}
+set.seed(10)
+model = cforest(as.factor(Survived) ~ Pclass + Sex + Age + Fare + Embarked + FamilySize + title + FamilyID + TicketCount, data = total[1:891, ], controls=cforest_unbiased(ntree=1000, mtry=3))
+
+cv.summarize <- function(data.true, data.predict) {
+  print(paste('Recall:', Recall(data.true, data.predict)))
+  print(paste('Precision:', Precision(data.true, data.predict)))
+  print(paste('Accuracy:', Accuracy(data.predict, data.true)))
+  print(paste('AUC:', AUC(data.predict, data.true)))
+ }
+set.seed(10)
+cv.test.sample = sample(1:nrow(train), as.integer(0.3 * nrow(train)), replace = TRUE)
+cv.test = total[cv.test.sample,]
+cv.prediction = predict(model, cv.test, OOB=TRUE, type = "response")
+cv.summarize(cv.test$Survived, cv.prediction)
+```
+
+
+## 5. Conclusion
+```{r}
+predict.result = predict(model, total[(1+nrow(train)):(nrow(total)), ], OOB=TRUE, type = "response")
+output = data.frame(PassengerId = test$PassengerId, Survived = predict.result)
+write.csv(output, file = "final.csv", row.names = FALSE)
+```

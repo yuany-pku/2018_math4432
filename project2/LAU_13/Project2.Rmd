@@ -1,0 +1,146 @@
+---
+title: "Project2"
+output:
+  html_document: default
+---
+
+```{r}
+train <- read.csv("train.csv") 
+test <- read.csv("test.csv") 
+library(dplyr) 
+full <- bind_rows(train, test)
+```
+
+```{r}
+head(full)
+summary(full)
+sapply(full,function(x) sum(is.na(x)))
+```
+
+```{r}
+embarked.na <- full$Embarked 
+which(embarked.na %in% "")
+full_62 <- full[full$PassengerId==62,] 
+full_62
+full_830 <- full[full$PassengerId==830,] 
+full_830
+library(ggplot2) 
+library(scales) 
+library(ggthemes) 
+embark_fare <- full %>% filter(PassengerId !=62 & PassengerId !=830)
+ggplot(embark_fare, aes(x=Embarked, y=Fare, fill=factor(Pclass)))+geom_boxplot()+geom_hline(aes(yintercept=80), colour='green', linetype='dashed',lwd=2)+scale_y_continuous(labels=dollar_format())+ggtitle('Embarked versus Pclass and Fare')
+full$Embarked[c(62, 830)] <- 'C' 
+sapply(full,function(x) sum(x==''))
+```
+
+```{r}
+Fare.na <- is.na(full$Fare) 
+which(Fare.na %in% TRUE)
+full[1044,]
+full_fare <- full[full$Pclass=='3'&full$Embarked=='S', ]
+ggplot(full_fare, aes(x=Fare))+geom_density(fill='skyblue',alpha=0.4)+geom_vline(aes(xintercept=median(Fare,na.rm=T)), colour='red', linetype='dashed',lwd=1)+scale_y_continuous(labels=dollar_format())+ggtitle('the density of Fare')
+full$Fare[1044] = median(full_fare$Fare, na.rm=T)
+```
+
+```{r}
+set.seed(100) 
+library(mice) 
+A <- c('PassengerId','Name','Ticket','Cabin','family','Surname','Survived')
+names(full)
+mice_mod <- mice(full[,!names(full) %in% A],method = 'rf')
+mice_output <- complete(mice_mod)
+par(mfrow=c(1,2)) 
+hist(full$Age,freq = F,main = 'Age:ORiginal Data',col='darkblue',ylim = c(0,0.04)) 
+hist(mice_output$Age,freq = F,main = 'Age:MICE Output',col = 'skyblue',ylim = c(0,0.04))
+full$Age <- mice_output$Age
+sum(is.na(full$Age))
+sum(is.na(full$Fare))
+```
+
+```{r}
+drops <- c("Cabin") 
+full = full[ , !(names(full) %in% drops)]
+summary(full)
+```
+
+```{r Survived_vs_Title}
+library(stringr) 
+full$Title <- gsub('(.*, )|(\\..*)','',full$Name) 
+table(full$Sex, full$Title)
+rare_title <- c('Capt','Col','Don','Dona','Dr','Jonkheer','Lady','Major','Rev','Sir','the Countess') 
+full$Title[full$Title=='Mlle'] <- 'Miss' 
+full$Title[full$Title=='Mme'] <- 'Mrs' 
+full$Title[full$Title=='Ms'] <- 'Miss' 
+full$Title[full$Title %in% rare_title] <- 'Rare title' 
+summary(full)
+table(full$Sex, full$Title)
+ggplot(full[1:891,], aes(Title, fill=factor(Survived)))+geom_bar()+facet_grid(.~Sex)+ggtitle('Survival versus Title and Sex')
+```
+
+```{r}
+mosaicplot(table(full$Sex, full$Survived), main='survival by Sex', shade=T)
+full$mother <- 'not mother' 
+full$mother[full$Sex == 'female' & full$Age>18 & full$Parch>0 & full$Title !='Miss'] <- 'mother' 
+mosaicplot(table(full$mother, full$Survived), main='survival by mother', color=c('skyblue','pink'))
+```
+
+```{r}
+full$familysize <- full$SibSp+full$Parch+1 
+full$Surname <- sapply(strsplit(full$Name,split = '[,.]'),'[',1) 
+ggplot(full[1:891,],aes(x=familysize,fill=factor(Survived)))+geom_bar(stat = 'count',position='dodge')+scale_x_continuous(breaks = c(1:11))+labs(x='Family size')+ggtitle("Survived versus FamilySize")
+full$Fsize[full$familysize==1] <- 'singleton' 
+full$Fsize[full$familysize>1&full$familysize<5] <- 'small family' 
+full$Fsize[full$familysize>=5] <- 'big family' 
+mosaicplot(table(full$Fsize,full$Survived),main = 'Survived versus FamilySizeCategories',shade = T)
+```
+
+```{r Survived_vs_Age}
+ggplot(full[1:891,],aes(Age,fill=factor(Survived)))+geom_histogram()+facet_grid(.~Sex)+ggtitle('Survived versus Age and Sex')
+full$child[full$Age < 18] <- 'child' 
+full$child[full$Age >= 18] <- 'adult' 
+table(full$child,full$Survived)
+mosaicplot(table(full$child,full$Survived),main = 'Survived versus Age',shade = T)
+```
+
+```{r}
+full$Fare1 = "low" 
+full$Fare1[full$Fare>=100 & full$Fare <=300] = 'middle' 
+full$Fare1[full$Fare>300] = 'high' 
+mosaicplot(table(full$Fare1,full$Survived),main = 'Survived versus Fare',shade = T)
+rate_survived <- function(n){ 
+  full_rate <- xtabs(~n+Survived,data = full) 
+  rate <- prop.table(full_rate,1) 
+  return(rate) 
+  } 
+rate_survived(full$Fare1)
+```
+
+```{r}
+train <- full[1:891,] 
+test <- full[892:1309,]
+train$Embarked = as.factor(train$Embarked) 
+train$Title = as.factor(train$Title) 
+train$Fsize = as.factor(train$Fsize) 
+train$child = as.factor(train$child) 
+test$Embarked = as.factor(test$Embarked) 
+test$Title = as.factor(test$Title) 
+test$Fsize = as.factor(test$Fsize) 
+test$child = as.factor(test$child)
+library(randomForest) 
+set.seed(700) 
+rf <- randomForest(factor(Survived)~Pclass+Fare+Embarked+Title+Sex+Fsize+child,data = train) 
+summary(rf)
+plot(rf,ylim = c(0,0.5))
+legend('topright',colnames(rf$err.rate),col=1:3,fill=1:3)
+```
+
+```{r}
+importance <- importance(rf) 
+varImportance <- data.frame(variables=row.names(importance),Importance=round(importance[,'MeanDecreaseGini'],2))
+library(dplyr) 
+rankImportance <- varImportance %>% mutate(Ranke=paste0('#',dense_rank(desc(Importance))))
+ggplot(rankImportance,aes(x=reorder(variables,Importance),y=Importance,fill=Importance))+ geom_bar(stat='identity')+ geom_text(aes(x=variables,y=0.5,label=Ranke),hjust=0,vjust=0.55,size=4,colour='white')+ labs(x='Variables')+ coord_flip()+theme_few()+ggtitle('The Importance of Variables')
+prediction <- predict(rf,test) 
+solution <- data.frame(PassengerId=test$PassengerId,Survived=prediction)
+write.csv(solution,file='solution.csv',row.names=F)
+```
