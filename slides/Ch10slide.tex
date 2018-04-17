@@ -1,0 +1,1091 @@
+\documentclass{beamer}
+
+\mode<presentation> {
+	\usetheme{Pittsburgh}
+}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\graphicspath{{./graphics/}}
+\usepackage{booktabs}
+\usepackage{picture}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{animate}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usepackage{adjustbox}
+\setbeamercovered{transparent}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\hypersetup{
+	colorlinks,
+	linkcolor={red!50!black},
+	citecolor={blue!50!black},
+	urlcolor={blue!80!black}
+}
+\def\calA{{\cal A}}
+\def\calF{{\cal F}}
+\def\calP{{\cal P}}
+\def\calE{{\cal E}}
+\def\var{{\rm var}}
+
+\def\bfA{{\bf A}}
+\def\bfB{{\bf B}}
+\def\bfC{{\bf C}}
+\def\bfD{{\bf D}}
+\def\bfE{{\bf E}}
+\def\bfF{{\bf F}}
+\def\bfG{{\bf G}}
+\def\bfU{{\bf U}}
+\def\bfV{{\bf V}}
+\def\bfW{{\bf W}}
+\def\bfX{{\bf X}}
+\def\bfY{{\bf Y}}
+\def\bfZ{{\bf Z}}
+
+\def\bfa{{\bf a}}
+\def\bfb{{\bf b}}
+\def\bfc{{\bf c}}
+\def\bfd{{\bf d}}
+\def\bfe{{\bf e}}
+\def\bff{{\bf f}}
+\def\bfg{{\bf g}}
+\def\bfu{{\bf u}}
+\def\bfv{{\bf v}}
+\def\bfw{{\bf w}}
+\def\bfx{{\bf x}}
+\def\bfy{{\bf y}}
+\def\bfz{{\bf z}}
+
+\setbeamertemplate{footline}{\insertframenumber}
+
+\usetheme{Montpellier}  
+\useoutertheme{infolines}
+\usefonttheme{serif}
+
+
+\title[Chapter 10]{Unsuperivised Learning} 
+
+\author{ } 
+\institute[ ]
+{
+	Chapter 10 \\ 
+	\medskip
+	\textit{ } 
+}
+%\date{\today}
+
+\begin{document}
+	 	
+	 	\begin{frame}
+	 		\titlepage % Print the title page as the first slide
+	 	\end{frame}
+	
+ \begin{frame}
+ 	\frametitle{ }
+ 	\tableofcontents
+ \end{frame}
+ %###################################################################
+ %###################################################################
+  
+ 
+      
+      
+      \begin{frame}
+      	\frametitle{About this chapter}
+      	\begin{itemize}
+      		\item  Supervised learning aims to predicting ouput/response from features, and 
+      		each training data point contains the input and output, $(\bfx_i,y_i)$. 
+      		\item  Unsupervised learning do not have a specific output or response to predict, i.e. only $(\bfx_i)$. It aims at 
+      		discovering the structure or characteristic of the variables in study.
+      		\item  This chapter focuses on two methodologies: PCA and cluster analysis.
+      		
+      	 
+        	\end{itemize}
+        \end{frame}
+        
+         \begin{frame}
+         	\frametitle{Unsupervised learning}
+         	\begin{itemize}
+         		\item Often used as part of exploratory data analysis.
+         		\item Examples: 
+         		     Identify the particular subgroups of stocks with close relations (clustering), 
+         		     
+         		     Accurate advertising based on the customers age, profession, reading, shopping habits, (clustering) ...
+         		     
+         		     Reduce the dimension of covariates (PCA). 
+         		     
+         		     ....
+         		     
+         		 
+         		
+         	\end{itemize}
+         \end{frame}
+        
+        	
+        
+\section{10.1 Principal component analysis.}    
+    
+       \begin{frame}
+       	\frametitle{ }
+       	\begin{itemize}
+       		\item   We have already addressed PCA in Chapter 6.
+       		
+       		\item Linearly combine the variables to create the new variables, called principle components.
+       		
+       		\item The first few explain most of the variation. 
+       		
+       		\item Achieve data reduction, without much loss of information.
+      
+       		\item Here we summarize the results and look at the examples. 
+       		
+       		
+       		
+       	\end{itemize}
+       	\end{frame}
+       	
+       	  \begin{frame}
+       	  	\frametitle{ }
+       	  	\begin{itemize}
+       	  		\item Data: $\bfx_i = (x_{i1}, ..., x_{ip} ) $, $i=1,...,n$.
+       	  \item  Compute sample covariance matrix, e.g.
+       	  ${\bf S}=\frac{1}{n}\sum_{i=1}^n (\bfx_i - \hat\mu)^T (\bfx_i - \hat\mu)$.
+       	  \item Decompose into eigenvalue-eigenvector pairs:
+       	  $${\bf S} = \hat {\bf e} \hat \Lambda \hat {\bf e}^T =
+       	   (\hat {\bf e}_1 \vdots ... \vdots \hat {\bf e}_p) \hat \Lambda 
+       	   \begin{pmatrix}
+       	   \hat {\bf e}_1  \\ \vdots  \\ \hat {\bf e}_p 
+       	   \end{pmatrix}$$
+       	   where $\hat \Lambda = diag(\hat \lambda_1, ..., \hat \lambda_p)$. 
+       	   \item $(\hat \lambda_k, \hat{\bf e}_k)$ are eigen-value-eigenvector pairs, $\hat \lambda_1 \geq ...\geq \hat \lambda_p$.
+       
+       	   
+       		 	\end{itemize}
+       		 \end{frame} 
+       		
+       		  \begin{frame}
+       		  	\frametitle{ }
+       		  	\begin{itemize}
+       		  		\item  The $k$-th sample PC.s:
+       		  		$$Z_k = \begin{pmatrix} z_{1k} \\ \vdots \\ z_{nk}\end{pmatrix} = {\bf X} \hat{\bf e}_k $$
+       		  		 \item Component-wise, 
+       		  		 $z_{ik} = x_{i1} e_{1k} + x_{i2} e_{2k} + ... + x_{ip} e_{pk}  $
+       		  		 are the principle component scores of the $i$-th observation.
+       		  		   \item $\hat \lambda_k$ measures the importance of the $k$-th PC.
+       		  		\item  $\hat \lambda_k/(\hat \lambda_1 + ... + \hat \lambda_p)=\hat\lambda_k/trace({\bf S})$ is 
+       		  		interpreted as percentage of the total variation explained by $Y_k$.
+       		  		\item  Usually retain the first few PCs.
+       		  		\item PCs are uncorrelated with each other.
+       		  		
+       		  	\end{itemize}
+       		  \end{frame} 
+       		  
+      
+     \begin{frame}
+     	\frametitle{ Example: USArrests data}
+     	
+       For each of the
+      50 states in the United States, the data set contains the number of arrests
+      per 100, 000 residents for each of three crimes: Assault, Murder, and Rape.
+      
+      We also record UrbanPop (the percent of the population in each state living
+      in urban areas). 
+      
+      The principal component score vectors $Z_k$ have length $n = 50$,
+      and the principal component loading vectors ($\hat{\bf e}_k$) have length $p = 4$.
+       
+      PCA was
+      performed after standardizing each variable to have mean zero and standard
+      deviation one.
+      
+      \end{frame}
+    
+    \begin{frame}
+    	\frametitle{ Example: USArrests data}
+    \begin{center}
+    	\begin{tabular}{ l   c   r }
+    		\hline
+    	      & PC1 & PC2  \\ \hline
+    	      Murder & 0.5358995 &  −0.4181809 \\
+    	      Assault  & 0.5831836 &−0.1879856\\
+    	      UrbanPop &0.2781909& 0.8728062\\
+    	      Rape &0.5434321 &0.1673186\\
+    		\hline \\
+    	\end{tabular}
+    	\end{center}
+     	 
+     	{Table 10.1. The principal component loading vectors, $\hat{\bf e}_1$  and
+     		$\hat{\bf e}_2$, for the
+     		USArrests data. These are also displayed in Figure 10.1. } 
+    \end{frame}   
+            
+    
+    \begin{frame}
+    	\frametitle{ }
+    	\begin{figure}
+    		\centering
+    		\includegraphics[width=.65\linewidth]{ISLRFigures/10_1.pdf}
+    		%\caption{A subfigure}
+    		\caption{\scriptsize 10.1.  Next page
+    		}
+    	\end{figure}
+    \end{frame}
+    
+     
+     \begin{frame}
+     	\frametitle{Figure 10.1 }
+      
+     		  Figure 10.1. The first two principal components for the USArrests data. The
+     			blue state names represent the scores for the first two principal components. The
+     			orange arrows indicate the first two principal component loading vectors (with
+     			axes on the top and right). For example, the loading for Rape on the first component
+     			is 0.54, and its loading on the second principal component 0.17 (the word
+     			Rape is centered at the point (0.54, 0.17)). This figure is known as a biplot, because
+     			it displays both the principal component scores and the principal component
+     			loadings.
+     	 
+      
+     \end{frame}
+  
+  \begin{frame}
+  	\frametitle{ The  1st and 2nd PCs}
+  	\begin{itemize}
+  		\item  The first loading vector places approximately
+  		equal weight on Assault, Murder, and Rape, with much less weight on UrbanPop
+  		
+  	   This component roughly corresponds to a measure of overall
+  	  rates of serious crimes.
+  	  
+  	  \item The second loading vector places most of its weight
+  	  on UrbanPop and much less weight on the other three features
+  	  
+  	  This
+  	  component roughly corresponds to the level of urbanization of the state.
+  	  
+  	  \end{itemize}
+  	   \end{frame}
+  	   
+  	   \begin{frame}
+  	   	\frametitle{Discussion }
+  	   	\begin{itemize}
+  	  
+  	  \item  The crime-related variables (Murder, Assault, and Rape)
+  	  are located close to each other, and that the UrbanPop variable is far from
+  	  the other three. 
+  	  
+  	  \item This indicates that the crime-related variables are correlated
+  	  with each other---states with high murder rates tend to have high
+  	  assault and rape rates----and that the UrbanPop variable is less correlated
+  	  with the other three. 
+  	   
+
+
+ \end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Discussion }
+ 
+	
+Our discussion of the loading
+vectors (PC1 roughly about crime rates and PC2 about urbanization)
+suggests:
+
+States with large positive scores on the first component,
+such as California, Nevada and Florida, have high crime rates;
+
+
+States like North Dakota, with negative scores on the first component, have
+low crime rates. 
+
+California also has a high score on the second component,
+indicating a high level of urbanization, while the opposite is true for states
+like Mississippi. 
+
+States close to zero on both components, such as Indiana,
+have approximately average levels of both crime and urbanization.
+10.2.2
+
+  	
+  
+\end{frame} 
+
+  
+           \begin{frame}
+           	\frametitle{Interpreation of PCs}
+           	\begin{itemize}
+           		
+           		\item  Seek one direction say ${\bf b}$ with $\|\bf b\|=1$, such that
+           		$$ \sum_{i=1}^n \| {\bf x}_{i} - a_i {\bf b}  \|$$
+           		is the smallest. This direction is ${\bf b}  = \hat {\bf e}_1$. And $a_i = {\bf x}_i^T \bfb = <{\bf x}_i, \bfb>$
+           		is the score of the $i$-th observation on the 1st PC. 
+           		
+           		\item  Wish to minimize rescontruction error
+           		in reconstructing all 
+           		 ${\bf x}_i$ using   vectors restricted to dimension $k$ linear space. 
+           		 
+           		 Then, the 
+           		this linear space is the space spanned by $\hat {\bf e}_1, ..., \hat {\bf e}_k$, the directions of the
+           		first $k$ PCs.  
+           		
+           	    They can be interpreted as the closest $k$ dimension linear hyperplanes to the data. 
+           		
+           	\end{itemize}
+           \end{frame} 
+            
+   
+         \begin{frame}
+         	\frametitle{ }
+         	\begin{figure}
+         		\centering
+         		\includegraphics[width=.45\linewidth]{ISLRFigures/10_2a.pdf}
+         		 \includegraphics[width=.45\linewidth]{ISLRFigures/10_2b.pdf}
+         		%\caption{A subfigure}
+         		\caption{\scriptsize 10.2. Ninety observations simulated in three dimensions. Left: the
+         			first two principal component directions span the plane that best fits the data. It
+         			minimizes the sum of squared distances from each point to the plane. Right: the
+         			first two principal component score vectors give the coordinates of the projection
+         			of the 90 observations onto the plane. The variance in the plane is maximized.
+         		}
+         	\end{figure}
+         \end{frame}
+           
+          
+      
+             
+             \begin{frame}
+             	\frametitle{Other issues about PCA }
+             	\begin{itemize}
+             		\item Scaling: 
+             		\item If the variables are measuared in different units, rescale to variables to have mean 0 and variance 1 is recommended.
+             		\item If the variables are of same unit and same nature (such as stock returns), PCA with both
+             		rescaled and original can be conducted. 
+             		\bigskip
+             		  	\end{itemize}
+             		  \end{frame}
+             		  
+             		  
+             		  
+             		  
+             		  \begin{frame}
+             		  	\frametitle{USArrest data }
+             		  	\begin{itemize}
+             		
+             		\item In USArrest data, The four variables are measured in different unites.
+       
+                 Murder, Rape, and Assault are
+             		reported as the number of occurrences per 100, 000 people, and UrbanPop
+             		is the percentage of the state’s population that lives in an urban area.
+             		These four variables have variance 18.97, 87.73, 6945.16, and 209.5
+             		
+             		\item Assault, a more common crime than murder and rape, have much larger variance.
+             		Without standardization, it is expected to contribute much to 1st PC. 
+             		
+             	\end{itemize}
+             \end{frame} 
+         
+         
+         \begin{frame}
+         	\frametitle{ }
+         	\begin{figure}
+         		\centering
+         		\includegraphics[width=.65\linewidth]{ISLRFigures/10_3.pdf}
+         		%\caption{A subfigure}
+         		\caption{\scriptsize 10.3. Two principal component biplots for the USArrests data. Left:
+         			the same as Figure 10.1, with the variables scaled to have unit standard deviations.
+         			Right: principal components using unscaled data. Assault has by far the largest
+         			loading on the first principal component because it has the highest variance among
+         			the four variables. In general, scaling the variables to have standard deviation one
+         			is recommended.
+         			
+         		}
+         	\end{figure}
+         \end{frame}
+         
+   
+   
+   \begin{frame}
+   	\frametitle{  }
+   	\begin{itemize}
+   		\item Just like eigenvectors,   direction of a PC can be reversed.
+   		
+   		(${\bf e}_1$ is eighvector, so is $-{\bf e}_1$.)  
+   		
+   		\item Proportion of variance explained is an importance measure of the PCs.
+   		
+   	 
+   	\end{itemize}
+   \end{frame}      
+         
+           
+            	 
+            		
+             
+         
+         \begin{frame}
+         	\frametitle{ }
+         	\begin{figure}
+         		\centering
+         		\includegraphics[width=.7\linewidth]{ISLRFigures/10_4.pdf}
+         		%\caption{A subfigure}
+         		\caption{\scriptsize 10.4.  Left: a scree plot depicting the proportion of variance explained
+         			by each of the four principal components in the USArrests data. Right: the cumulative
+         			proportion of variance explained by the four principal components in the
+         			USArrests data.
+         		
+         		}
+         	\end{figure}
+         \end{frame}
+         
+          \begin{frame}
+          	\frametitle{  Number of PCs to retain}
+          	\begin{itemize}
+          		\item  No universal rule.
+          		\item  Problem specific.
+          		 \item Recommended:
+          		 \begin{enumerate}
+          		 \item Look for elbow in the scree plot.
+          			\item Enough PCs to explain 90\% of total variation.
+          			\item PCs with variance larger than average.
+				\item Horn's Parallel Analysis with random permutations (Random Matrix Theory)
+          		\end{enumerate}
+          		\item This is useful to regression, classification and cluster analysis 
+          		to work with the first few PCs rather than all the $p$ 
+          		inputs. $p$ could   be  too large and contain many noisy or useless inputs.
+          	 
+          		
+          	\end{itemize}
+          \end{frame}    
+                  
+ \section{10.2. Clustering methods}
+ 
+   \begin{frame}
+   	\frametitle{ About cluster analysis}
+   	\begin{itemize}
+   		
+   		\item 
+   		Techniques for finding subgroups or data points, or
+   		clusters, in a data set, so that the observations within
+   		each group are quite similar to each other. 
+   		\item An unsupervised problem:   to discover
+   		structure --- in this case, distinct clusters --- on the basis of a data set.
+   		 \item 
+   		Both clustering and PCA seek to simplify the data via a small number
+   		of summaries, but their mechanisms are different:
+   		\begin{enumerate}
+   			\item PCA looks to find a low-dimensional representation of the observations
+   			that explain a good fraction of the variance;
+   		\item Clustering looks to find homogeneous subgroups among the observations.
+   		 
+   		\end{enumerate}
+   		
+   		  	\end{itemize}
+   		  \end{frame}    
+   		  
+   		 
+   		  
+   		  \begin{frame}
+   		  	\frametitle{ Market segmentation}
+   		  	\begin{itemize}
+   		 \item The goal is to perform market segmentation by identifying
+   		subgroups of people who might be more receptive to a particular form
+   		of advertising, or more likely to purchase a particular product. 
+   		
+   		\item The task of
+   		performing market segmentation amounts to clustering the people in the
+   		data set.
+   	      		
+   	      	\end{itemize}
+   	      \end{frame}    
+   	      
+   	      
+   	      
+   	      
+   	      \begin{frame}
+   	      	\frametitle{ K-means clustering and hierarchical clustering }
+   	      	\begin{itemize}
+   	      		
+   	   \item  Two best-known
+   		clustering approaches: K-means clustering and hierarchical clustering.  
+   		\begin{enumerate}
+   		\item K-means clustering:  seek to partition the observations into a pre-specified
+   		number of clusters. 
+   		\item Hierarchical clustering: 
+   		a tree-like visual representation of the observations, called a {\color{red} dendrogram},
+   		that allows us to view at once the clusterings obtained for each possible
+   		number of clusters, from 1 to n. 
+   		\end{enumerate}
+   		 \item
+   		Cluster observations on the basis of the features in
+   		order to identify subgroups among the observations;
+   		
+   		Or cluster features
+   		on the basis of the observations in order to discover subgroups
+   		
+     	\end{itemize}
+     \end{frame}    
+     
+    
+     
+     
+     \begin{frame}
+     	\frametitle{K-Means clustering}
+     	\begin{itemize}
+     		\item Partition the data set of $n$ observations into $K$ distinct, non-overlapping subsets.
+     		
+     		Each set, denoted as $C_k$, $k=1, .., K$,  is called a cluster.
+     		
+     		\item Good clustering:  the
+     		within-cluster variation is as small as possible
+     		
+     		\item Let $W(C_k)$ be a measure of the within-cluster variation for cluster $C_k$.
+     		
+     		\item We wish to minimize the total within-cluster variations 
+     		
+     		$$ \hbox{minmize}_{C_1, ..., C_K} \Bigl\{ \sum_{i=1}^K W(C_K)\}$$
+     		
+     			\end{itemize}
+     		\end{frame} 
+     		
+     	
+     	\begin{frame}
+     		\frametitle{K-Means clustering}
+     		\begin{itemize}
+     			\item Several different ways to define $W(C_k)$. 
+     			
+     			\item Using squared Euclidan distance, we define
+     			$$ W(C_k)= {1 \over |C_k|}   \sum_{i, j \in C_k} \|\bfx_i - \bfx_j\|^2$$
+     			 
+     		 
+     
+     		 
+     		\end{itemize}
+     	\end{frame} 	
+         
+         \begin{frame}
+         	\frametitle{ }
+         	\begin{figure}
+         		\centering
+         		\includegraphics[width=.8\linewidth]{ISLRFigures/10_5.pdf}
+         		%\caption{A subfigure}
+         		\caption{\scriptsize   10.5. A simulated data set with 150 observations in two-dimensional
+         			space. Panels show the results of applying K-means clustering with different values
+         			of K, the number of clusters. The color of each observation indicates the cluster
+         			to which it was assigned using the K-means clustering algorithm. Note that
+         			there is no ordering of the clusters, so the cluster coloring is arbitrary. These
+         			cluster labels were not used in clustering; instead, they are the outputs of the
+         			clustering procedure.
+         		}
+         	\end{figure}
+         \end{frame}
+         
+        
+         
+         \begin{frame}
+         	\frametitle{K-Means cluster algorithm}
+         	
+         	 Algorithm 10.1 K-Means Clustering
+         	\begin{itemize}
+         		\item
+         		1. Randomly assign a number, from 1 to K, to each of the observations.
+         		These serve as initial cluster assignments for the observations.
+         	\item 	2. Iterate until the cluster assignments stop changing:
+         	\begin{enumerate}
+         		\item   For each of the K clusters, compute the cluster centroid. The
+         		kth cluster centroid is the vector of the p feature means for the
+         		observations in the kth cluster.
+         		\item Assign each observation to the cluster whose centroid is closest
+         		(where closest is defined using Euclidean distance).
+         	\end{enumerate}	
+         		
+         		
+         		
+         	\end{itemize}
+         \end{frame} 	
+         
+          
+           \begin{frame}
+           	\frametitle{K-Means cluster algorithm}
+           	\begin{itemize}
+           		\item The objective function always decreases at each step.
+           		
+           		\item $${1 \over |C_k|} \sum_{i, j\in C_k} \|\bfx_i - \bfx_j\|^2
+           	 = 2 \sum_{i \in C_k} \|\bfx_i - \bar \bfx\|^2
+           	 $$
+           	 where $\bar \bfx$ is the sample mean $\bfx_i$ for $i \in C_k$   
+      
+           		\item $K$-means algorithm finds a local minimum. 
+           		
+           		\item The result depends on the initial (random) cluster assignment.
+           		
+           		\item Try several different initials, and select the best result (the smallest 
+           		objective function).
+           	\end{itemize}
+           \end{frame} 	
+           
+                \begin{frame}
+                	 
+                	\begin{figure}
+                		\centering
+                		
+                		\centering
+                		\includegraphics[width=.65\linewidth]{ISLRFigures/10_6.pdf}
+                		%\caption{A subfigure}
+                		\caption{10.6
+                		}
+                		
+                		
+                	\end{figure}
+                \end{frame}
+                
+             
+              
+                \begin{frame}
+                 
+                	 FIGURE 10.6. The progress of the K-means algorithm on the example of Figure
+                	 10.5 with $K=3$. Top left: the observations are shown. Top center: in Step 1
+                	 of the algorithm, each observation is randomly assigned to a cluster. Top right:
+                	 in Step 2(a), the cluster centroids are computed. These are shown as large colored
+                	 disks. Initially the centroids are almost completely overlapping because the
+                	 initial cluster assignments were chosen at random. Bottom left: in Step 2(b),
+                	 each observation is assigned to the nearest centroid. Bottom center: Step 2(a) is
+                	 once again performed, leading to new cluster centroids. Bottom right: the results
+                	 obtained after ten iterations.
+                		 		
+                		  
+                		 \end{frame} 
+                		\begin{frame}
+                		 
+                			\begin{figure}
+                				\centering
+                				
+                				\centering
+                				\includegraphics[width=.65\linewidth]{ISLRFigures/10_7.pdf}
+                				%\caption{A subfigure}
+                				\caption{10.7
+                				}
+                				
+                				
+                			\end{figure}
+                		\end{frame} 
+                		 
+                		 
+                		  \begin{frame}
+                		  	 
+                		   
+                		  		FIGURE 10.7. K-means clustering performed six times on the data from Figure
+                		  		10.5 with $K = 3$, each time with a different random assignment of the observations
+                		  		in Step 1 of the K-means algorithm. Above each plot is the value of
+                		  		the objective (10.11). Three different local optima were obtained, one of which
+                		  		resulted in a smaller value of the objective and provides better separation between
+                		  		the clusters. Those labeled in red all achieved the same best solution, with an
+                		  		objective value of 235.8.
+                		  
+                
+                \end{frame} 
+                
+                  
+                \begin{frame}
+                	\frametitle{Hierarchical  clustering }
+                	\begin{itemize}
+                		\item  $K$-means clustering requres pre-specified number of clusters, a disadvantage.
+                		 \item Hierarchical clustering   does not require that.
+                		 \item It results in a tree-based representation of the
+                		 observations, called a dendrogram.
+                		 \item {\it  bottom-up } or {\it  agglomerative }
+                		  clustering
+                		 
+                		
+                	\end{itemize}
+                \end{frame}   
+                
+              
+                
+                \begin{frame}
+                	
+                	\begin{figure}
+                		\centering
+                		
+                		\centering
+                		\includegraphics[width=.55\linewidth]{ISLRFigures/10_8.pdf}
+                		%\caption{A subfigure}
+                		\caption{\scriptsize 10.8. Forty-five observations generated in two-dimensional space. In
+                			reality there are three distinct classes, shown in separate colors. However, we will
+                			treat these class labels as unknown and will seek to cluster the observations in
+                			order to discover the classes from the data.
+                		}
+                		
+                		
+                	\end{figure}
+                \end{frame} 
+                
+                \begin{frame}
+                	\begin{figure}
+                		\centering
+                		
+                		\centering
+                		\includegraphics[width=.8\linewidth]{ISLRFigures/10_9.pdf}
+                		%\caption{A subfigure}
+                		\caption{\tiny 10.9. Left: dendrogram obtained from hierarchically clustering the data
+                			from Figure 10.8 with complete linkage and Euclidean distance. Center: the dendrogram
+                			from the left-hand panel, cut at a height of nine (indicated by the dashed
+                			line). This cut results in two distinct clusters, shown in different colors. Right:
+                			the dendrogram from the left-hand panel, now cut at a height of five. This cut
+                			results in three distinct clusters, shown in different colors. Note that the colors
+                			were not used in clustering, but are simply used for display purposes in this figure.
+                		}
+                		
+                		
+                	\end{figure}
+                \end{frame} 
+                
+                  
+                 \begin{frame}
+                 	\frametitle{Interpreting a dendrogram }
+                 	\begin{itemize}
+                 		\item Each leaf of the dendrogram represents
+                 		one of the 45 observations in Figure 10.8. 
+                 		
+                 		\item However, as we move
+                 		up the tree, some leaves begin to fuse into branches. These correspond to
+                 		observations that are similar to each other.
+                 		
+                 		\item As we move higher up the tree,
+                 		branches themselves fuse, either with leaves or other branches.
+                 		
+                 		        
+                 		 \item The earlier
+                 		 (lower in the tree) fusions occur, the more similar the groups of observations
+                 		 are to each other.
+                 		 
+                 		\item Observations that fuse later
+                 		(near the top of the tree) can be quite different
+                 	 
+                 	\end{itemize}
+                 \end{frame}   
+              
+                 \begin{frame}
+                 	\frametitle{A rough closeness measure}
+                 	\begin{itemize}
+                 		\item  For any two observations, we can look for the point in
+                 		the tree where branches containing those two observations are first fused.
+                 		The height of this fusion, as measured on the vertical axis, indicates how
+                 		different the two observations are
+                 		\item Observations that fuse at the very
+                 		bottom of the tree are quite similar to each other, whereas observations
+                 		that fuse close to the top of the tree will tend to be quite different. 
+                 		
+                 	 
+                 		
+                 	 
+                 	\end{itemize}
+                 \end{frame}   
+                 
+                           
+                           
+                           \begin{frame}
+                           	\frametitle{Interpreting dendrogram}
+                           	\begin{figure}
+                           		\centering
+                           		
+                           		\centering
+                           		\includegraphics[width=.7\linewidth]{ISLRFigures/10_10.pdf}
+                           		%\caption{A subfigure}
+                           		\caption{\scriptsize 10.10. An illustration of how to properly interpret a dendrogram with
+                           			nine observations in two-dimensional space. Left: a dendrogram generated using
+                           			Euclidean distance and complete linkage. Observations 5 and 7 are quite similar
+                           			to each other, as are observations 1 and 6. However, observation 9 is no more
+                           			similar to observation 2 than it is to observations 8, 5, and 7, even though observations
+                           			9 and 2 are close together in terms of horizontal distance. This is because
+                           			observations 2, 8, 5, and 7 all fuse with observation 9 at the same height, approximately
+                           			1.8. Right: the raw data used to generate the dendrogram can be used to
+                           			confirm that indeed, observation 9 is no more similar to observation 2 than it is
+                           			to observations 8, 5, and 7.
+                           			Now
+                           		}
+                           		
+                           		
+                           	\end{figure}
+                           \end{frame} 
+                           
+                           
+                       	       \begin{frame}
+                       	       	\frametitle{ Identifying clusters}
+                       	       	\begin{itemize}
+                       	       		\item Make a horizontal cut across the
+                       	       		dendrogram, as   Figure 10.9
+                       	       		
+                       	       		\item  The distinct sets of observations beneath the cut can be interpreted as clusters.
+                       	       		
+                       	       	    \item The lower cuts create more clusters. The higher cuts create less clusters.
+                       	       	    
+                       	       	    \item One single dendrogram can be used to obtain any number of
+                       	       	    clusters.
+                       	       	    
+                       	       		\item  Choice of cuts can even be done by visual judgment of the dendrogram.
+                       	       	 
+                       	       		\item When hierarchical structure does not exist in data, the hirarchical clustering could be worse than K-means clustering.
+                       	       		
+                       	       	\end{itemize}
+                       	       \end{frame}   
+               
+          
+              
+                
+   
+  
+               
+                   \begin{frame}
+                   	\frametitle{ Hierarchical clustering algorithm}
+                   	\begin{itemize}
+                   		\item  
+                   		1. Begin with $n$ observations and a measure (such as Euclidean distance)
+                   		of all the
+                   	  ${n \choose 2} = n(n-1)/2   $ pairwise dissimilarities. Treat each
+                   		observation as its own cluster.
+                   	\item 	2. For $i=n, n-1, ...2$:
+                   	\begin{enumerate} 
+                   		\item 
+                   		  Examine all pairwise inter-cluster dissimilarities among the i
+                   		clusters and identify the pair of clusters that are least dissimilar
+                   		(that is, most similar). Fuse these two clusters. The dissimilarity
+                   		between these two clusters indicates the height in the dendrogram
+                   		at which the fusion should be placed.
+                   		\item  Compute the new pairwise inter-cluster dissimilarities among
+                   		the $i -1$ remaining clusters.
+                   		 
+                   	\end{enumerate}	 
+                   		
+      
+                   		
+                   	\end{itemize}
+                   \end{frame}   
+                   
+                  
+             
+                   \begin{frame}
+                   	\frametitle{ {\it Linkage}: the dissimilarity measure between two clusters }
+                   	\centering 
+                   	{\scriptsize  
+                   	\begin{tabular}{ | l |  l   |}
+                   		\hline
+                   	Linkage &  Description \\
+                   	\hline 
+                   	Complete & 
+                   	Maximal intercluster dissimilarity. Compute all pairwise\\
+                   	&  dissimilarities between the observations in cluster A and the
+                    \\ & 	   observations   in cluster B, and record the largest of these  
+                   	dissimilarities. \\
+                   	
+                   	\hline
+                   	Single & 
+                   	Minimal intercluster dissimilarity. Compute all pairwise
+                   	 \\ &   dissimilarities between the observations in cluster A and the
+                   	observations
+                   	\\ &   in cluster B,  and record the smallest of these
+                   	dissimilarities. Single 
+                   	 \\ &  linkage can result in extended, trailing
+                   	clusters in which single \\ & observations are fused one-at-a-time. \\
+                   	  \hline
+                   	Average & 
+                   	Mean intercluster dissimilarity. Compute all pairwise dissimilarities
+                   	 \\ & between the observations in cluster A and the
+                   	observations in cluster B, 
+                   	 \\ & and record the average of these
+                   	dissimilarities. \\
+  \hline
+                   	Centroid & 
+                   	Dissimilarity between the centroid for cluster A (a mean
+                   	vector \\ &   of length $p$) and
+                   	  the centroid for cluster B. Centroid
+                   	linkage can \\ &   result in undesirable inversions.
+                   	 \\  
+                   		\hline
+                   	\end{tabular}
+                   }
+                   
+                 {\scriptsize   TABLE 10.2. A summary of the four most commonly-used types of linkage}
+                   \end{frame}
+                   
+                    
+              \begin{frame}
+              \frametitle{ }
+              \begin{figure}
+              	\centering
+              	\includegraphics[width=.5\linewidth]{ISLRFigures/10_11.pdf}
+              	%\caption{A subfigure}
+              	\caption{\scriptsize 10.11. An illustration of the first few steps of the hierarchical
+              		clustering algorithm, using the data from Figure 10.10, with complete linkage
+              		and Euclidean distance. Top Left: initially, there are nine distinct clusters,
+              		$\{1\}, \{2\}, . . . , \{9\}$. Top Right: the two clusters that are closest together, $\{5\}$ and
+              		$\{7\}$, are fused into a single cluster. Bottom Left: the two clusters that are closest
+              		together, $\{6\}$ and $\{1\}$, are fused into a single cluster. Bottom Right: the two clusters
+              		that are closest together using complete linkage, $\{8\}$ and the cluster $\{5, 7\}$,
+              		are fused into a single cluster.
+              		 
+              	}
+              \end{figure}
+            \end{frame}
+                  
+                   \begin{frame}
+                   	\frametitle{ }
+                   	\begin{figure}
+                   		\centering
+                   		\includegraphics[width=.6\linewidth]{ISLRFigures/10_12.pdf}
+                   		%\caption{A subfigure}
+                   		\caption{\scriptsize 10.12. Average, complete, and single linkage applied to an example
+                   			data set. Average and complete linkage tend to yield more balanced clusters.
+                   		}
+                   	\end{figure}
+                   \end{frame}
+                   
+                 
+                    \begin{frame}
+                    	\frametitle{ Dissimilarity measure }
+                    	\begin{itemize}
+                    		\item  Very important and can greatly affect the final result.
+                    		
+                    		\item  Euclidean distrance.
+                    		
+                    		\item  Correlation based distrance: if two observations have high correlation, the distance is closer. 
+                    		
+                    		(Caution: this is not correlation between two variables, but between two observations.)
+                    		
+                    		\item   Different problem may need different dissimilarity measure. 
+                    		
+                    	\end{itemize}
+                    \end{frame}   
+                   
+            
+            \begin{frame}
+            	\frametitle{ The online shopping example}
+            	\begin{itemize}
+            		\item Using Euclidean distance may not be appropriate.
+            		
+            		Those with same shopping habit but different shopping volume should be but may not be 
+            		clustered together.
+            	 
+            	\item  Using correlation based distrance is more appropriate. 
+            	
+            	\item   Variable scaling, as in PCA, whether the variables should be standardized is problem specific.
+            	
+            	 Example:  High-frequency purchases like socks therefore tend
+            	to have a much larger effect on the inter-shopper dissimilarities, and hence
+            	on the clustering ultimately obtained, than rare purchases like computers.
+            	This may not be desirable.
+            	
+            	\item Variables measured in different units should be standardized.
+             	
+            	\end{itemize}
+            \end{frame}   
+            
+            \begin{frame}
+            	\frametitle{ }
+            	\begin{figure}
+            		\centering
+            		\includegraphics[width=.7\linewidth]{ISLRFigures/10_14.pdf}
+            		%\caption{A subfigure}
+            	 
+            	\end{figure}
+            \end{frame}
+            
+               \begin{frame}
+               	\frametitle{}
+              {\scriptsize  
+               	  FIGURE 10.14. An  online retailer sells two items: socks and computers.
+               	  Left: the number of pairs of socks, and computers, purchased by eight online shoppers
+               	  is displayed. Each shopper is shown in a different color. If inter-observation
+               	  dissimilarities are computed using Euclidean distance on the raw variables, then
+               	  the number of socks purchased by an individual will drive the dissimilarities obtained,
+               	  and the number of computers purchased will have little effect. This might be
+               	  undesirable, since (1) computers are more expensive than socks and so the online
+               	  retailer may be more interested in encouraging shoppers to buy computers than
+               	  socks, and (2) a large difference in the number of socks purchased by two shoppers
+               	  may be less informative about the shoppers’ overall shopping preferences than a
+               	  small difference in the number of computers purchased. Center: the same data
+               	  is shown, after scaling each variable by its standard deviation. Now the number
+               	  of computers purchased will have a much greater effect on the inter-observation
+               	  dissimilarities obtained. Right: the same data are displayed, but now the y-axis
+               	  represents the number of dollars spent by each online shopper on socks and on
+               	  computers. Since computers are much more expensive than socks, now computer
+               	  purchase history will drive the inter-observation dissimilarities obtained.
+               	}
+               	   
+               		  \end{frame} 
+               		  
+               		 \begin{frame}
+               		 	\frametitle{}
+               		 	\begin{itemize}
+               		\item 
+               		  Should the observations or features first be standardized in some way?
+               		For instance, maybe the variables should be centered to have mean
+               		zero and scaled to have standard deviation one.
+               	
+               	\item In the case of hierarchical clustering,
+               	
+               		– What dissimilarity measure should be used?
+               		
+               		– What type of linkage should be used?
+               		
+               		– Where should we cut the dendrogram in order to obtain clusters?
+               	\item  In the case of K-means clustering, how many clusters should we look
+               		for in the data?
+               	
+               		
+               	\end{itemize}
+               \end{frame}  
+                
+                
+             \begin{frame}
+             	\frametitle{ }
+             	\begin{itemize}
+             		\item Forcing every observation, including outliers, into clusters, can distort
+             		the final outcome.
+        (A soft version  of $K$-means clustering by mixture model may help)
+             		
+             		\item Clustering methods generally are not very robust to perturbations
+             		to the data.
+             		
+             		\item Performing clustering with
+             		different choices of these parameters (linkage, standardization or not, etc), and looking at the full set of results
+             		\item Clustering subsets of the data in order to get a
+             		sense of the robustness
+             	
+             		
+             	\end{itemize}
+             \end{frame}  
+           
+                       
+               
+               
+ 
+                      
+      		\begin{frame}
+      			\frametitle{Exercises  }
+      			
+      			
+      			{\sl  Run the R-Lab codes in Section 10.4 of ISLR
+      				
+      				Exercises
+      	 1-3  and 10 of Section  10.7 of ISLR 
+      			}
+      			
+   
+      		\end{frame}
+      		
+      			\begin{frame}
+      				\frametitle{  }
+      				
+      				
+      				
+      				End of Chapter 10. 
+      				
+      				
+      			\end{frame}
+      
+    \end{document}
+    
+    
+ 
