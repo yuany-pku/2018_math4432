@@ -1,0 +1,186 @@
+---
+title: "House Prices: Advanced Regression Techniques"
+author: "Sarah James"
+date: "21 May 2018"
+output: html_document
+---
+```{r}
+#inital set up
+
+#set working directory
+setwd("~/HP Data/Documents/HKUST/Semester 2/MATH4432/Final Project")
+
+#install packages
+install.packages('caret')
+install.packages('dplyr')
+install.packages('ranger')
+library(caret, quietly = TRUE)
+library(dplyr, quietly = TRUE)
+library(ranger)
+
+#read data into r
+train = read.csv("train.csv", stringsAsFactors = FALSE)
+test = read.csv("test.csv", stringsAsFactors = FALSE)
+```
+
+```{r}
+#dealing with missing values
+
+#CATEGORICAL VARIABLES
+#where NA means it does not exist
+train$Alley[is.na(train$Alley)] = "No alley"
+test$Alley[is.na(test$Alley)] = "No alley"
+train$BsmtQual[is.na(train$BsmtQual)] = "No basement"
+test$BsmtQual[is.na(test$BsmtQual)] = "No basement"
+train$BsmtCond[is.na(train$BsmtCond)] = "No basement"
+test$BsmtCond[is.na(test$BsmtCond)] = "No basement"
+train$BsmtExposure[is.na(train$BsmtExposure)] = "No basement"
+test$BsmtExposure[is.na(test$BsmtExposure)] = "No basement"
+train$BsmtFinType1[is.na(train$BsmtFinType1)] = "No basement"
+test$BsmtFinType1[is.na(test$BsmtFinType1)] = "No basement"
+train$BsmtFinType2[is.na(train$BsmtFinType2)] = "No basement"
+test$BsmtFinType2[is.na(test$BsmtFinType2)] = "No basement"
+train$FireplaceQu[is.na(train$FireplaceQu)] = "No fireplace"
+test$FireplaceQu[is.na(test$FireplaceQu)] = "No fireplace"
+train$GarageType[is.na(train$GarageType)] = "No garage"
+test$GarageType[is.na(test$GarageType)] = "No garage"
+train$GarageFinish[is.na(train$GarageFinish)] = "No garage"
+test$GarageFinish[is.na(test$GarageFinish)] = "No garage"
+train$GarageQual[is.na(train$GarageQual)] = "No garage"
+test$GarageQual[is.na(test$GarageQual)] = "No garage"
+train$GarageCond[is.na(train$GarageCond)] = "No garage"
+test$GarageCond[is.na(test$GarageCond)] = "No garage"
+train$PoolQC[is.na(train$PoolQC)] = "No pool"
+test$PoolQC[is.na(test$PoolQC)] = "No pool"
+train$Fence[is.na(train$Fence)] = "No fence"
+test$Fence[is.na(test$Fence)] = "No fence"
+train$MiscFeature[is.na(train$MiscFeature)] = "None"
+test$MiscFeature[is.na(test$MiscFeature)] = "None"
+
+
+#where NA does mean missing data
+#replace with mode
+train$MasVnrType[is.na(train$MasVnrType)] = "None"
+test$MasVnrType[is.na(test$MasVnrType)] = "None"
+train$Electrical[is.na(train$Electrical)] = "SBrkr"
+test$MSZoning[is.na(test$MSZoning)] = "RL"
+test$Utilities[is.na(test$Utilities)] = "AllPub"
+test$Exterior1st[is.na(test$Exterior1st)] = "VinylSd"
+test$Exterior2nd[is.na(test$Exterior2nd)] = "VinylSd"
+test$KitchenQual[is.na(test$KitchenQual)] = "TA"
+test$Functional[is.na(test$Functional)] = "Min2"
+test$SaleType[is.na(test$SaleType)] = "WD"
+
+#NUMERICAL VALUES
+#where NA means it does not exist
+test$BsmtFinSF1[is.na(test$BsmtFinSF1)] = 0
+test$BsmtFinSF2[is.na(test$BsmtFinSF2)] = 0
+test$BsmtUnfSF[is.na(test$BsmtUnfSF)] = 0
+test$TotalBsmtSF[is.na(test$TotalBsmtSF)] = 0
+test$BsmtFullBath[is.na(test$BsmtFullBath)] = 0
+test$BsmtHalfBath[is.na(test$BsmtHalfBath)] = 0
+test$GarageCars[is.na(test$GarageCars)] = 0
+test$GarageArea[is.na(test$GarageArea)] = 0
+
+#where NA means missing data
+#replace with median
+train$LotFrontage[is.na(train$LotFrontage)] = median(train$LotFrontage, na.rm = TRUE)
+test$LotFrontage[is.na(test$LotFrontage)] = median(test$LotFrontage, na.rm = TRUE)
+
+#where the variable cannot be reasonably estimated
+train$GarageYrBlt[is.na(train$GarageYrBlt)] = -9999
+test$GarageYrBlt[is.na(test$GarageYrBlt)] = -9999
+train$MasVnrArea[is.na(train$MasVnrArea)] = -9999
+test$MasVnrArea[is.na(test$MasVnrArea)] = -9999
+
+```
+
+```{r}
+#TESTING DIFFERENT ALGORITHMS
+
+library(caret)
+library(party)
+library(ranger)
+library(dplyr)
+
+set.seed(54)
+
+#random forest
+myControl = trainControl(method = "cv", number = 5, verboseIter = FALSE)
+randomF = train(SalePrice ~ ., data = train,tuneLength = 1,method = "ranger",importance = 'impurity',trControl = myControl)
+randomF
+
+#linear regression
+linearR = train(SalePrice ~ .,data = train,method = "lm",trControl = myControl)
+linearR
+
+#compare
+models <- list(lm = linearR, rf = randomF)
+resamples = resamples(models)
+summary(resamples)
+bwplot(resamples, metric = "RMSE")
+rm(resamples, models)
+#random forest is better
+
+#improve random forest, two mtry values
+randomF2 = train(SalePrice ~ .,data = train,tuneLength = 2,method = "ranger",importance = 'impurity',trControl = myControl)
+randomF2
+
+#compare
+models <- list(rf = randomF, rf2 = randomF2)
+resamples = resamples(models)
+summary(resamples)
+bwplot(resamples, metric = "RMSE")
+rm(resamples, models)
+
+#random forest with 20 most explanatory variables
+varImp(randomF)
+Top20Variables = c("OverallQual", "GrLivArea", "TotalBsmtSF", "GarageArea", "GarageCars","X1stFlrSF", "YearBuilt", "ExterQual", "BsmtFinSF1", "FullBath","KitchenQual", "LotArea", "Fireplaces","FireplaceQu", "YearRemodAdd", "GarageYrBlt", "X2ndFlrSF","TotRmsAbvGrd", "MasVnrArea", "LotFrontage")
+train_Top20Var = select(train, one_of(Top20Variables, "SalePrice"))
+randomF_20 = train(SalePrice ~ .,data = train_Top20Var,tuneLength = 1,method = "ranger",importance = 'impurity',trControl = myControl)
+
+#compare
+models = list(rf2 = randomF2, rf_Top20 = randomF_20)
+resamples = resamples(models)
+summary(resamples)
+
+bwplot(resamples, metric = "RMSE")
+rm(resamples, models)
+
+#model with 20 most important explanatory variables and 2 mtry values
+randomF_20_2mtry = train(SalePrice ~ .,data = train_Top20Var,tuneLength = 2,method = "ranger",importance = 'impurity',trControl = myControl)
+#compare
+models = list(rf2 = randomF2, rf_Top20 = randomF_20, rf_Top20_2mtry = randomF_20_2mtry)
+resamples = resamples(models)
+summary(resamples)
+
+bwplot(resamples, metric = "RMSE")
+rm(resamples, models)
+
+#linear model with a trimmed training set
+ggplot(train ,aes(y = SalePrice, x = GrLivArea)) + geom_point()
+train_trim = filter(train, GrLivArea <= 4000)
+linearR2 = train(SalePrice ~ .,data = train_trim,method = "lm",trControl = myControl)
+
+#compare
+models = list(rf_Top20 = randomF_20,lm2 = linearR2)
+resamples = resamples(models)
+summary(resamples)
+bwplot(resamples, metric = "RMSE")
+rm(resamples, models)
+
+#regularised linear regression
+glmnetTuningGrid = expand.grid(alpha = seq(0, 1, 0.2),
+                               lambda = seq(0, 1, 0.2))
+model_glmnet1 = train(SalePrice ~ .,data = train_trim,method = "glmnet",trControl = myControl, tuneGrid = glmnetTuningGrid)
+
+#compare
+models = list(rf_Top20 = randomF_20,lm2 = linearR2, glmnet1 = model_glmnet1)
+resamples = resamples(models)
+summary(resamples)
+resamples = resamples(models)
+summary(resamples)
+bwplot(resamples, metric = "RMSE")
+rm(resamples, models)
+
+```

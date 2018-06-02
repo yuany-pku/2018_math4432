@@ -1,0 +1,54 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+library(corrplot)
+train = read.csv("train.csv", stringsAsFactors = F)
+test = read.csv("test.csv", stringsAsFactors = F)
+full = rbind(train[,-81], test)
+catCol = names(full)[which(sapply(full, is.character))]
+numCol = names(full)[which(sapply(full, is.numeric))]
+full_cat = full[catCol]
+full_num = full[numCol]
+```
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+missValues = colSums(sapply(full, is.na))
+missData = as.data.frame(missValues)
+length(which(missData$missValues>0))
+miss = as.vector(which(missData$missValues>0))
+missValues = missData[miss,]
+missData = as.data.frame(x=missValues,row.names=rownames(missData)[miss])
+
+png(file="miss.png", res=300, width=5000, height=3000)
+ggplot(data = missData, aes(x = rownames(missData), y = missData$missValues, label = missData$missValues, fill = rownames(missData))) + 
+  geom_bar(stat="identity") +
+  ggtitle("Summary of missing values in all data") +
+  xlab("missingTypes") +
+  ylab("missingValues") +
+  geom_text(position = position_dodge(width = 1), hjust = -0.05, size = 3) +
+  theme_few() +
+  coord_flip()
+dev.off()
+```
+
+```{r eval=T}
+#Filter the rows with stronger correlations
+correlations = cor(na.omit(full_num[,-1]))
+row_ind = apply(correlations, 1, function(x) sum(x > 0.3 | x < -0.3) > 1)
+correlations = correlations[row_ind, row_ind]
+png(file="cor.png", res=300, width=10000, height=10000)
+corrplot(correlations, method = "color", addCoef.col = "black", number.digits = 2, number.cex = 2, tl.cex = 3)
+dev.off()
+
+correlations2 = correlations[c("LotFrontage", "GarageYrBlt"), ]
+png(file="cor2.png", res=300, width=10000, height=3000)
+corrplot(correlations2, method = "color", addCoef.col = "black", number.digits = 2, number.cex = 2, tl.cex = 3)
+dev.off()
+```

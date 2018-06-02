@@ -1,0 +1,228 @@
+---
+title: "R Notebook"
+output: html_document
+---
+
+```{r}
+train = read.csv("train.csv")
+test = read.csv("test.csv")
+full = rbind(train[,-81], test)
+colnames(full)[colSums(is.na(full)) > 0]
+colSums(sapply(full, is.na))
+```
+
+#MSZoning 
+```{r}
+MSZoning1 = as.character(full$MSZoning)
+MSZoning1[which(is.na(full$MSZoning))] = "Unknown"
+full$MSZoning = as.factor(MSZoning1)
+```
+
+#LotFrontage 
+```{r}
+library(mice)
+set.seed(1) 
+mice.model = mice(full[,c("LotShape","LotArea","LotConfig", "MSSubClass")], method="rf")
+mice.output = complete(mice.model)
+full$LotFrontage = mice.output$LotFrontage
+```
+
+#Alley
+```{r}
+Alley1 = as.character(full$Alley)
+Alley1[which(is.na(full$Alley))] = "None"
+full$Alley = as.factor(Alley1)
+```
+
+#Utilities
+```{r}
+Utilities1 = as.character(full$Utilities)
+Utilities1[which(is.na(full$Utilities))] = "Unknown"
+full$Utilities = as.factor(Utilities1)
+```
+
+#Exterior1st, Exterior2nd 
+```{r}
+index1 = which(is.na(full$Exterior1st))
+index2 = which(is.na(full$Exterior2nd))
+Exterior1st1 = as.character(full$Exterior1st)
+Exterior2nd1 = as.character(full$Exterior2nd)
+Exterior1st1[index1] = "Other"
+Exterior2nd1[index2] = "Other"
+full$Exterior1st = as.factor(Exterior1st1)
+full$Exterior2nd = as.factor(Exterior2nd1)
+```
+
+#MasVnrType
+```{r}
+MasVnrType1 = as.character(full$MasVnrType)
+MasVnrType1[which(is.na(full$MasVnrType))] = "None"
+full$MasVnrType = as.factor(MasVnrType1)
+```
+
+#MasVnrArea
+```{r}
+full$MasVnrArea[which(is.na(full$MasVnrArea) & full$MasVnrType=="None")] = 0
+```
+
+#BsmtQual
+```{r}
+BsmtQual1 = as.character(full$BsmtQual)
+BsmtQual1[which(is.na(full$BsmtQual))] = "None"
+full$BsmtQual = as.factor(BsmtQual1)
+```
+
+#BsmtCond
+```{r}
+BsmtCond1 = as.character(full$BsmtCond)
+BsmtCond1[which(is.na(full$BsmtCond))] = "None"
+full$BsmtCond = as.factor(BsmtCond1)
+```
+
+#BsmtExposure
+```{r}
+BsmtExposure1 = as.character(full$BsmtExposure)
+BsmtExposure1[which(is.na(full$BsmtExposure))] = "None"
+full$BsmtExposure = as.factor(BsmtExposure1)
+```
+
+#BsmtFinType1
+```{r}
+BsmtFinType11 = as.character(full$BsmtFinType1)
+BsmtFinType11[which(is.na(full$BsmtFinType1))] = "None"
+full$BsmtFinType1 = as.factor(BsmtFinType11)
+```
+
+#BsmtFinType2
+```{r}
+BsmtFinType21 = as.character(full$BsmtFinType2)
+BsmtFinType21[which(is.na(full$BsmtFinType2))] = "None"
+full$BsmtFinType2 = as.factor(BsmtFinType21)
+```
+
+#BsmtFinSF1, BsmtFinSF2, BsmtUnfSF, TotalBsmtSF, BsmtFullBath, BsmtHalfBath
+```{r}
+index1 = which(is.na(full$BsmtFinSF1))
+index2 = which(is.na(full$BsmtFinSF2))
+index3 = which(is.na(full$BsmtUnfSF))
+index4 = which(is.na(full$TotalBsmtSF))
+index5 = which(is.na(full$BsmtFullBath))
+index6 = which(is.na(full$BsmtHalfBath))
+full$BsmtFinSF1[index1] = 0
+full$BsmtFinSF2[index2] = 0
+full$BsmtUnfSF[index3] = 0
+full$TotalBsmtSF[index4] = 0
+full$BsmtFullBath[index5] = 0
+full$BsmtHalfBath[index6] = 0
+```
+
+#Electrical 
+```{r}
+Electrical1 = as.character(full$Electrical)
+Electrical1[which(is.na(full$Electrical))] = "Unknown"
+full$Electrical = as.factor(Electrical1)
+```
+
+#KitchenQual
+```{r}
+index1 = which(is.na(full$KitchenQual))
+table(full$KitchenQual)
+full$KitchenQual[index1] = "TA"
+```
+
+#Functional 
+```{r}
+Functional1 = as.character(full$Functional)
+Functional1[which(is.na(full$Functional))] = "Unknown"
+full$Functional = as.factor(Functional1)
+```
+
+#FireplaceQu
+```{r}
+FireplaceQu1 = as.character(full$FireplaceQu)
+FireplaceQu1[which(is.na(full$FireplaceQu))] = "None"
+full$FireplaceQu = as.factor(FireplaceQu1)
+```
+
+#GarageType
+```{r}
+GarageType1 = as.character(full$GarageType)
+GarageType1[which(is.na(full$GarageType))] = "None"
+full$GarageType = as.factor(GarageType1)
+```
+
+#GarageYrBlt
+```{r}
+full$GarageYrBlt[which(is.na(full$GarageYrBlt)&full$GarageType=="None")] = 0 
+index = which(is.na(full$GarageYrBlt)&full$GarageType!="None")
+mice.model = mice(full[,c("GarageType", "GarageYrBlt", "GarageFinish", "GarageCars", "GarageArea", "GarageQual", "GarageCond", "YearBuilt", "YearRemodAdd", "OverallQual")], method="rf")
+mice.output = complete(mice.model)
+full[index, ]$GarageYrBlt = mice.output[index, ]$GarageYrBlt
+```
+
+#GarageFinish
+```{r}
+GarageFinish1 = as.character(full$GarageFinish)
+GarageFinish1[which(is.na(full$GarageFinish)&full$GarageType=="None")] = "None"
+full$GarageFinish = as.factor(GarageFinish1)
+index = which(is.na(full$GarageFinish)&full$GarageType!="None")
+full[index, ]$GarageFinish = mice.output[index, ]$GarageFinish
+```
+
+#GarageCars, GarageArea
+```{r}
+index1 = which(is.na(full$GarageCars&full$GarageType!="None"))
+index2 = which(is.na(full$GarageArea&full$GarageType!="None"))
+full[index1, ]$GarageCars = mice.output[index1, ]$GarageCars
+full[index2, ]$GarageArea = mice.output[index2, ]$GarageArea
+```
+
+#GarageQual
+```{r}
+GarageQual1 = as.character(full$GarageQual)
+GarageQual1[which(is.na(full$GarageQual)&full$GarageType=="None")] = "None"
+full$GarageQual = as.factor(GarageQual1)
+index = which(is.na(full$GarageQual)&full$GarageType!="None")
+full[index, ]$GarageQual = mice.output[index, ]$GarageQual
+```
+
+#GarageCond
+```{r}
+GarageCond1 = as.character(full$GarageCond)
+GarageCond1[which(is.na(full$GarageCond)&full$GarageType=="None")] = "None"
+full$GarageCond = as.factor(GarageCond1)
+index = which(is.na(full$GarageCond)&full$GarageType!="None")
+full[index, ]$GarageCond = mice.output[index, ]$GarageCond
+```
+
+#PoolQC
+```{r}
+PoolQC1 = as.character(full$PoolQC)
+PoolQC1[which(is.na(full$PoolQC))] = "None"
+full$PoolQC = as.factor(PoolQC1)
+```
+
+#Fence
+```{r}
+Fence1 = as.character(full$Fence)
+Fence1[which(is.na(full$Fence))] = "None"
+full$Fence = as.factor(Fence1)
+```
+
+#MiscFeature
+```{r}
+MiscFeature1 = as.character(full$MiscFeature)
+MiscFeature1[which(is.na(full$MiscFeature))] = "None"
+full$MiscFeature = as.factor(MiscFeature1)
+```
+
+#SaleType
+```{r}
+index = which(is.na(full$SaleType))
+full$SaleType[index] = "Oth"
+```
+
+```{r}
+colSums(sapply(full, is.na))
+write.csv(full,file="full.csv",row.names=F)
+```

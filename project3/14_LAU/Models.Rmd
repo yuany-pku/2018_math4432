@@ -1,0 +1,96 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+train = read.csv("train.csv")
+test = read.csv("test.csv")
+full = read.csv("full.csv")
+full = full[!names(full) %in% c("FireplaceQu", "PoolQC", "Fence", "MiscFeature", "Alley")]
+new.train = full[1:nrow(train),-c(1)]
+new.train$SalePrice = train[ ,81]
+new.test = full[(nrow(train)+1):nrow(full),-c(1)]
+```
+
+```{r eval=F}
+library(randomForest)
+model = randomForest(SalePrice~., data = new.train)
+
+png(file="imp.png", res=500, width=8000, height=10000)
+library(ggplot2)
+library(ggthemes)
+ln.imp = as.data.frame(log(importance(model)))
+ln.imp = ln.imp[order(-ln.imp$IncNodePurity),,drop=FALSE]
+ggplot(ln.imp,aes(x=rownames(ln.imp),y=ln.imp$IncNodePurity, label=round(ln.imp$IncNodePurity,2), fill=ln.imp$IncNodePurity)) + 
+  geom_bar(stat="identity") +
+  geom_text(position = position_dodge(width = 1), hjust = -0.05, size = 3) +
+  coord_flip() +
+  ggtitle("The Importance of Variables") + 
+  xlab("Variables") +
+  ylab("IncNodePurity") +
+  scale_x_discrete(limits = rev(rownames(ln.imp)))
+dev.off()
+
+topthree = data.frame(ln.imp[1:3,])
+colnames(topthree) = c("IncNodePurity")
+rownames(topthree) = rownames(ln.imp)[1:3]
+png(file="top3.png", res=300, width=3000, height=2000)
+ggplot(topthree,aes(x=rownames(topthree),y=topthree$IncNodePurity, label=round(topthree$IncNodePurity,2), fill=topthree$IncNodePurity)) + 
+  geom_bar(stat="identity", width = 0.3) +
+  geom_text(position = position_dodge(width = 1), hjust = -0.05, size = 3) +
+  coord_flip() +
+  ggtitle("Top three importance of variables") + 
+  xlab("Variables") +
+  ylab("InceNodePurity") +
+  scale_x_discrete(limits = rev(rownames(topthree))) +
+  theme_few()
+dev.off()
+
+prediction = predict(model, new.test)
+prediction = cbind(test[,"Id"], prediction)
+colnames(prediction) = c("Id","SalePrice")
+#write.csv(prediction,file="final_rf.csv",row.names=F)
+```
+
+```{r eval=T}
+library(glmnet)
+n = ncol(new.train)
+x = as.matrix(sapply(new.train[, -n], as.numeric))
+lasso = glmnet(x = x, y = new.train$SalePrice, alpha = 1, family = "gaussian")
+cv.lasso = cv.glmnet(x = x, y = new.train$SalePrice, alpha = 1,  family = "gaussian")
+
+png(file="lasso1.png", res=300, width=3000, height=2000)
+plot(lasso, xvar='lambda', main="Lasso")
+dev.off()
+png(file="lasso2.png", res=300, width=3000, height=2000)
+plot(cv.lasso)
+dev.off()
+
+cv.lasso$lambda.min
+log(cv.lasso$lambda.min)
+best.lasso.lambda = cv.lasso$lambda.min
+prediction = predict(lasso, s = best.lasso.lambda, newx = as.matrix(sapply(new.test, as.numeric)))
+prediction = cbind(test[,"Id"], prediction)
+colnames(prediction) = c("Id","SalePrice")
+#write.csv(prediction,file="final_lasso.csv",row.names=F)
+```
+
+```{r eval=F}
+library(gbm)
+gbmModel = gbm(SalePrice~., distribution = "gaussian", data = new.train, n.trees = 20000, shrinkage = 0.01, n.minobsinnode = 20)
+
+png(file="gbmError.png", res=300, width=2000, height=2000)
+n.trees = seq(from=100 ,to=20000, by=100)
+predmatrix = predict(object = gbmModel, newdata = new.train[,-75], n.trees = n.trees, type = "response")
+test.error = log(with(new.test,apply( (predmatrix-new.train[,75])^2,2,mean)))
+plot(n.trees , test.error , pch=19, col="blue", xlab="Number of trees", ylab="log(error)", main="Log-error w.r.t number of trees being drawn")
+dev.off()
+
+gbmTrainPredictions = predict(object = gbmModel, newdata = new.test, n.trees = 20000, type = "response")
+prediction = cbind(test[,"Id"], gbmTrainPredictions)
+colnames(prediction) = c("Id","SalePrice")
+#write.csv(prediction,file="final_gbm.csv",row.names=F)
+```
