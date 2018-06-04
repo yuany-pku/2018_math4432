@@ -1,0 +1,94 @@
+{% block body %}
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+  <meta charset="utf-8">
+  <title>Twitter Prediction Tool</title>
+  <link href="{{ url_for('static', filename='style.css')}}" media="screen" rel="stylesheet" type="text/css"  />
+  <link href="{{url_for('static', filename='iconic.css')}}" media="screen" rel="stylesheet" type="text/css" />
+  <script src="{{url_for('static', filename='prefix-free.js')}}"></script>
+</head>
+
+
+<div class="wrap">
+<nav>
+  <ul class="menu">
+    <li><a href="/"><span class="iconic home"></span> Home (Summary)</a></li>
+
+    <li><a href="#"><span class="iconic magnifying-glass"></span> Prediction</a>
+      <ul>
+        <li><a href="/select">Hashtag Entries</a></li>
+        <li><a href="/htSummary">Summary of Hashtag Data</a></li>
+        <li><a href="/valuePredict">Value Prediction</a></li>
+        <li><a href="/isTrendPredict">isTrend Prediction</a></li>
+      </ul>
+    </li>
+    <li><a href="#"><span class="iconic magnifying-glass"></span>Clustered Prediction</a>
+      <ul>
+        <li><a href="/clusterValueInput">Value Prediction</a></li>
+        <li><a href="/clusterIsTrendInput">isTrend Prediction</a></li>
+      </ul>
+    </li>
+    <li><a href="#"><span class="iconic map-pin"></span> Cluster Visualization</a>
+      <ul>
+        <li><a href="/bubble">Hashtag Bubble Chart</a></li>
+        <li><a href="/tsne">T-Distributed Stochastic Neighbor Embedding(t-SNE) </a></li>
+        <li><a href="/cluster">K-means cluster</a></li>
+        <li><a href="/words">SVD/LSA optimized K-means cluster</a></li>
+      </ul>
+    </li>
+    <li align = "right"><a href="#"><span class="iconic plus-alt"></span> About Us</a>
+      <ul>
+        <li><a href="#">Meet the team</a></li>
+      </ul>
+    </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+</div>
+
+
+
+  <div align="center">
+    <p>Clustering Methodology: 
+    <select id="cluster">
+      <option value="c1">K-means cluster</option>
+      <option value="c2">SVD/LSA optimized K-means cluster</option>
+    </select>
+    </p>
+    <p>Hash Tag &nbsp
+      <input id="ht_name" type="text" required>
+      <font color="red"> (required) </font>
+      <font id="htMessage" color="red"></font>
+    <!--&nbsp&nbsp&nbsp&nbsp
+    Start Time &nbsp
+      <input id="ts_start" type="text" required>
+      <input type="checkbox" name="vehicle" value="Bike"> Clustering<br>-->
+    Prediction Algorithm: 
+    <select id="algorithm">
+      <option value="kr">Kernel Ridge Regression</option>
+      <option value="dt">Decision Tree Regression</option>
+      <option value="kn">KNN Regression</option>
+      <option value="lp">MLP Regression</option>
+      <option value="rf">Random Forest Ridge Regression</option>
+      <option value="gp">Gaussian Process Regression</option>
+      <option value="ls">Linear Support Vector Regression</option>
+  </select>
+  <button onclick="searchHandler()">Get a list of cluster</button>
+  </div>
+  <br>
+  <script> 
+    function searchHandler(){
+      window.location.href=  'http://127.0.0.1:5000/clusterValueInput/' + document.getElementById('cluster').value + document.getElementById('algorithm').value + '_' +document.getElementById("ht_name").value
+    }
+  </script>
+   
+  <div align="left">
+  <div id="menu" align="center">
+    
+  </div>
+  </div>
+</body>
+
+
+{% endblock %}

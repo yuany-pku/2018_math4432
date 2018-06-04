@@ -1,0 +1,23 @@
+id,value
+Value Prediction,
+Value Prediction.Hash Tag,
+Value Prediction.Hash Tag.Kenel Ridge Regression, 3242
+Value Prediction.Hash Tag.Decision Tree Regression, 22
+Value Prediction.Hash Tag.KNN Regression, 2
+Value Prediction.Hash Tag.Random Forest Regression, 2
+Value Prediction.Hash Tag.Gaussian Process Regression, 2
+Value Prediction.Hash Tag.Linear Support Vector Regression, 2
+Value Prediction.K-Means Cluster,
+Value Prediction.K-Means Cluster.Kenel Ridge Regression, 3242
+Value Prediction.K-Means Cluster.Decision Tree Regression, 22
+Value Prediction.K-Means Cluster.KNN Regression, 2
+Value Prediction.K-Means Cluster.Random Forest Regression, 2
+Value Prediction.K-Means Cluster.Gaussian Process Regression, 2
+Value Prediction.K-Means Cluster.Linear Support Vector Regression, 2
+Value Prediction.PCA Optimized K-Means Cluster,
+Value Prediction.PCA Optimized K-Means Cluster.Kenel Ridge Regression, 3242
+Value Prediction.PCA Optimized K-Means Cluster.Decision Tree Regression, 22
+Value Prediction.PCA Optimized K-Means Cluster.KNN Regression, 2
+Value Prediction.PCA Optimized K-Means Cluster.Random Forest Regression, 2
+Value Prediction.PCA Optimized K-Means Cluster.Gaussian Process Regression, 2
+Value Prediction.PCA Optimized K-Means Cluster.Linear Support Vector Regression, 2

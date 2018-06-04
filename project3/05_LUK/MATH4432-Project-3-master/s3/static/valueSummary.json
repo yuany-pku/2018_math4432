@@ -1,0 +1,77 @@
+{
+	"name": "Value Prediction",
+	"children": [
+		{"name": "Hash Tag",
+		"children": [{
+			"name": "Kernel Ridge Regression: 4.449910311"
+			},
+			{
+			"name": "Decision Tree Regression: 6.318584563"
+			},
+			{
+			"name": "KNN Regression: 6.084973799"
+			},
+			{
+			"name": "MLP Regression: 6.192667041"
+			},
+			{
+			"name": "Random Forest Ridge Regression: 6.128285151"
+			},
+			{
+			"name": "Gaussian  rocess Regression: 344.3642791"
+			},
+			{
+			"name": "Linear Support Vector Regression: 4.459506737"
+			}
+			]
+		},
+		{"name": "K-Means Cluster",
+		"children": [{
+			"name": "Kernel Ridge Regression: 0.757763088"
+			},
+			{
+			"name": "Decision Tree Regression: 1.411528436"
+			},
+			{
+			"name": "KNN Regression: 1.29671941"
+			},
+			{
+			"name": "MLP Regression: 1.188744197"
+			},
+			{
+			"name": "Random Forest Ridge Regression: 1.261234171"
+			},
+			{
+			"name": "Gaussian  rocess Regression : 321.2769986"
+			},
+			{
+			"name": "Linear Support Vector Regression: 0.744341231"
+			}
+			]
+		},
+		{"name": "SVD/LSA optimized K-Means Cluster",
+		"children": [{
+			"name": "Kernel Ridge Regression: 0.666259963"
+			},
+			{
+			"name": "Decision Tree Regression: 1.270388298"
+			},
+			{
+			"name": "KNN Regression: 1.157404663"
+			},
+			{
+			"name": "MLP Regression: 1.119811401"
+			},
+			{
+			"name": "Random Forest Ridge Regression: 1.139110554"
+			},
+			{
+			"name": "Gaussian  rocess Regression: 282.8007031"
+			},
+			{
+			"name": "Linear Support Vector Regression: 0.656892518"
+			}
+			]
+		}
+	]
+}

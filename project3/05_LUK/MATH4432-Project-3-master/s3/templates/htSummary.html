@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+  <meta charset="utf-8">
+  <title>Twitter Prediction Tool</title>
+  <link href="{{ url_for('static', filename='style.css')}}" media="screen" rel="stylesheet" type="text/css"  />
+  <link href="{{url_for('static', filename='iconic.css')}}" media="screen" rel="stylesheet" type="text/css" />
+  <script src="{{url_for('static', filename='prefix-free.js')}}"></script>
+</head>
+
+
+<div class="wrap">
+<nav>
+  <ul class="menu">
+    <li><a href="/"><span class="iconic home"></span> Home (Summary)</a></li>
+
+    <li><a href="#"><span class="iconic magnifying-glass"></span> Prediction</a>
+      <ul>
+        <li><a href="/select">Hashtag Entries</a></li>
+        <li><a href="/htSummary">Summary of Hashtag Data</a></li>
+        <li><a href="/valuePredict">Value Prediction</a></li>
+        <li><a href="/isTrendPredict">isTrend Prediction</a></li>
+      </ul>
+    </li>
+    <li><a href="#"><span class="iconic magnifying-glass"></span>Clustered Prediction</a>
+      <ul>
+        <li><a href="/clusterValueInput">Value Prediction</a></li>
+        <li><a href="/clusterIsTrendInput">isTrend Prediction</a></li>
+      </ul>
+    </li>
+    <li><a href="#"><span class="iconic map-pin"></span> Cluster Visualization</a>
+      <ul>
+        <li><a href="/bubble">Hashtag Bubble Chart</a></li>
+        <li><a href="/tsne">T-Distributed Stochastic Neighbor Embedding(t-SNE) </a></li>
+        <li><a href="/cluster">K-means cluster</a></li>
+        <li><a href="/words">SVD/LSA optimized K-means cluster</a></li>
+      </ul>
+    </li>
+    <li align = "right"><a href="#"><span class="iconic plus-alt"></span> About Us</a>
+      <ul>
+        <li><a href="#">Meet the team</a></li>
+      </ul>
+    </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+</div>
+
+
+
+<iframe width="1400" height="660" align="middle" src="https://app.powerbi.com/view?r=eyJrIjoiZTQzOTRhZGQtYTQwMC00NzQzLTkyMTQtMWUwZTZmOWM1MzYwIiwidCI6IjZjMWQ0MTUyLTM5ZDAtNDRjYS04OGQ5LWI4ZDZkZGNhMDcwOCIsImMiOjEwfQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>

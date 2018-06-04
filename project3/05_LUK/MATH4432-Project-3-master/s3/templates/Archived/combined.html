@@ -1,0 +1,172 @@
+{% block body %}
+ <head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+  <meta charset="utf-8">
+  <title>Twitter Prediction Tool</title>
+  <link href="{{ url_for('static', filename='style.css')}}" media="screen" rel="stylesheet" type="text/css"  />
+  <link href="{{url_for('static', filename='iconic.css')}}" media="screen" rel="stylesheet" type="text/css" />
+  <script src="{{url_for('static', filename='prefix-free.js')}}"></script>
+</head>
+
+
+<div class="wrap">
+<nav>
+  <ul class="menu">
+    <li><a href="/"><span class="iconic home"></span> Home (Summary)</a></li>
+
+    <li><a href="#"><span class="iconic magnifying-glass"></span> Prediction</a>
+      <ul>
+        <li><a href="/select">Select From Entries</a></li>
+        <li><a href="/direct">Direct Prediction (Advanced)</a></li>
+        <!--<li><a href="#">Email Campaigns</a></li>
+        <li><a href="#">Copyrighting</a></li>-->
+      </ul>
+    </li>
+    <li><a href="#"><span class="iconic map-pin"></span> Cluster Visualization</a>
+      <ul>
+        <li><a href="/bubble">Hashtag Bubble Chart</a></li>
+        <li><a href="/cluster">K-means cluster</a></li>
+        <li><a href="/words">PCA optimized K-means cluster</a></li>
+        <!--<li><a href="#">Widget Two</a></li>
+        <li><a href="#">Web App Three</a></li>
+        <li><a href="#">Web App Four</a></li>
+        <li><a href="#">Crazy Products</a></li>
+        <li><a href="#">iPhone Apps</a></li>-->
+      </ul>
+    </li>
+    <li align = "right"><a href="#"><span class="iconic plus-alt"></span> About Us</a>
+      <ul>
+        <li><a href="#">Meet the team</a></li>
+      </ul>
+    </li>
+   <!--<li><a href="#"><span class="iconic mail"></span> Contact</a>
+      <ul>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Directions</a></li>
+      </ul>
+    </li>-->
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+</div>
+
+
+
+
+
+
+<body>
+  <div align="center">
+    <p>Hash Tag &nbsp
+      <input id="ht_name" type="text" required>
+      <font color="red"> (required) </font>
+      <font id="htMessage" color="red"></font>
+    
+    Start Time
+      <input id="ts_start" type="text" required>
+    <button onclick="searchHandler()">Submit</button>
+    </p>
+  </div>
+
+  <script> 
+    function searchHandler(){
+      window.location.href= 'tag/'+'_'+document.getElementById("ht_name").value + '-'+document.getElementById("ts_start").value
+    }
+  </script>
+
+ 
+  <div align="center">
+  <h1>tag_name: {{tag_name}}</h1>
+  <h2>ht_name: {{ht_name}}</h2>
+  <h2>ts_start: {{ts_start}}</h2>
+  <h2>isTrend: {{isTrend}}</h2>
+  
+	<table class="rows">
+      
+    <tr><div id="chart_df_raw"  style="width: 900px; height: 300px;"></div>
+      <div id="chart_df_nor"  style="width: 900px; height: 300px;"></div></tr>
+	  <tr><div id="chart_df_em"  style="width: 900px; height: 300px;"></div>
+      <div id="chart_df_smoothed"  style="width: 900px; height: 300px;"></div></tr>
+    </table>
+ </div>
+ 
+<script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+		var data_df_raw = google.visualization.arrayToDataTable(
+			  {{df_raw|tojson}}
+			);
+        var options_df_raw = {
+          title: 'df_raw',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        var chart_df_raw = new google.visualization.LineChart(document.getElementById('chart_df_raw'));
+        chart_df_raw.draw(data_df_raw, options_df_raw);
+		
+		var data_df_nor = google.visualization.arrayToDataTable(
+			  {{df_nor|tojson}}
+			);
+        var options_df_nor = {
+          title: 'df_nor',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        var chart_df_nor = new google.visualization.LineChart(document.getElementById('chart_df_nor'));
+        chart_df_nor.draw(data_df_nor, options_df_nor)	;
+		
+		var data_df_em = google.visualization.arrayToDataTable(
+			  {{df_em|tojson}}
+			);
+        var options_df_em = {
+          title: 'df_em',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        var chart_df_em = new google.visualization.LineChart(document.getElementById('chart_df_em'));
+        chart_df_em.draw(data_df_em, options_df_em)	;
+		
+		var data_df_smoothed = google.visualization.arrayToDataTable(
+			  {{df_smoothed|tojson}}
+			);
+        var options_df_smoothed = {
+          title: 'df_smoothed',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        var chart_df_smoothed = new google.visualization.LineChart(document.getElementById('chart_df_smoothed'));
+        chart_df_smoothed.draw(data_df_smoothed, options_df_smoothed)	;
+		
+      }
+    </script> 
+ 
+  <div align="left">
+  <h1>list of samples</h1>
+  <div id="menu" align="center">
+    
+  </div>
+  </div>
+
+   <script type="text/javascript">
+    function render_menu(){
+    var list_of_samples = {{list_of_samples|tojson}};
+    var text = "";
+    
+    //s += '<tr><a href="tag/{}">'.format(k) + '</a></tr>'
+
+    for (var key in list_of_samples) {
+      // check if the property/key is defined in the object itself, not in parent
+      if (list_of_samples.hasOwnProperty(key)) {           
+          text += 'isTrend: ' + list_of_samples[key]['isTrend'] + ' <a href="/tag/' + key + '">' + list_of_samples[key]['tag_name'] + '</a><br>'
+      }
+    }
+    document.getElementById("menu").innerHTML = text;
+    }
+    render_menu();
+  </script>
+</body>
+
+
+{% endblock %}

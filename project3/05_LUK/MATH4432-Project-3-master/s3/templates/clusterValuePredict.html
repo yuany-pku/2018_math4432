@@ -1,0 +1,189 @@
+{% block body %}
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+  <meta charset="utf-8">
+  <title>Twitter Prediction Tool</title>
+  <link href="{{ url_for('static', filename='style.css')}}" media="screen" rel="stylesheet" type="text/css"  />
+  <link href="{{url_for('static', filename='iconic.css')}}" media="screen" rel="stylesheet" type="text/css" />
+  <script src="{{url_for('static', filename='prefix-free.js')}}"></script>
+</head>
+
+
+<div class="wrap">
+<nav>
+  <ul class="menu">
+    <li><a href="/"><span class="iconic home"></span> Home (Summary)</a></li>
+
+    <li><a href="#"><span class="iconic magnifying-glass"></span> Prediction</a>
+      <ul>
+        <li><a href="/select">Hashtag Entries</a></li>
+        <li><a href="/htSummary">Summary of Hashtag Data</a></li>
+        <li><a href="/valuePredict">Value Prediction</a></li>
+        <li><a href="/isTrendPredict">isTrend Prediction</a></li>
+      </ul>
+    </li>
+    <li><a href="#"><span class="iconic magnifying-glass"></span>Clustered Prediction</a>
+      <ul>
+        <li><a href="/clusterValueInput">Value Prediction</a></li>
+        <li><a href="/clusterIsTrendInput">isTrend Prediction</a></li>
+      </ul>
+    </li>
+    <li><a href="#"><span class="iconic map-pin"></span> Cluster Visualization</a>
+      <ul>
+        <li><a href="/bubble">Hashtag Bubble Chart</a></li>
+        <li><a href="/tsne">T-Distributed Stochastic Neighbor Embedding(t-SNE) </a></li>
+        <li><a href="/cluster">K-means cluster</a></li>
+        <li><a href="/words">SVD/LSA optimized K-means cluster</a></li>
+      </ul>
+    </li>
+    <li align = "right"><a href="#"><span class="iconic plus-alt"></span> About Us</a>
+      <ul>
+        <li><a href="#">Meet the team</a></li>
+      </ul>
+    </li>
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+</div>
+
+
+
+
+
+
+
+  <div align="center">
+    <!--<p>Hash Tag &nbsp
+      <input id="ht_name" type="text" required>
+      <font color="red"> (required) </font>
+      <font id="htMessage" color="red"></font>
+    &nbsp&nbsp&nbsp&nbsp
+    Start Time &nbsp
+      <input id="ts_start" type="text" required>
+      <input type="checkbox" name="vehicle" value="Bike"> Clustering<br>-->
+    <!--Prediction Algorithm: 
+    <select id="algorithm">
+      <option value="kr">Kernel Ridge Regression</option>
+      <option value="dt">Decision Tree Regression</option>
+      <option value="kn">KNN Regression</option>
+      <option value="lp">MLP Regression</option>
+      <option value="rf">Random Forest Ridge Regression</option>
+      <option value="gp">Gaussian Process Regression</option>
+      <option value="ls">Linear Support Vector Regression</option>
+  </select>
+  <button onclick="searchHandler()">Predict</button>
+  </div>
+  <br>
+  <script> 
+    function searchHandler(){
+      window.location.href=  'http://127.0.0.1:5000/clusterValuePredict/' + document.getElementById('algorithm').value + '_' +document.getElementById("ht_name").value + '-'+document.getElementById("ts_start").value
+    }
+  </script>
+-->
+ 
+  <div align="center">
+  <h2>Prediction Algorithm:</h2>  
+  <h2 style="color:blue">{{algo_name}}</h2>
+  <h2>Algorithm's Average Root-Mean-Square Error: {{algo_rmse}}</h2>
+  
+
+  <br><br>
+  <!--<h1>tag_name: {{tag_name}}</h1>-->
+  <h2>Prediction Result</h2>
+  <h2>cluster_id: {{ht_name}}</h2>
+  <h2>cluster_words: {{clusterWords}}</h2>
+  <h2>ts_start: {{ts_start}}</h2>
+  <h2>cluster's average rmse: {{ht_rmse}} </h2>
+  
+  
+	<table class="rows">
+      
+    <tr><div id="chart_df_raw"  style="width: 900px; height: 300px;"></div>
+      <div id="chart_df_nor"  style="width: 900px; height: 300px;"></div></tr>
+	  <tr><div id="chart_df_em"  style="width: 900px; height: 300px;"></div>
+      <div id="chart_df_smoothed"  style="width: 900px; height: 300px;"></div></tr>
+    </table>
+ </div>
+ 
+<script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+		var data_df_raw = google.visualization.arrayToDataTable(
+			  {{df_raw|tojson}}
+			);
+        var options_df_raw = {
+          title: 'df_raw',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        var chart_df_raw = new google.visualization.LineChart(document.getElementById('chart_df_raw'));
+        chart_df_raw.draw(data_df_raw, options_df_raw);
+		
+		var data_df_nor = google.visualization.arrayToDataTable(
+			  {{df_nor|tojson}}
+			);
+        var options_df_nor = {
+          title: 'df_nor',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        var chart_df_nor = new google.visualization.LineChart(document.getElementById('chart_df_nor'));
+        chart_df_nor.draw(data_df_nor, options_df_nor)	;
+		
+		var data_df_em = google.visualization.arrayToDataTable(
+			  {{df_em|tojson}}
+			);
+        var options_df_em = {
+          title: 'df_em',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        var chart_df_em = new google.visualization.LineChart(document.getElementById('chart_df_em'));
+        chart_df_em.draw(data_df_em, options_df_em)	;
+		
+		var data_df_smoothed = google.visualization.arrayToDataTable(
+			  {{df_smoothed|tojson}}
+			);
+        var options_df_smoothed = {
+          title: 'df_smoothed',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+        var chart_df_smoothed = new google.visualization.LineChart(document.getElementById('chart_df_smoothed'));
+        chart_df_smoothed.draw(data_df_smoothed, options_df_smoothed)	;
+		
+      }
+    </script> 
+ 
+  <div align="left">
+  <div id="menu" align="center">
+    
+  </div>
+  </div>
+<!--
+   <script type="text/javascript">
+    function render_menu(){
+    var list_of_samples = {{list_of_samples|tojson}};
+    var text = "";
+    
+    //s += '<tr><a href="tag/{}">'.format(k) + '</a></tr>'
+
+    for (var key in list_of_samples) {
+      // check if the property/key is defined in the object itself, not in parent
+      if (list_of_samples.hasOwnProperty(key)) {           
+          text += 'isTrend: ' + list_of_samples[key]['isTrend'] + ' <a href="/tag/' + key + '">' + list_of_samples [key]['tag_name'] + '</a><br>'
+      }
+    }
+    document.getElementById("menu").innerHTML = text;
+    }
+    render_menu();
+  </script>
+-->
+<script> var list_of_samples = {{list_of_samples|tojson}};</script>
+</body>
+
+
+
+{% endblock %}

@@ -1,0 +1,119 @@
+{
+	"name": "Value Prediction",
+	"children": [
+		{"name": "Hash Tag",
+		"children": [{
+			"name": "Kernel Ridge Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Decision Tree Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "KNN Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "MLP Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Random Forest Ridge Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Gaussian  rocess Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Linear Support Vector Regression",
+			"children": [{
+				"name": "1.444"
+			}]}
+		]
+		},
+		{"name": "K-Means Cluster",
+		"children": [{
+			"name": "Kernel Ridge Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Decision Tree Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "KNN Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "MLP Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Random Forest Ridge Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Gaussian  rocess Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Linear Support Vector Regression",
+			"children": [{
+				"name": "1.444"
+			}]}
+		]
+		},
+		{"name": "PCA K-Means Cluster",
+		"children": [{
+			"name": "Kernel Ridge Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Decision Tree Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "KNN Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "MLP Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Random Forest Ridge Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Gaussian  rocess Regression",
+			"children": [{
+				"name": "1.444"
+			}]},
+			{
+			"name": "Linear Support Vector Regression",
+			"children": [{
+				"name": "1.444"
+			}]}
+		]
+		}
+	]
+}
